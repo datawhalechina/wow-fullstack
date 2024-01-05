@@ -5,7 +5,11 @@
 
 ## Roadmap
 
-*注：说明当前项目的规划，并将每个任务通过 Issue 形式进行对外进行发布。*
+2024年1月第1章
+2024年2月第2章
+2024年3月第3章
+2024年4月第4章
+2024年5月第5章
 
 ## 参与贡献
 
@@ -19,11 +23,13 @@
 
 | 姓名 | 职责 | 简介 |
 | :----| :---- | :---- |
-| 小明 | 项目负责人 | 小明 |
-| 小红 | 第1章贡献者 | 小明的朋友 |
-| 小强 | 第2章贡献者 | 小明的朋友 |
+| 黎伟 | 项目负责人 | 在律所做知识产权 |
+| 黎伟 | 第1章 | 基本语法 |
+| 宋志学 | 第2章 | 控制语句 |
+| 高增玉 | 第3章 | 数据结构 |
+| 黎伟 | 第4章 | 面向对象 |
+| 高增玉 | 第5章 | 异步处理 |
 
-*注：表头可自定义，但必须在名单中标明项目负责人*
 
 ## 关注我们
 
@@ -34,6 +40,6 @@
 
 ## LICENSE
 
-<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="知识共享许可协议" style="border-width:0" src="https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-lightgrey" /></a><br />本作品采用<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">知识共享署名-非商业性使用-相同方式共享 4.0 国际许可协议</a>进行许可。
+<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/"><img alt="知识共享许可协议" style="border-width:0" src="https://img.shields.io/badge/license-CC%20BY--NC--SA%204.0-lightgrey" /></a><br />本作品采用<a rel="license" href="http://creativecommons.org/licenses/by-nc-sa/4.0/">MIT</a>进行许可。
 
 *注：默认使用CC 4.0协议，也可根据自身项目情况选用其他协议*
