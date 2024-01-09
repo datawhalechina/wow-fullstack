@@ -27,7 +27,7 @@
 Course：夏某  
 Tutorial：高某、宋某、吴某  
 Guide：张某  
-Docs：王某  
+Docs：[Kailigithub](https://github.com/Kailigithub)  
 Frontend：L某  
 Backend：T某、李某、徐某  
 
