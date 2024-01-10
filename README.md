@@ -29,7 +29,7 @@ Tutorial：高某、宋某、吴某
 Guide：张某  
 Docs：[Kailigithub](https://github.com/Kailigithub)  
 Frontend：L某  
-Backend：[Tom.Yang](https://github.com/7n8fail)、李某、徐某  
+Backend：[Tom.Yang](https://github.com/7n8fail)、李某、[wu](https://github.com/AIzealotwu)  
 
 
 ## 关注我们
