@@ -1,18 +1,14 @@
-import os
-from typing import Optional
+# Author Tom.Yang (https://github.com/7n8fail)
 
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
 
+from .routers.v1 import users
 
-from routers import users
-
-
+from .dependencies import settings
 
 app = FastAPI()
-
 
 app.add_middleware(
     CORSMiddleware,
@@ -33,12 +29,9 @@ app.add_middleware(
 
 app.include_router(users.router)
 
-
-@app.get("/")
+@app.get("/test")
 def read_root():
     return {"Hello": "World"}
 
-
-
 if __name__ == '__main__':
-    uvicorn.run(app, host="0.0.0.0", port=8008)
+    uvicorn.run(app, host=settings.HOST, port=settings.PORT)
