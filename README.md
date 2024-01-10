@@ -28,7 +28,7 @@ Course：夏某
 Tutorial：高某、宋某、吴某  
 Guide：张某  
 Docs：[Kailigithub](https://github.com/Kailigithub)  
-Frontend：[lime](https://github.com/yyhhxx)
+Frontend：[lime](https://github.com/yyhhxx)  
 Backend：[Tom.Yang](https://github.com/7n8fail)、[lish](https://github.com/kevin-light)、[wu](https://github.com/AIzealotwu)  
 
 
