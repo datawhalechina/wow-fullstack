@@ -2,9 +2,7 @@
   <div id="app">
     <div class="text-center">
       <h2 class="text-center">
-        <a href="https://github.com/zishu-co/tm" target="_blank"
-          >自塾时间管理</a
-        >
+        自塾时间管理
       </h2>
     </div>
     <div id="app">
@@ -45,9 +43,9 @@
                 <th class="lie1">序号</th>
                 <th class="lie2">编号</th>
                 <th class="lie3">主题</th>
-                <th class="lie6">统筹配时</th>
+                <th class="lie6">目标用时</th>
                 <th class="lie5">分拆事项</th>
-                <th class="lie6">分拆配时</th>
+                <th class="lie6">计划用时</th>
                 <th class="lie6">开始时间</th>
                 <th class="lie6">结束时间</th>
                 <th class="lie6">实际用时</th>
@@ -107,11 +105,11 @@
         <hr />
 
         <div v-if="cur_archive != -1">
-          {[cur_riqi]}有效工作时间：{[validtime_archive]}小时。
+          {{cur_riqi}}有效工作时间：{{validtime_archive}}小时。
         </div>
         <div v-if="cur_archive != -1">
-          {[cur_anhao]}-{[cur_zhuti]}：统筹配时{[tongchou]}小时，分拆配时{[yi_peishi
-          || tongchou]}小时，实际用时{[yi_yongshi]}小时。
+          {{cur_anhao}}-{{cur_zhuti}}：目标用时{{tongchou}}小时，计划用时{{yi_peishi
+          || tongchou}}小时，实际用时{{yi_yongshi}}小时。
         </div>
         <table class="table-css">
           <thead>
@@ -119,9 +117,9 @@
               <th class="lie1">序号</th>
               <th class="lie2">编号</th>
               <th class="lie3">主题</th>
-              <th class="lie6">统筹配时</th>
+              <th class="lie6">目标用时</th>
               <th class="lie5">分拆事项</th>
-              <th class="lie6">分拆配时</th>
+              <th class="lie6">计划用时</th>
               <th class="lie6">开始时间</th>
               <th class="lie6">结束时间</th>
               <th class="lie6">实际用时</th>
@@ -186,7 +184,7 @@
           </tbody>
         </table>
         <div v-if="finishlist.length > 0">
-          当前列表总实际时间：{[total_time]}小时。
+          当前列表总实际时间：{{total_time}}小时。
         </div>
         <button
           v-if="finishlist.length > 0"
@@ -316,10 +314,9 @@ export default defineComponent({
       console.log(timestring);
       const datestring = newDate.toLocaleDateString();
       console.log(datestring);
-      console.log(state.tasklist[state.cur.value]);
 
-      state.tasklist[state.cur.value][5].value = timestring;
-      state.tasklist[state.cur.value][8].value = datestring;
+      state.tasklist.value[state.cur.value][5] = timestring;
+      state.tasklist.value[state.cur.value][8] = datestring;
       state.key.value += 1;
       tijiao();
     };
@@ -327,13 +324,13 @@ export default defineComponent({
     const end = () => {
       const newDate = new Date();
       const timestring = newDate.toLocaleTimeString().substring(0, 8);
-      state.tasklist[state.cur.value][6] = timestring;
-      const starttime = state.tasklist[state.cur.value][5];
+      state.tasklist.value[state.cur.value][6] = timestring;
+      const starttime = state.tasklist.value[state.cur.value][5];
       console.log(starttime);
       console.log(timestring);
       const hour = getHour(starttime, timestring);
       console.log(hour);
-      state.tasklist[state.cur.value][7] = hour;
+      state.tasklist.value[state.cur.value][7] = hour;
       state.no_time.value = false;
       state.key.value += 1;
       tijiao();
