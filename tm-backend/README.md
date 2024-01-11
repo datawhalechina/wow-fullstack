@@ -3,7 +3,7 @@
 ```
 cd tm-backend
 pip install -r requirements.txt
-uvicorn start:app --host 0.0.0.0 --port 8008
+uvicorn app.main:app --host 0.0.0.0 --port 8008
 ```
 
 ## API接口文档
