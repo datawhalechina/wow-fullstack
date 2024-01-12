@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .routers.v1 import users
 
-from .dependencies import settings
+from .config import settings
 
 app = FastAPI()
 

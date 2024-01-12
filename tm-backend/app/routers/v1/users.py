@@ -2,9 +2,15 @@
 
 from fastapi import APIRouter, Form, Depends, HTTPException, status
 from datetime import timedelta
-from app.dependencies import settings, check_jwt_token
-from app.models.users import UserBase, TokenModel
+from app.dependencies import check_jwt_token, get_db
+from app.config import settings
+from app.core.schemas.users import UserBase, TokenModel
 from app.controllers.users import check_user, create_access_token
+from sqlalchemy.orm import Session
+from app.core import models
+from app.database import engine
+
+models.users.Base.metadata.create_all(bind=engine)
 
 router = APIRouter(
     prefix="/v1/users",
@@ -12,10 +18,13 @@ router = APIRouter(
     responses={404: {"description": "Not found"}},
 )
 
+
+
+
 # 使用表单格式参数需要安装模块：python-multipart
 @router.post("/token", response_model=TokenModel)
-async def login_for_access_token(username: str = Form(...), password: str = Form(...)):
-    user = check_user(username, password)
+async def login_for_access_token(username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+    user = check_user(db, username, password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -25,9 +34,11 @@ async def login_for_access_token(username: str = Form(...), password: str = Form
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     # 把id进行username加密，要使用str类型
     access_token = create_access_token(
-        data={"sub": user.get("username")}, expires_delta=access_token_expires
+        # data={"sub": user.get("username")}, expires_delta=access_token_expires
+        data={"sub": user.username}, expires_delta=access_token_expires
     )
-    user.update({"token": access_token})
+    # user.update({"token": access_token})
+    user.token = access_token
     return user
 
 
