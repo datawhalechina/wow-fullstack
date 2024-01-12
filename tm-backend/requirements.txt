@@ -1,2 +1,7 @@
 fastapi
 uvicorn
+bcrypt
+python-multipart
+pydantic[email]
+passlib
+pydantic-settings
