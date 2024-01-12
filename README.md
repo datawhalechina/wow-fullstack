@@ -25,7 +25,7 @@
 开发者需要根据自己的技能和兴趣选定一个开发产品作为主产品。  
 目前的开发人员安排：  
 Course：[Susan](https://github.com/Susan2048)  
-Tutorial：高某、宋某、吴某  
+Tutorial：[Hoshino-wind](https://github.com/Hoshino-wind)、宋某、吴某  
 Guide：张某  
 Docs：[Kailigithub](https://github.com/Kailigithub)  
 Frontend：[lime](https://github.com/yyhhxx)  
