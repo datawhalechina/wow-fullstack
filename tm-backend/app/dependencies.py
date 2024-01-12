@@ -1,22 +1,26 @@
 # Author Tom.Yang (https://github.com/7n8fail)
 
 from . import config
-from .database import users_db
-from functools import lru_cache
+from .database import SessionLocal
 from typing import Optional
-from fastapi import Header, HTTPException, status
+from fastapi import Header, HTTPException, status, Depends
 import jwt
 from pydantic import ValidationError
 
 from passlib.context import CryptContext
+
+from sqlalchemy.orm import Session
+from app.core.models import users
+from .config import settings
 # 使用的算法是Bcrypt
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-@lru_cache
-def get_settings():
-    return config.Settings()
-
-settings = get_settings()
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 def get_password_hash(password):
     """
@@ -37,7 +41,7 @@ def verify_password(plain_password, hashed_password):
     """
     return pwd_context.verify(plain_password, hashed_password)
 
-def check_jwt_token(token: Optional[str] = Header("")):
+def check_jwt_token(token: Optional[str] = Header(""), db: Session = Depends(get_db)):
     """
     验证token
     :param token:
@@ -47,7 +51,8 @@ def check_jwt_token(token: Optional[str] = Header("")):
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
         username: str = payload.get("sub")
         # 通过解析得到的username,获取用户信息,并返回
-        return users_db.get(username)
+        # return users_db.get(username)
+        return db.query(users.Users).filter(users.Users.username== username).first()
     except (jwt.PyJWTError, jwt.ExpiredSignatureError, ValidationError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

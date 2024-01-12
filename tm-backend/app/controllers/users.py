@@ -3,8 +3,10 @@
 from datetime import datetime, timedelta
 import jwt
 from typing import Optional
-from ..database import users_db
-from ..dependencies import verify_password, settings
+from ..dependencies import verify_password
+from ..config import settings
+from sqlalchemy.orm import Session
+from app.core.models import users
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     """
@@ -25,16 +27,18 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
-def check_user(username, password):
+def check_user(db: Session, username, password):
     """
     校验用户（真实的应该是跟DB进行校验，这里只是做演示）
     :param username:
     :param password:
     :return:
     """
-    user = users_db.get(username)
+    # user = users_db.get(username)
+    user = db.query(users.Users).filter(users.Users.username== username).first()
     if not user:
         return False
-    if not verify_password(password, user.get("password")):
+    # if not verify_password(password, user.get("password")):
+    if not verify_password(password, user.password):
         return False
     return user
