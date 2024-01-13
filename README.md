@@ -24,12 +24,12 @@
 
 开发者需要根据自己的技能和兴趣选定一个开发产品作为主产品。  
 目前的开发人员安排：  
-Course：[Susan](https://github.com/Susan2048)  
+Course：[Susan](https://github.com/Susan2048)
 Tutorial：[Hoshino-wind](https://github.com/Hoshino-wind)、[KMnO4-zx](https://github.com/KMnO4-zx)、吴某  
-Guide：张某  
-Docs：[Kailigithub](https://github.com/Kailigithub)  
-Frontend：[lime](https://github.com/yyhhxx)  
-Backend：[Tom.Yang](https://github.com/7n8fail)、[lish](https://github.com/kevin-light)、[wu](https://github.com/AIzealotwu)  
+Guide：张某  、[WuXiaoMing](https://xlight5.github.io)
+Docs：[Kailigithub](https://github.com/Kailigithub)  、[WuXiaoMing](https://xlight5.github.io)
+Frontend：[lime](https://github.com/yyhhxx)  、[WuXiaoMing](https://xlight5.github.io)
+Backend：[Tom.Yang](https://github.com/7n8fail)、[lish](https://github.com/kevin-light)、[wu](https://github.com/AIzealotwu)  、[WuXiaoMing](https://xlight5.github.io)
 
 
 ## 关注我们
