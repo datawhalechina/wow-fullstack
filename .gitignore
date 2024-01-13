@@ -2,3 +2,5 @@ tm-frontend/node_modules
 .gitignore
 
 tm-backend/**/__pycache__
+
+**/.idea
