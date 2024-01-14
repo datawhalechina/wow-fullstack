@@ -2,5 +2,8 @@ tm-frontend/node_modules
 .gitignore
 
 tm-backend/**/__pycache__
+tm-backend/.venv
+tm-backend/poetry.lock
+tm-backend/pyproject.toml
 
 **/.idea
