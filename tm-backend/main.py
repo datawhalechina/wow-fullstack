@@ -4,9 +4,9 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .routers.v1 import users
+from app.routers.v1 import users
 
-from .config import settings
+from app.config import settings
 
 app = FastAPI()
 
