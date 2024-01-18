@@ -6,7 +6,11 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers.v1 import users
 
+<<<<<<< HEAD
 from app.dependencies import settings
+=======
+from app.config import settings
+>>>>>>> c8b677f42cdd1cf72674562af85744e22c8a14eb
 
 app = FastAPI()
 
@@ -34,4 +38,8 @@ def read_root():
     return {"Hello": "World"}
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     uvicorn.run(app, host=settings.HOST, port=settings.PORT)
+=======
+    uvicorn.run(app, host=settings.HOST, port=settings.PORT)
+>>>>>>> c8b677f42cdd1cf72674562af85744e22c8a14eb

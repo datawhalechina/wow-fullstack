@@ -9,12 +9,18 @@ class UserBase(BaseModel):
     # pip install pydantic[email] 使用email验证的时候需要增加这个库
     email: Optional[EmailStr] = None
 
+    class Config:
+        from_attributes = True
+
 class TokenModel(UserBase):
     token: str = None
 
 class LoginModel(BaseModel):
     username: str = None
     password: str = None
+
+    class Config:
+        from_attributes = True
 
 class CreateModel(UserBase):
     password: str

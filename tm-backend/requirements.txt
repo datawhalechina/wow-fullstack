@@ -5,3 +5,5 @@ python-multipart
 pydantic[email]
 passlib
 pydantic-settings
+sqlalchemy
+psycopg[binary,pool]
