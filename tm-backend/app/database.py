@@ -16,7 +16,8 @@ from .config import settings
 
 
 engine = create_engine(
-    settings.SQLALCHEMY_DATABASE_URL
+    # settings.SQLALCHEMY_DATABASE_URL
+    settings.SQLALCHEMY_DATABASE_URL_BACKUP
 )
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
