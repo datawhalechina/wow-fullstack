@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     HOST:str
     PORT:int
     SQLALCHEMY_DATABASE_URL:str
+    SQLALCHEMY_DATABASE_URL_BACKUP:str
 
     model_config = SettingsConfigDict(env_file='.env', _env_file_encoding='utf-8', extra='allow')
 
