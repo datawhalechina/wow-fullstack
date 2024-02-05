@@ -1,11 +1,11 @@
 <template>
-  <div id="app">
+  <div>
     <div class="text-center">
       <h2 class="text-center">
         自塾时间管理
       </h2>
     </div>
-    <div id="app">
+    <div>
       <div style="margin-left: 20px; text-align: center">
         <div style="display: inline-block; margin: auto">
           <div>
@@ -99,15 +99,15 @@
               </tr>
             </tbody>
           </table>
-          <div>今天有效工作时间：{{ validtime }}小时。</div>
+          <div class="divfont">今天有效工作时间：{{ validtime }}小时。</div>
         </div>
 
         <hr />
 
-        <div v-if="cur_archive != -1">
+        <div class="divfont" v-if="cur_archive != -1">
           {{cur_riqi}}有效工作时间：{{validtime_archive}}小时。
         </div>
-        <div v-if="cur_archive != -1">
+        <div class="divfont" v-if="cur_archive != -1">
           {{cur_anhao}}-{{cur_zhuti}}：目标用时{{tongchou}}小时，计划用时{{yi_peishi
           || tongchou}}小时，实际用时{{yi_yongshi}}小时。
         </div>
@@ -183,7 +183,7 @@
             </tr>
           </tbody>
         </table>
-        <div v-if="finishlist.length > 0">
+        <div class="divfont" v-if="finishlist.length > 0">
           当前列表总实际时间：{{total_time}}小时。
         </div>
         <button
@@ -579,6 +579,7 @@ img:not([src]) {
   margin-top: 10px;
   vertical-align: middle;
   text-align: center;
+  font-size: 18px;
 }
 table th {
   border: 1px solid black;
@@ -627,6 +628,10 @@ table td {
   width: 100%;
   font-size: 1em;
   vertical-align: middle;
+}
+
+.divfont { 
+  font-size: 18px;
 }
 
 </style> 

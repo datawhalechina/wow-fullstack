@@ -9,10 +9,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "vue": "^3.3.11"
+    "element-plus": "^2.5.5",
+    "pinia": "^2.1.7",
+    "pinia-use-persist": "^0.0.21",
+    "vue": "^3.3.11",
+    "vue-router": "^4.2.5"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.2",
+    "sass": "^1.70.0",
     "typescript": "^5.2.2",
     "vite": "^5.0.8",
     "vite-plugin-singlefile": "^0.13.5",

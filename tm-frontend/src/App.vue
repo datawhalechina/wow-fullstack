@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import Manager2 from './components/Manager2.vue'
 
 </script>
 
 <template>
-  <Manager2 />
+    <router-view></router-view>
 </template>
 
 <style scoped>
+
 </style>
