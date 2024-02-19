@@ -1,4 +1,4 @@
-## 4.TypeScrip Map对象
+## 4.TypeScript Map对象
 在 TypeScript 中，`Map` 是一种键-值对的集合，其中键和值可以是任意类型。以下是 TypeScript 中 `Map` 对象常用的一些内置方法：
 ### 内置方法：
 
