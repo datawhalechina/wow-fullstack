@@ -1,7 +1,7 @@
 # Author Tom.Yang (https://github.com/7n8fail)
 
 from datetime import datetime, timedelta
-import jwt
+from jose import jwt
 from typing import Optional
 from ..dependencies import verify_password
 from ..config import settings
@@ -26,6 +26,9 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     # ALGORITHM：JWT令牌签名算法
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
+
+
+
 
 def check_user(db: Session, username, password):
     """

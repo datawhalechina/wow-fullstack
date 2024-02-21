@@ -15,7 +15,8 @@ export interface ItypeAPI {
     id: number,//请求的数据，用泛型
     username: string, // 返回状态码的信息，如请求成功等
     email: string, //返回后端自定义的200，404，500这种状态码
-    token: string, 
+    atoken: string, 
+    rtoken: string
 }
 
 

@@ -1,5 +1,7 @@
 import axios from 'axios'
 import router from '../router/index'
+import { useLoginStore } from "../store";
+const loginstate = useLoginStore();
 // 创建axios实例
 const instance = axios.create({
     baseURL: 'http://127.0.0.1:8008',// 所有的请求地址前缀部分(没有后端请求不用写)
@@ -8,20 +10,32 @@ const instance = axios.create({
     headers: {
     // 设置后端需要的传参类型
     // 'Content-Type': 'application/json',
-    'token': localStorage.getItem("token"),//一开始就要token
+    // 'token': loginstate.atoken,//一开始就要token
     // 'X-Requested-With': 'XMLHttpRequest',
     },
 })
+
+async function refreshToken() {
+    const res = await instance.get("/v2/users/refresh");
+    if(res.id > 0) {
+        loginstate.atoken = res.atoken;
+        loginstate.rtoken = res.rtoken;
+    }
+    
+    return res;
+}
  
 // request拦截器
 instance.interceptors.request.use(
     config => {
         // 如果你要去localStor获取token,(如果你有)
         // let token = localStorage.getItem("x-auth-token");
-        // if (token) {
-                //添加请求头
-                //config.headers["Authorization"]="Bearer "+ token
-        // }
+        if (loginstate.atoken == '') {
+            //添加请求头
+            config.headers["token"]=loginstate.rtoken
+        } else{
+            config.headers["token"]=loginstate.atoken
+        }
         return config
     },
     error => {
@@ -36,13 +50,28 @@ instance.interceptors.response.use(
         // 对响应数据做点什么
         return response.data
     },
-    error => {  
+    async error => {  
+        let { data, config } = error.response;
+        console.log("失败了");
+        console.log(data.detail.code);
+        console.log(config.url);
         // 处理401错误
-        if (error.response.status === 401) {
-        // 删除用户信息
-        localStorage.setItem("x-auth-token", "");
-        // 跳转登录页
-        router.push(`/login?returnUrl=${router.currentRoute.value.fullPath}`)
+        if (data.detail.code == 5000 && !config.url.includes('/refresh')) {
+            loginstate.atoken = ''
+            console.log("准备刷新token");
+            const res = await refreshToken();
+            console.log(res);
+            if(res.id > 0) {
+                return instance(config);
+            } else {
+                // 跳转登录页
+                loginstate.dialogFormVisible = true
+                //router.push(`/login?returnUrl=${router.currentRoute.value.fullPath}`)
+            }
+        } else {
+            // 跳转登录页
+            loginstate.dialogFormVisible = true
+            //router.push(`/login?returnUrl=${router.currentRoute.value.fullPath}`)
         }
         return Promise.reject(error)
     }

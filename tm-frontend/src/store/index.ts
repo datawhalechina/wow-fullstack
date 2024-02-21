@@ -5,7 +5,10 @@ export const useLoginStore = defineStore('login',{
     // 将初始化的变量或要用到的变量定义到这里
     return {
         logined: false,
-        name: '黎伟'
+        dialogFormVisible: false,
+        name: '黎伟',
+        atoken: '',
+        rtoken: '',
     }
   },
   persist: {
