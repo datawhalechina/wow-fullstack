@@ -13,7 +13,8 @@ class UserBase(BaseModel):
         from_attributes = True
 
 class TokenModel(UserBase):
-    token: str = None
+    atoken: str = None
+    rtoken: str = None
 
 class LoginModel(BaseModel):
     username: str = None

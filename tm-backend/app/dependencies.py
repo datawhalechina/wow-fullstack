@@ -1,10 +1,10 @@
 # Author Tom.Yang (https://github.com/7n8fail)
-
+from datetime import datetime
 from . import config
 from .database import SessionLocal
 from typing import Optional
 from fastapi import Header, HTTPException, status, Depends
-import jwt
+from jose import JWTError, jwt
 from pydantic import ValidationError
 
 from passlib.context import CryptContext
@@ -50,10 +50,15 @@ def check_jwt_token(token: Optional[str] = Header(""), db: Session = Depends(get
     try:
         payload = jwt.decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
         username: str = payload.get("sub")
+        # 得到令牌过期时间
+        expiration_timestamp = payload.get("exp")
+        # 把令牌过期时间转化为人类可读时间信息
+        expiration_time = datetime.fromtimestamp(expiration_timestamp)
+        print(expiration_time)
         # 通过解析得到的username,获取用户信息,并返回
         # return users_db.get(username)
         return db.query(users.Users).filter(users.Users.username== username).first()
-    except (jwt.PyJWTError, jwt.ExpiredSignatureError, ValidationError):
+    except (JWTError, ValidationError):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={
@@ -62,3 +67,4 @@ def check_jwt_token(token: Optional[str] = Header(""), db: Session = Depends(get
                 'data': "Token Error",
             }
         )
+    
