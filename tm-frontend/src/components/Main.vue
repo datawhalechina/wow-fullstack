@@ -8,7 +8,5 @@ import Manager2 from './Manager2.vue'
 </template>
 
 <style lang="scss" scoped>
-.centered-text {
-  text-align: center;
-}
+
 </style>

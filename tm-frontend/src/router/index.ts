@@ -15,25 +15,63 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import("../views/Home.vue"),
         },
         {
+            path: "/course",
+            // 命名
+            name: "Course",
+            component: () => import("../views/course/Course.vue"),
+        },
+        {
+            path: "/course/edit",
+            // 命名
+            name: "Editcourse",
+            component: () => import("../views/course/Edit.vue"),
+        },
+        {
             path: "/articles",
             // 命名
             name: "Articles",
             component: () => import("../views/Articles.vue"),
         },
+        {
+          path: "/user",
+          // 命名
+          name: "User",
+          component: () => import("../views/user/Center.vue"),
+        },
+        {
+        path: "/user/registers",
+          // 命名
+          name: "Register",
+          component: () => import("../views/user/Registers.vue"),
+        },
+        {
+          path: "/user/changepass",
+          // 命名
+          name: "Changepass",
+          component: () => import("../views/user/Changepass.vue"),
+        },
+        {
+          path: "/user/editprofile",
+            // 命名
+            name: "Editprofile",
+            component: () => import("../views/user/Editprofile.vue"),
+        },
+        {
+          path: "/user/profile/:id",
+            // 命名
+            name: "Profile",
+            component: () => import("../views/user/Profile.vue"),
+        },
+        {
+          path: "/user/learn",
+          // 命名
+          name: "Learn",
+          component: () => import("../views/user/Learn.vue"),
+        },
     ]
   },
-  {
-    path: "/login",
-    // 命名
-    name: "Login",
-    component: () => import("../components/Login.vue"),
-  },
-  {
-    path: "/register",
-    // 命名
-    name: "Register",
-    component: () => import("../components/Register.vue"),
-  },
+  
+  
   
 ];
  

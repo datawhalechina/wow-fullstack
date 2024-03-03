@@ -7,7 +7,7 @@
   </span>
   
   <span v-else>
-    <el-button text>{{ loginstate.name }}</el-button>
+    <el-link type="primary" href="/user" target="_blank">{{ loginstate.name }}</el-link>
     <el-button text @click="logOut">登出</el-button>
   </span>
   
@@ -18,7 +18,7 @@
         <el-input v-model="form.name" autocomplete="off" />
       </el-form-item>
       <el-form-item label="密码" :label-width="formLabelWidth">
-        <el-input v-model="form.password" autocomplete="off" />
+        <el-input type="password" v-model="form.password" autocomplete="off" show-password/>
       </el-form-item>
     </el-form>
     <template #footer>
@@ -32,20 +32,26 @@
   </el-dialog>
 
   <el-dialog v-model="registerFormVisible" :width="diaglogwidth" :center="true" title="注册">
-    <el-form :model="formRegi">
-      <el-form-item label="用户名" :label-width="formLabelWidth">
+    <el-form :model="formRegi" ref="ruleFormRef" :rules="rules" status-icon>
+      <el-form-item label="用户名" prop="name" :label-width="formLabelWidth">
         <el-input v-model="formRegi.name" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="创建密码" :label-width="formLabelWidth">
-        <el-input v-model="formRegi.password" autocomplete="off" />
+      <el-form-item label="密码" prop="password" :label-width="formLabelWidth">
+        <el-input v-model="formRegi.password" type="password" autocomplete="off" />
       </el-form-item>
-      <el-form-item label="确认密码" :label-width="formLabelWidth">
-        <el-input v-model="formRegi.password2" autocomplete="off" />
+      <el-form-item label="确认密码" prop="checkpass" :label-width="formLabelWidth">
+        <el-input v-model="formRegi.checkpass" type="password" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="邮箱" prop="email" :label-width="formLabelWidth">
+        <el-input v-model="formRegi.email" autocomplete="off" />
+      </el-form-item>
+      <el-form-item label="手机号" prop="phone" :label-width="formLabelWidth">
+        <el-input v-model.number="formRegi.phone" autocomplete="off" />
       </el-form-item>
     </el-form>
     <template #footer>
       <span class="dialog-footer">
-        <el-button type="primary" @click="register">注册</el-button>
+        <el-button type="primary" @click="register(ruleFormRef)">注册</el-button>
       </span>
     </template>
   </el-dialog>
@@ -57,7 +63,9 @@
 <script lang="ts" setup>
 import { reactive,ref } from 'vue'
 import { useLoginStore } from "../store";
-import {loginAPI} from '../request/user/api'
+import {loginAPI,RegisterAPI} from '../request/user/api'
+import router from "../router";
+import type { FormInstance, FormRules } from 'element-plus'
 
 const registerFormVisible = ref(false)
 const formLabelWidth = '70px'
@@ -69,11 +77,55 @@ const form = reactive({
   password: '',
 })
 
-const formRegi = reactive({
+const ruleFormRef = ref<FormInstance>()
+interface RuleForm {
+  name: string
+  password: string
+  checkpass: string
+  email: string
+  phone: string
+}
+
+const formRegi = reactive<RuleForm>({
   name: '',
   password: '',
-  password2: '',
+  checkpass: '',
+  email: '',
+  phone: ''
 })
+
+const validatePass2 = (rule: any, value: any, callback: any) => {
+  if (value === '') {
+    callback(new Error('请再次输入密码'))
+  } else if (value !== formRegi.password) {
+    console.log("密码不一致")
+    callback(new Error("密码不一致!"))
+  } else {
+    callback()
+  }
+}
+
+const rules = reactive<FormRules<RuleForm>>({
+  name: [
+    { required: true, message: '请输入名字', trigger: 'blur' },
+    { min: 2, max: 5, message: '长度为2到5个字符', trigger: 'blur' },
+  ],
+  password: [
+    { required: true, message: '请输入密码', trigger: 'blur' },
+    { min: 6, message: '密码应不少于六位', trigger: 'blur' },
+  ],
+  checkpass: [{ validator: validatePass2, trigger: 'blur' }],
+  email: [
+    { required: true, message: '请输入邮箱', trigger: 'blur' },
+    { type: 'email', message: '邮箱格式错误', trigger: 'blur' },
+  ],
+  phone: [
+    { required: true, message: '请输入手机号', trigger: 'blur' },
+    { pattern: /^1[3456789]\d{9}$/, message: '手机号码格式不正确', trigger: 'blur' }
+  ],
+})
+
+
 
 const checklogin = async() => {
     console.log("发送请求")
@@ -81,24 +133,67 @@ const checklogin = async() => {
     let res = await loginAPI(data)
     console.log(res);
     console.log("接收数据")
-    loginstate.atoken = res.atoken
-    loginstate.rtoken = res.rtoken
-    loginstate.logined = true
-    loginstate.dialogFormVisible = false
+    if (res.id>0) {
+      loginstate.id = res.id
+      loginstate.name = res.username
+      loginstate.atoken = res.atoken
+      loginstate.rtoken = res.rtoken
+      loginstate.logined = true
+      loginstate.dialogFormVisible = false
+      form.name = ""
+      form.password = ""
+    } else {
+      alert("用户名或密码错误,请重新输入")
+    }
+    
+    
 }
 
 const logOut = () => {
   loginstate.logined = false
+  loginstate.id = 0
+  loginstate.name = ""
   loginstate.atoken = "atoken"
   loginstate.rtoken = "rtoken"
+  router.push('/')
 }
 
 const forgetPass = () => {
   console.log(form.name);
 }
 
-const register = () => {
-  console.log(formRegi.name);
+
+const register = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return
+  await formEl.validate((valid) => {
+    if (valid) {
+      console.log(formRegi)
+      doRegister()
+    } else {
+      alert('请完善注册信息!')
+    }
+  })
+}
+
+const doRegister = async() => {
+  let data = {
+    name: formRegi.name, 
+    password: formRegi.password,
+    email:formRegi.email,
+    phone:formRegi.phone,
+  }
+  let res = await RegisterAPI(data)
+  if (res.code == 200){
+    alert("注册成功，请等待至多三天审核！")
+    formRegi.name = ''
+    formRegi.password = ''
+    formRegi.checkpass = ''
+    formRegi.email = ''
+    formRegi.phone = ''
+    registerFormVisible.value = false
+  } else {
+    alert("注册失败")
+  }
 }
 
 </script>

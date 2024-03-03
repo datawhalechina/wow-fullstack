@@ -1,5 +1,4 @@
 import axios from 'axios'
-import router from '../router/index'
 import { useLoginStore } from "../store";
 const loginstate = useLoginStore();
 // 创建axios实例
@@ -10,13 +9,14 @@ const instance = axios.create({
     headers: {
     // 设置后端需要的传参类型
     // 'Content-Type': 'application/json',
-    // 'token': loginstate.atoken,//一开始就要token
+    "content-type": "application/x-www-form-urlencoded"
+    // 'token': localStorage.getItem("token"),//一开始就要token
     // 'X-Requested-With': 'XMLHttpRequest',
     },
 })
-
+ 
 async function refreshToken() {
-    const res = await instance.get("/v2/users/refresh");
+    const res:any = await instance.get("/users/refresh");
     if(res.id > 0) {
         loginstate.atoken = res.atoken;
         loginstate.rtoken = res.rtoken;
@@ -24,12 +24,10 @@ async function refreshToken() {
     
     return res;
 }
- 
+
 // request拦截器
 instance.interceptors.request.use(
     config => {
-        // 如果你要去localStor获取token,(如果你有)
-        // let token = localStorage.getItem("x-auth-token");
         if (loginstate.atoken == '') {
             //添加请求头
             config.headers["token"]=loginstate.rtoken
@@ -52,9 +50,6 @@ instance.interceptors.response.use(
     },
     async error => {  
         let { data, config } = error.response;
-        console.log("失败了");
-        console.log(data.detail.code);
-        console.log(config.url);
         // 处理401错误
         if (data.detail.code == 5000 && !config.url.includes('/refresh')) {
             loginstate.atoken = ''
@@ -68,12 +63,12 @@ instance.interceptors.response.use(
                 loginstate.dialogFormVisible = true
                 //router.push(`/login?returnUrl=${router.currentRoute.value.fullPath}`)
             }
-        } else {
+        } else if(error.code==401) {
             // 跳转登录页
             loginstate.dialogFormVisible = true
             //router.push(`/login?returnUrl=${router.currentRoute.value.fullPath}`)
         }
-        return Promise.reject(error)
+        return error.response.data
     }
 )
 export default instance

@@ -5,5 +5,8 @@ tm-backend/**/__pycache__
 tm-backend/.venv
 tm-backend/poetry.lock
 tm-backend/pyproject.toml
+tm-backend/alembic
+tm-backend/alembic.ini
+tm-backend/static
 
 **/.idea

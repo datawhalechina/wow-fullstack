@@ -3,7 +3,7 @@ import Main from '../components/Main.vue'
 </script>
 
 <template>
-  <h1><Main msg="你好" /></h1>
+  <Main />
 </template>
 
 <style lang="scss" scoped>

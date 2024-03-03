@@ -2,14 +2,16 @@
 
 import uvicorn
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.routers.v2 import users
+from app.routers import users
+from app.routers import course
 
 from app.config import settings
 
 app = FastAPI()
-
+app.mount("/static", StaticFiles(directory="static"), name="static")
 app.add_middleware(
     CORSMiddleware,
     # 允许跨域的源列表，例如 ["http://www.example.org"] 等等，["*"] 表示允许任何源
@@ -28,6 +30,7 @@ app.add_middleware(
 )
 
 app.include_router(users.router)
+app.include_router(course.course)
 
 @app.get("/test")
 def read_root():

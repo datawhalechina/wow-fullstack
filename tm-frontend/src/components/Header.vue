@@ -16,7 +16,7 @@ const handleSelect = (key: string, keyPath: string[]) => {
         <img src="/vite.svg" class="logo" alt="你好" />
       </a>
       <span class="title">
-        &nbsp;&nbsp;·&nbsp;&nbsp;wow全栈
+        ·&nbsp;&nbsp;wow全栈
       </span>
     </el-col>
     <el-col :span="9">
@@ -24,13 +24,13 @@ const handleSelect = (key: string, keyPath: string[]) => {
         :default-active="activeIndex"
         mode="horizontal"
         @select="handleSelect"
-        style="width: 500px"
+        style="width: 400px"
         router
       >
         <el-menu-item index="/">首页</el-menu-item>
         <el-sub-menu index="2">
           <template #title>学习</template>
-          <el-menu-item index="2-1">item one</el-menu-item>
+          <el-menu-item index="/course">课程</el-menu-item>
           <el-menu-item index="2-2">item two</el-menu-item>
           <el-menu-item index="2-3">item three</el-menu-item>
           <el-sub-menu index="2-4">
@@ -40,21 +40,12 @@ const handleSelect = (key: string, keyPath: string[]) => {
             <el-menu-item index="2-4-3">item three</el-menu-item>
           </el-sub-menu>
         </el-sub-menu>
-        <el-menu-item index="/articles">开发</el-menu-item>
+        <el-menu-item index="/articles">研发</el-menu-item>
         <el-menu-item index="4">咨询</el-menu-item>
       </el-menu>
     </el-col>
 
     <el-col :span="6">
-      <el-input
-        v-model="input"
-        placeholder="请输入内容"
-        style="width: 200px;margin-top:15px;"
-      >
-      <template #append>
-        <el-button color="#F5F7FA"><el-icon><Search /></el-icon></el-button>
-      </template>
-      </el-input>
       <el-link style="float: right;margin-top:20px;" type="primary">
         <Login />
       </el-link>

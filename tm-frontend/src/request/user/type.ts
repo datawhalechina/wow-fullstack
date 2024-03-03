@@ -16,7 +16,39 @@ export interface ItypeAPI {
     username: string, // 返回状态码的信息，如请求成功等
     email: string, //返回后端自定义的200，404，500这种状态码
     atoken: string, 
-    rtoken: string
+    rtoken: string, 
 }
 
+export interface IRegister {
+    name: string,
+    email: string,
+    password: string,
+    phone: string, 
+}
 
+export interface IRegisterRes {
+    code: number,
+    message: string,
+}
+
+export interface IHandleRegister {
+    action:string
+    id:number
+}
+
+export interface IChangePass {
+    newpass:string
+    name:string
+}
+
+export interface IGetProfile {
+    userid:number
+}
+
+export interface IDeleteProfile {
+    filename:string
+}
+
+export interface ISubmitProfile {
+    info:string
+}

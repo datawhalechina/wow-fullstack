@@ -4,16 +4,17 @@ export const useLoginStore = defineStore('login',{
   state: ()=>{
     // 将初始化的变量或要用到的变量定义到这里
     return {
-        logined: false,
-        dialogFormVisible: false,
-        name: '黎伟',
-        atoken: '',
-        rtoken: '',
+      id:0,
+      logined: false,
+      dialogFormVisible: false,
+      name: '黎伟',
+      atoken: '',
+      rtoken: '',
+      iframeurl:'',
     }
   },
   persist: {
     enabled: true,
-    encryptionKey: 'letscode',
   },
   // 类似computed,修饰一些值，也是有缓存的
   getters: {
