@@ -164,11 +164,9 @@ async def report_learn(
         time_granted=float(reported_hour),
         grant_time=datetime.now()
     )
-    #db.add(new_report)
+    db.add(new_report)
     next_serial = selection.current_serial + 1
     next_chapter = db.query(Chapter).filter_by(course_id=course_id,serial=next_serial).first()
-    print(chapter_id)
-    print(next_serial)
     if next_chapter:
         selection.current_serial=next_serial
         selection.update_time=datetime.now()

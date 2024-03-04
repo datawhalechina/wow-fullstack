@@ -20,19 +20,23 @@ function isFloat(str:string) {
 }
 
 const report = async (row:any) => {
-  let reported_hour = prompt("请确认已学完《"+row.chapter_title+"》并填写申报学习时间，单位为小时数。") || ''
-  let data = {chapter_id:row.chapter_id,course_id:row.course_id,chapter_title:row.chapter_title,sele_id:row.sele_id,reported_hour:reported_hour}
-  if (!isFloat(reported_hour)){
-    alert("请输入整数或小数")
-  } else {
-    let res = await reportLearnAPI(data)
-    console.log(res)
-    if(res.code==200){
-      alert("已成功申报《"+row.chapter_title+"》"+reported_hour+"小时")
-      tableData.length=0
-      getCurrentSelection()
+  let reported_hour = prompt("请确认已学完《"+row.chapter_title+"》并填写申报学习时间，单位为小时数。")
+  
+  if (reported_hour != null){
+    if (isFloat(reported_hour)){
+      let data = {chapter_id:row.chapter_id,course_id:row.course_id,chapter_title:row.chapter_title,sele_id:row.sele_id,reported_hour:reported_hour}
+      let res = await reportLearnAPI(data)
+      console.log(res)
+      if(res.code==200){
+        alert("已成功申报《"+row.chapter_title+"》"+reported_hour+"小时")
+        tableData.length=0
+        getCurrentSelection()
+      }
+    } else {
+      alert("请输入整数或小数")
     }
   }
+  
   
 }
 

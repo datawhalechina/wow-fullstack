@@ -316,7 +316,7 @@ export default defineComponent({
 
     const start = () => {
       const newDate = new Date();
-      const timeString = newDate.toLocaletimeString().substring(0, 8);
+      const timeString = newDate.toLocaleTimeString().substring(0, 8);
       console.log(timeString);
       const dateString = newDate.toLocaleDateString();
       console.log(dateString);
@@ -329,7 +329,7 @@ export default defineComponent({
 
     const end = () => {
       const newDate = new Date();
-      const timeString = newDate.toLocaletimeString().substring(0, 8);
+      const timeString = newDate.toLocaleTimeString().substring(0, 8);
       state.taskList.value[state.cur.value][6] = timeString;
       const startingTime = state.taskList.value[state.cur.value][5];
       console.log(startingTime);
@@ -357,7 +357,7 @@ export default defineComponent({
         tmp_time.value += parseFloat(tmpList[i][7] || 0);
       }
       tmp_time.value = tmp_time.value.toFixed(2);
-      return tmp_time;
+      return tmp_time.value;
     };
 
     const finish = () => {
@@ -533,9 +533,9 @@ export default defineComponent({
       const title = [
         "编号",
         "主题",
-        "统筹配时",
+        "目标用时",
         "分拆事项",
-        "分拆配时",
+        "计划用时",
         "开始时间",
         "结束时间",
         "实际用时",
