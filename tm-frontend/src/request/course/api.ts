@@ -13,5 +13,8 @@ export const selectCourseAPI = (data:Course.ISelectCourse): Promise<any> =>
 export const fetchCurrentSelectionAPI = (): Promise<any> =>
     instance.get("/course/fetch_current_selections");
 
+export const fetchAllSelectionAPI = (): Promise<any> =>
+    instance.get("/course/fetch_selections");
+
 export const reportLearnAPI = (data:Course.IReportLearn): Promise<any> =>
     instance.post("/course/report_learn", data);

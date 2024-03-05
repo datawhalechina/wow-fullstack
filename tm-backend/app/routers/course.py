@@ -8,6 +8,7 @@ from app.core.schemas.course import CourseModel
 from app.core.schemas.users import UserBase
 from sqlalchemy.orm import Session
 from app.core.models.course import Base, Course, Chapter, Selection, Report
+from app.core.models.users import Users
 from app.database import engine
 import json
 
@@ -174,3 +175,26 @@ async def report_learn(
         selection.finish_time=datetime.now()
     db.commit()
     return {"code": "200"}
+
+
+@course.get("/fetch_selections")
+async def fetch_selections(db: Session = Depends(get_db)):
+    selections = db.query(Selection).filter_by(finish_time=None).all()
+    rtn = []
+    for sele in selections:
+        sele_dict = {}
+        user = db.query(Users).filter_by(id=sele.user_id).first()
+        course = db.query(Course).filter_by(id=sele.course_id).first()
+        chapter = db.query(Chapter).filter_by(course_id=sele.course_id,serial=sele.current_serial).first()
+        sele_dict['sele_id'] = sele.id
+        sele_dict['user_id'] = sele.user_id
+        sele_dict['user_name'] = user.username
+        sele_dict['course_title'] = course.title
+        sele_dict['course_id'] = chapter.course_id
+        sele_dict['chapter_title'] = chapter.title
+        sele_dict['chapter_id'] = chapter.id
+        sele_dict['current_serial'] = sele.current_serial
+        sele_dict['deadline'] = get_deadline(sele.update_time,chapter.period)
+        sele_dict['url'] = chapter.url
+        rtn.append(sele_dict)
+    return rtn
