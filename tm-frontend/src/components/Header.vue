@@ -13,11 +13,8 @@ const handleSelect = (key: string, keyPath: string[]) => {
   <el-row>
     <el-col :span="9">
       <a href="" target="_blank">
-        <img src="/vite.svg" class="logo" alt="你好" />
+        <img src="/logo.png" class="logo" alt="你好" />
       </a>
-      <span class="title">
-        ·&nbsp;&nbsp;wow全栈
-      </span>
     </el-col>
     <el-col :span="9">
       <el-menu
@@ -31,17 +28,10 @@ const handleSelect = (key: string, keyPath: string[]) => {
         <el-sub-menu index="2">
           <template #title>学习</template>
           <el-menu-item index="/course">课程</el-menu-item>
-          <el-menu-item index="2-2">item two</el-menu-item>
-          <el-menu-item index="2-3">item three</el-menu-item>
-          <el-sub-menu index="2-4">
-            <template #title>item four</template>
-            <el-menu-item index="2-4-1">item one</el-menu-item>
-            <el-menu-item index="2-4-2">item two</el-menu-item>
-            <el-menu-item index="2-4-3">item three</el-menu-item>
-          </el-sub-menu>
+          <el-menu-item index="">item two</el-menu-item>
+          <el-menu-item index="">item three</el-menu-item>
         </el-sub-menu>
-        <el-menu-item index="/articles">研发</el-menu-item>
-        <el-menu-item index="4">咨询</el-menu-item>
+        <el-menu-item index="/create/project">创造</el-menu-item>
       </el-menu>
     </el-col>
 
@@ -56,11 +46,10 @@ const handleSelect = (key: string, keyPath: string[]) => {
 
 <style lang="scss" scoped>
 img.logo {
-  height:50px;
+  height:40px;
   vertical-align: middle;
 }
 .logo {
-  padding: 0.5em;
   will-change: filter;
   transition: filter 300ms;
 }

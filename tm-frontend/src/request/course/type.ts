@@ -14,6 +14,10 @@ export interface ISaveCourse {
     chapters:string
 }
 
+export interface IGetCourse {
+    course_id:number
+}
+
 export interface ISelectCourse {
     id:number
     courseid:number

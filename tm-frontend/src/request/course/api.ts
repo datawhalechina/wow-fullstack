@@ -5,7 +5,10 @@ export const SaveCourseAPI = (data: Course.ISaveCourse): Promise<any> =>
     instance.post("/course/save_course", data);
 
 export const fetchCourseAPI = (): Promise<any> =>
-    instance.get("/course/fetch_course");
+    instance.get("/course/fetch_all_courses");
+
+export const getCourseAPI = (params: Course.IGetCourse): Promise<any> =>
+    instance.get(`/course/get_course/${params.course_id}`, { params });
 
 export const selectCourseAPI = (data:Course.ISelectCourse): Promise<any> =>
     instance.post("/course/select_course", data);

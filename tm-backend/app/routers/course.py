@@ -89,8 +89,8 @@ async def save_course(request: Request,
             db.commit()
     return {"code": "200"}
     
-@course.get("/fetch_course")
-async def fetch_course(db: Session = Depends(get_db)):
+@course.get("/fetch_all_courses")
+async def fetch_all_courses(db: Session = Depends(get_db)):
     courses = db.query(Course).all()
     rtn = []
     for course in courses:
@@ -99,6 +99,14 @@ async def fetch_course(db: Session = Depends(get_db)):
             del course_dict["_sa_instance_state"]
         rtn.append(course_dict)
     return rtn
+
+@course.get("/get_course/{course_id}")
+async def get_course(course_id:int, db: Session = Depends(get_db)):
+    course = db.query(Course).filter_by(id=course_id).first()
+    course_dict = course.__dict__
+    if "_sa_instance_state" in course_dict:
+        del course_dict["_sa_instance_state"]
+    return course_dict
 
 @course.post("/select_course")
 async def select_course(id: int = Form(...), courseid: int = Form(...), db: Session = Depends(get_db)):
