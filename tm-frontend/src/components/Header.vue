@@ -21,17 +21,12 @@ const handleSelect = (key: string, keyPath: string[]) => {
         :default-active="activeIndex"
         mode="horizontal"
         @select="handleSelect"
-        style="width: 400px"
+        style="width: 300px"
         router
       >
         <el-menu-item index="/">首页</el-menu-item>
-        <el-sub-menu index="2">
-          <template #title>学习</template>
-          <el-menu-item index="/course">课程</el-menu-item>
-          <el-menu-item index="">item two</el-menu-item>
-          <el-menu-item index="">item three</el-menu-item>
-        </el-sub-menu>
-        <el-menu-item index="/create/project">创造</el-menu-item>
+        <el-menu-item index="/learn">学习</el-menu-item>
+        <el-menu-item index="/create">创造</el-menu-item>
       </el-menu>
     </el-col>
 

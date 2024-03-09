@@ -284,10 +284,10 @@ style="width: 100%"
         <el-input v-model="newTask.title" autocomplete="off" />
       </el-form-item>
       <el-form-item label="开始日期" prop="start_date" :label-width="formLabelWidth">
-        <el-input v-model="newTask.start_date" autocomplete="off" />
+        <el-date-picker v-model="newTask.start_date" value-format="YYYY-MM-DD" type="date" />
       </el-form-item>
       <el-form-item label="截止日期" prop="deadline" :label-width="formLabelWidth">
-        <el-input v-model="newTask.deadline" autocomplete="off" />
+        <el-date-picker v-model="newTask.deadline" value-format="YYYY-MM-DD" type="date" />
       </el-form-item>
       <el-form-item label="详情链接" prop="url" :label-width="formLabelWidth">
         <el-input v-model="newTask.url" autocomplete="off" />
@@ -307,10 +307,10 @@ style="width: 100%"
         <el-input v-model="currentRow.title" autocomplete="off" />
       </el-form-item>
       <el-form-item label="开始日期" prop="start_date" :label-width="formLabelWidth">
-        <el-input v-model="currentRow.start_date" autocomplete="off" />
+        <el-date-picker v-model="currentRow.start_date" value-format="YYYY-MM-DD" type="date" />
       </el-form-item>
       <el-form-item label="截止日期" prop="deadline" :label-width="formLabelWidth">
-        <el-input v-model="currentRow.deadline" autocomplete="off" />
+        <el-date-picker v-model="currentRow.deadline" value-format="YYYY-MM-DD" type="date" />
       </el-form-item>
       <el-form-item label="详情链接" prop="url" :label-width="formLabelWidth">
         <el-input v-model="currentRow.url" autocomplete="off" />

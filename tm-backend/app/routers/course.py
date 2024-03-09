@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Form, Depends, HTTPException, status, Request
 from datetime import datetime, timedelta
-from app.dependencies import check_jwt_token, get_db, verify_password, get_password_hash
+from app.dependencies import check_jwt_token, get_db
 from app.config import settings
 import jwt
 from typing import Optional
@@ -106,7 +106,14 @@ async def get_course(course_id:int, db: Session = Depends(get_db)):
     course_dict = course.__dict__
     if "_sa_instance_state" in course_dict:
         del course_dict["_sa_instance_state"]
-    return course_dict
+    chapters = db.query(Chapter).filter_by(course_id=course_id).all()
+    chapters_list = []
+    for chapter in chapters:
+        chapter_dict = chapter.__dict__
+        if "_sa_instance_state" in chapter_dict:
+            del chapter_dict["_sa_instance_state"]
+        chapters_list.append(chapter_dict)
+    return {"course":course_dict,"chapters":chapters_list}
 
 @course.post("/select_course")
 async def select_course(id: int = Form(...), courseid: int = Form(...), db: Session = Depends(get_db)):

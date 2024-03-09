@@ -15,7 +15,7 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import("../views/Home.vue"),
         },
         {
-            path: "/course",
+            path: "/learn",
             // 命名
             name: "Course",
             component: () => import("../views/course/Course.vue"),
@@ -33,9 +33,9 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import("../views/course/Edit.vue"),
         },
         {
-          path: "/create/project",
+          path: "/create",
           // 命名
-          name: "Project",
+          name: "Create",
           component: () => import("../views/create/Project.vue"),
       },
         {

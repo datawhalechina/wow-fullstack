@@ -14,6 +14,8 @@ class Users(Base):
     bumen = Column(VARCHAR(32))
     role = Column(VARCHAR(32))
     bcoin = Column(Float)
+    learn_hour = Column(Float)
+    create_hour = Column(Float)
     avantar = Column(VARCHAR(256))
     desc = Column(VARCHAR(1000))
     register_time = Column(DateTime)
