@@ -13,8 +13,6 @@ const userid = loginstate.id
     <br />
     <el-link type="primary" :href="'/user/profile/'+userid" target="_blank">展示个人信息</el-link>
     <br />
-    <el-link type="primary" href="/user/learn" target="_blank">我的学习</el-link>
-    <br />
     <el-link type="primary" href="/user/supervise" target="_blank">监督</el-link>
 
     

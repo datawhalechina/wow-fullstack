@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from app.routers import users
 from app.routers import course
+from app.routers import create
 
 from app.config import settings
 
@@ -31,6 +32,7 @@ app.add_middleware(
 
 app.include_router(users.router)
 app.include_router(course.course)
+app.include_router(create.create)
 
 @app.get("/test")
 def read_root():

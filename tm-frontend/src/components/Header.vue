@@ -12,7 +12,7 @@ const handleSelect = (key: string, keyPath: string[]) => {
 <template>
   <el-row>
     <el-col :span="9">
-      <a href="" target="_blank">
+      <a href="/" target="_blank">
         <img src="/logo.png" class="logo" alt="你好" />
       </a>
     </el-col>
@@ -21,10 +21,9 @@ const handleSelect = (key: string, keyPath: string[]) => {
         :default-active="activeIndex"
         mode="horizontal"
         @select="handleSelect"
-        style="width: 300px"
+        style="width: 50%"
         router
       >
-        <el-menu-item index="/">首页</el-menu-item>
         <el-menu-item index="/learn">学习</el-menu-item>
         <el-menu-item index="/create">创造</el-menu-item>
       </el-menu>
@@ -41,6 +40,7 @@ const handleSelect = (key: string, keyPath: string[]) => {
 
 <style lang="scss" scoped>
 img.logo {
+  padding-top:10px;
   height:40px;
   vertical-align: middle;
 }

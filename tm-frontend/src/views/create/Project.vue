@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useLoginStore } from "../../store";
+import {fetchProjectsAPI, getNextSerialAPI, addProjectAPI, updateProjectAPI} from '../../request/create/api'
 import { ElTable } from 'element-plus'
 import { onMounted, ref, reactive } from 'vue'
 const loginstate = useLoginStore();
@@ -52,7 +53,13 @@ const taskdata = [
     }
 ]
 let tableData:any = reactive([])
-tableData.push(...taskdata)
+// tableData.push(...taskdata)
+const getAllProjects = async () => {
+  let res = await fetchProjectsAPI()
+  console.log(res)
+  tableData.push(...res)
+}
+onMounted(getAllProjects)
 const currentRow = ref()
 const singleTableRef = ref<InstanceType<typeof ElTable>>()
 interface Task {
@@ -157,16 +164,18 @@ function padding(num:number, length:number) {
 
 const add_confirm = async() => {
     let tmpserial = ""
-    let tmpnumber = 0
-    tableData.forEach((row:Task) => {
-        if (row.task_serial.slice(0,1) == selectvalue.value && Number(row.task_serial.slice(1))>tmpnumber) {
-            tmpnumber = Number(row.task_serial.slice(1))
-            let nextnumber = Number(row.task_serial.slice(1))+1
-            tmpserial = selectvalue.value + padding(nextnumber,3)
-        } else if (tmpserial=="") {
-            tmpserial = selectvalue.value+"001"
-        }
-    });
+    let res = await getNextSerialAPI({task_type:selectvalue.value})
+    tmpserial = res
+    // let tmpnumber = 0
+    // tableData.forEach((row:Task) => {
+    //     if (row.task_serial.slice(0,1) == selectvalue.value && Number(row.task_serial.slice(1))>tmpnumber) {
+    //         tmpnumber = Number(row.task_serial.slice(1))
+    //         let nextnumber = Number(row.task_serial.slice(1))+1
+    //         tmpserial = selectvalue.value + padding(nextnumber,3)
+    //     } else if (tmpserial=="") {
+    //         tmpserial = selectvalue.value+"001"
+    //     }
+    // });
 
     let temp = {
         id: 0,
@@ -188,14 +197,17 @@ const add_confirm = async() => {
         update_date: '',
         
         }
-  tableData.push(temp)
-  console.log(temp)
-  addTaskFormVisible.value = false
-  newTask.title = ''
-  newTask.task_serial = ''
-  newTask.start_date = ''
-  newTask.deadline = ''
-  newTask.url = ''
+    let res2 = await addProjectAPI(temp)
+    console.log(res2)
+    temp.id = res2.project_id
+    tableData.push(temp)
+    console.log(temp)
+    addTaskFormVisible.value = false
+    newTask.title = ''
+    newTask.task_serial = ''
+    newTask.start_date = ''
+    newTask.deadline = ''
+    newTask.url = ''
 
 }
 
@@ -203,6 +215,18 @@ const add_confirm = async() => {
 const edit_confirm = async() => {
     editTaskFormVisible.value = false
     console.log(currentRow.value.title)
+    let data = {
+      project_id:currentRow.value.id, 
+      action:'edit',
+      title:currentRow.value.title,
+      url:currentRow.value.url,
+      desc:currentRow.value.desc,
+      start_date:currentRow.value.start_date,
+      deadline:currentRow.value.deadline,
+      planed_hour:currentRow.value.planed_hour
+    }
+    let res = await updateProjectAPI(data)
+    console.log(res)
     let now = new Date();
     currentRow.value.update_date=now.toISOString().slice(0, 10)
 }
@@ -215,6 +239,9 @@ const apply = async ()=> {
         currentRow.value.taker = loginstate.name
         currentRow.value.taker_id = loginstate.id
         let now = new Date();
+        let data = {project_id:currentRow.value.id, action:'apply'}
+        let res = await updateProjectAPI(data)
+        console.log(res)
         currentRow.value.update_date=now.toISOString().slice(0, 10)
     }
 }
@@ -225,6 +252,9 @@ const half_confirm = async() => {
     currentRow.value.half_progress = radio_half_process.value
     halfReportFormVisible.value = false
     console.log(radio_half_process.value)
+    let data = {project_id:currentRow.value.id, action:'half_report', half_progress:radio_half_process.value}
+    let res = await updateProjectAPI(data)
+    console.log(res)
     let now = new Date();
     currentRow.value.update_date=now.toISOString().slice(0, 10)
 }
@@ -232,6 +262,9 @@ const half_confirm = async() => {
 // 补充 finish_confirm 函数
 const finish_confirm = async() => {
     finishReportFormVisible.value = false
+    let data = {project_id:currentRow.value.id, action:'finish_report', actual_hour:currentRow.value.actual_hour}
+    let res = await updateProjectAPI(data)
+    console.log(res)
     let now = new Date();
     currentRow.value.finish_date=now.toISOString().slice(0, 10)
     currentRow.value.update_date=now.toISOString().slice(0, 10)
@@ -241,10 +274,10 @@ const finish_confirm = async() => {
 <template>
 <div>
     <el-button type="primary" @click="add">新增</el-button>
-    <el-button v-if="currentRow && currentRow.taker==''" type="primary" @click="apply">认领</el-button>
+    <el-button v-if="currentRow && !currentRow.taker" type="primary" @click="apply">认领</el-button>
     <el-button v-if="currentRow && currentRow.publisher_id==userid" type="primary" @click="edit">编辑</el-button>
-    <el-button v-if="currentRow && currentRow.taker_id==userid && currentRow.half_progress==''" type="primary" @click="half_report">半程汇报</el-button>
-    <el-button v-if="currentRow && currentRow.taker_id==userid && currentRow.half_progress.length>1 && currentRow.finish_date==''" type="primary" @click="finish_report">结束汇报</el-button>
+    <el-button v-if="currentRow && currentRow.taker_id==userid && !currentRow.half_progress" type="primary" @click="half_report">半程汇报</el-button>
+    <el-button v-if="currentRow && currentRow.taker_id==userid && currentRow.half_progress && !currentRow.finish_date" type="primary" @click="finish_report">结束汇报</el-button>
 </div>
 <el-table 
 ref="singleTableRef"
@@ -255,17 +288,38 @@ style="width: 100%"
 @current-change="handleCurrentChange"
 >
     <el-table-column prop="task_serial" label="项目号" width="80" />
-    <el-table-column prop="taker" label="执行人" />
-    <el-table-column prop="publisher" label="发布人" />
-    <el-table-column prop="title" label="名称" />
-    <el-table-column prop="start_date" label="开始日期" />
-    <el-table-column prop="deadline" label="截止日期" />
+    <el-table-column label="执行人">
+      <template #default="scope">
+        <el-link type="primary" :href="'/user/profile/'+scope.row.taker_id" target="_blank">{{ scope.row.taker }}</el-link>
+      </template>
+    </el-table-column>
+    <el-table-column label="发布人">
+      <template #default="scope">
+        <el-link type="primary" :href="'/user/profile/'+scope.row.publisher_id" target="_blank">{{ scope.row.publisher }}</el-link>
+      </template>
+    </el-table-column>
+    <el-table-column label="名称">
+      <template #default="scope">
+        <el-link type="primary" :href="scope.row.url" target="_blank">{{ scope.row.title }}</el-link>
+      </template>
+    </el-table-column>
+    <el-table-column label="开始日期">
+      <template #default="scope">
+        {{ scope.row.start_date?scope.row.start_date.slice(0,10):'' }}
+      </template>
+    </el-table-column>
+    <el-table-column label="截止日期">
+      <template #default="scope">
+        {{ scope.row.deadline?scope.row.deadline.slice(0,10):'' }}
+      </template>
+    </el-table-column>
     <el-table-column prop="planed_hour" label="计划用时" />
     <el-table-column prop="half_progress" label="半程进度" />
-    <el-table-column prop="finish_date" label="结束日期" />
-    <el-table-column prop="actual_hour" label="实际用时" />
-    <el-table-column prop="total_hour" label="累计工时" />
-    <el-table-column prop="update_date" label="更新日期" />
+    <el-table-column label="更新日期">
+      <template #default="scope">
+        {{ scope.row.update_date?scope.row.update_date.slice(0,10):'' }}
+      </template>
+    </el-table-column>
 </el-table>
 
 <el-dialog v-model="addTaskFormVisible" :width="diaglogwidth" :center="true" title="新增任务">
@@ -289,6 +343,9 @@ style="width: 100%"
       <el-form-item label="截止日期" prop="deadline" :label-width="formLabelWidth">
         <el-date-picker v-model="newTask.deadline" value-format="YYYY-MM-DD" type="date" />
       </el-form-item>
+      <el-form-item label="计划用时" prop="planed_hour" :label-width="formLabelWidth">
+        <el-input v-model="newTask.planed_hour" autocomplete="off" />
+      </el-form-item>
       <el-form-item label="详情链接" prop="url" :label-width="formLabelWidth">
         <el-input v-model="newTask.url" autocomplete="off" />
       </el-form-item>
@@ -311,6 +368,9 @@ style="width: 100%"
       </el-form-item>
       <el-form-item label="截止日期" prop="deadline" :label-width="formLabelWidth">
         <el-date-picker v-model="currentRow.deadline" value-format="YYYY-MM-DD" type="date" />
+      </el-form-item>
+      <el-form-item label="计划用时" prop="planed_hour" :label-width="formLabelWidth">
+        <el-input v-model="currentRow.planed_hour" autocomplete="off" />
       </el-form-item>
       <el-form-item label="详情链接" prop="url" :label-width="formLabelWidth">
         <el-input v-model="currentRow.url" autocomplete="off" />
