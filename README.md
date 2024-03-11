@@ -5,9 +5,9 @@
 
 # 使用方法
 
-TS：进入tutorial文件夹，再进入TypeScript文件夹，自行阅读各个章节。文档都是Markdown，点开后可直接阅读。代码的输出结果已经写在相应代码下方了。需要什么代码尽管拷贝。
-Vue3：进入tutorial文件夹，再进入Vue3文件夹，自行阅读各个章节。文档都是Markdown，点开后可直接阅读。代码的输出结果已经写在相应代码下方了。需要什么代码尽管拷贝。
-FastAPI：进入tutorial文件夹，再进入FastAPI文件夹。文档都是jupyter notebook，需要把ipynb文件下载到本地去运行。直接运行每个代码格子就可以。
+- TS：进入tutorial文件夹，再进入TypeScript文件夹，自行阅读各个章节。文档都是Markdown，点开后可直接阅读。代码的输出结果已经写在相应代码下方了。需要什么代码尽管拷贝。
+- Vue3：进入tutorial文件夹，再进入Vue3文件夹，自行阅读各个章节。文档都是Markdown，点开后可直接阅读。代码的输出结果已经写在相应代码下方了。需要什么代码尽管拷贝。
+- FastAPI：进入tutorial文件夹，再进入FastAPI文件夹。文档都是jupyter notebook，需要把ipynb文件下载到本地去运行。直接运行每个代码格子就可以。
 
 
 ## 参与贡献
