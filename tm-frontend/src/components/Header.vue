@@ -12,7 +12,7 @@ const handleSelect = (key: string, keyPath: string[]) => {
 <template>
   <el-row>
     <el-col :span="9">
-      <a href="/" target="_blank">
+      <a href="/">
         <img src="/logo.png" class="logo" alt="你好" />
       </a>
     </el-col>

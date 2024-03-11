@@ -28,6 +28,17 @@ async def fetch_current_projects(db: Session = Depends(get_db)):
         rtn.append(project_dict)
     return rtn
 
+@create.get("/fetch_finished_projects")
+async def fetch_finished_projects(db: Session = Depends(get_db)):
+    projects = db.query(Project).filter(Project.finish_date!=None).order_by(Project.id.desc()).all()
+    rtn = []
+    for project in projects:
+        project_dict = project.__dict__
+        if "_sa_instance_state" in project_dict:
+            del project_dict["_sa_instance_state"]
+        rtn.append(project_dict)
+    return rtn
+
 @create.get("/fetch_next_serial/{task_type}")
 async def fetch_next_serial(task_type:str, db: Session = Depends(get_db)):
     serial_type = task_type[0]

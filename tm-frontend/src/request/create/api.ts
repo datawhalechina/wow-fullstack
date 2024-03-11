@@ -10,5 +10,8 @@ export const addProjectAPI = (data: Create.ISaveProject): Promise<any> =>
 export const fetchProjectsAPI = (): Promise<any> =>
     instance.get("/create/fetch_current_projects");
 
+export const fetchFinishedProjectsAPI = (): Promise<any> =>
+    instance.get("/create/fetch_finished_projects");
+
 export const updateProjectAPI = (params: Create.IUpdateProject): Promise<any> =>
     instance.put(`/create/edit_project/${params.project_id}`, { params });

@@ -1,36 +1,22 @@
 <script setup lang="ts">
-import {SaveCourseAPI, getCourseAPI} from '../../request/course/api'
+import {SaveCourseAPI} from '../../request/course/api'
 import {Chapter} from '../../request/course/type'
 import { onMounted, ref, reactive } from 'vue'
 import { ElTable } from 'element-plus'
-import { useRoute } from 'vue-router'
-const route = useRoute()
-const courseid = Number(route.params.id)
+//const input = ref('')
+const courseid = ref(0)
+const desc = ref('')
+const input = ref('')
 const addChapterFormVisible = ref(false)
 const editChapterFormVisible = ref(false)
 const diaglogwidth = '400px'
 const formLabelWidth = '100px'
 let tableData:Chapter[] = reactive([])
-const course = reactive({
-  id:0,
-  title: '',
-  director_name: '',
-  director_id: 0,
-  desc: '',
-})
-
-const getCourse = async () => {
-  let res = await getCourseAPI({course_id:courseid})
-  console.log(res)
-  course.id = res.course.id
-  course.title=res.course.title
-  course.director_id=res.course.director_id
-  course.director_name=res.course.director_name
-  course.desc=res.course.desc
-  tableData.push(...res.chapters)
+const getCourse = async() => {
+    // let res = await fetchCourseAPI()
+    // tableData.push(...res)
 }
-
-onMounted(getCourse)
+// onMounted(getCourse)
 
 const currentRow = ref()
 const singleTableRef = ref<InstanceType<typeof ElTable>>()
@@ -134,14 +120,21 @@ const move_down = async() => {
   tableData.splice(rowindex + 1, 0, temp)
 }
 
+// 请写出 delete_chapter 的函数
+const delete_chapter = async() => {
+  if (!currentRow) return
+  let rowindex = tableData.indexOf(currentRow.value)
+  if (rowindex === -1) return
+  tableData.splice(rowindex, 1)
+}
 
 // 请写出 save_course 的函数
 const save_course = async() => {
   // 保存tableData的数据
   let data={
-    "courseid":course.id,
-    "title": course.title, 
-    "desc":course.desc, 
+    "courseid":courseid.value,
+    "title": input.value, 
+    "desc":desc.value, 
     "chapters":JSON.stringify(tableData)
   }
   let res = await SaveCourseAPI(data)
@@ -151,10 +144,10 @@ const save_course = async() => {
 </script>
 
 <template>
-  <el-input v-model="course.title" placeholder="请输入课程名称" />
+  <el-input v-model="input" placeholder="请输入课程名称" />
   <br><br>
   <el-input
-    v-model="course.desc"
+    v-model="desc"
     maxlength="100"
     placeholder="请输入课程简介"
     show-word-limit
@@ -162,10 +155,11 @@ const save_course = async() => {
   />
   <br><br>
   <div>
-    <el-button v-if="course.title.length>1 && course.desc.length>1" type="primary" @click="add_chapter">新增</el-button>
+    <el-button v-if="input.length>1 && desc.length>1" type="primary" @click="add_chapter">新增</el-button>
     <el-button v-if="currentRow" type="primary" @click="edit_chapter">编辑</el-button>
     <el-button v-if="currentRow" type="primary" @click="move_up">上移</el-button>
     <el-button v-if="currentRow" type="primary" @click="move_down">下移</el-button>
+    <el-button v-if="currentRow" type="primary" @click="delete_chapter">删除</el-button>
   </div>
   <el-table 
   ref="singleTableRef"

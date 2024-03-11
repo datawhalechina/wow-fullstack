@@ -25,19 +25,25 @@ const routes: Array<RouteRecordRaw> = [
           // 命名
           name: "Coursedetail",
           component: () => import("../views/course/Detail.vue"),
-      },
-        {
-            path: "/course/edit",
-            // 命名
-            name: "Editcourse",
-            component: () => import("../views/course/Edit.vue"),
         },
+        {
+            path: "/course/add",
+            // 命名
+            name: "Addcourse",
+            component: () => import("../views/course/Add.vue"),
+        },
+        {
+          path: "/course/edit/:id",
+          // 命名
+          name: "Addcourse",
+          component: () => import("../views/course/Edit.vue"),
+       },
         {
           path: "/create",
           // 命名
           name: "Create",
           component: () => import("../views/create/Project.vue"),
-      },
+        },
         {
             path: "/articles",
             // 命名
@@ -85,6 +91,12 @@ const routes: Array<RouteRecordRaw> = [
           // 命名
           name: "Supervise",
           component: () => import("../views/user/Supervise.vue"),
+        },
+        {
+          path: "/user/followup",
+          // 命名
+          name: "Followup",
+          component: () => import("../views/user/Followup.vue"),
         },
     ]
   },

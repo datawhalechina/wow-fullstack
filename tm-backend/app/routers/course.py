@@ -106,7 +106,7 @@ async def get_course(course_id:int, db: Session = Depends(get_db)):
     course_dict = course.__dict__
     if "_sa_instance_state" in course_dict:
         del course_dict["_sa_instance_state"]
-    chapters = db.query(Chapter).filter_by(course_id=course_id).all()
+    chapters = db.query(Chapter).filter_by(course_id=course_id).order_by(Chapter.serial).all()
     chapters_list = []
     for chapter in chapters:
         chapter_dict = chapter.__dict__
