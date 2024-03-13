@@ -8,7 +8,7 @@ from app.core.schemas.course import CourseModel
 from app.core.schemas.users import UserBase
 from sqlalchemy.orm import Session
 from app.core.models.course import Base, Course, Chapter, Selection, Report
-from app.core.models.users import Users
+from app.core.models.users import Users, Mentors
 from app.database import engine
 import json
 
@@ -158,6 +158,9 @@ async def fetch_current_selections(user: UserBase = Depends(check_jwt_token), db
         sele_dict['current_serial'] = sele.current_serial
         sele_dict['deadline'] = get_deadline(sele.update_time,chapter.period)
         sele_dict['url'] = chapter.url
+        if sele.shushi_id:
+            sele_dict['shushi_id'] = sele.shushi_id
+            sele_dict['shushi_name'] = db.query(Users).filter_by(id=sele.shushi_id).first().username
         rtn.append(sele_dict)
     return rtn
 
@@ -211,5 +214,100 @@ async def fetch_selections(db: Session = Depends(get_db)):
         sele_dict['current_serial'] = sele.current_serial
         sele_dict['deadline'] = get_deadline(sele.update_time,chapter.period)
         sele_dict['url'] = chapter.url
+        if sele.shushi_id:
+            sele_dict['shushi_id'] = sele.shushi_id
+            sele_dict['shushi_name'] = db.query(Users).filter_by(id=sele.shushi_id).first().username
         rtn.append(sele_dict)
+    return rtn
+
+
+@course.get("/cal_mentors")
+async def cal_mentors(user: UserBase = Depends(check_jwt_token), db: Session = Depends(get_db)):
+    selection = db.query(Selection).filter(
+        Selection.shushi_id==None,
+        Selection.user_id==user.id,
+        Selection.finish_time==None
+        ).first()
+    rtn = {}
+    finished_selections = None
+    if selection:
+        finished_selections = db.query(Selection).filter(
+            Selection.course_id==selection.course_id,
+            Selection.finish_time!=None
+            ).all()
+        course = db.query(Course).filter_by(id=selection.course_id).first()
+        rtn['course_title'] = course.title
+        rtn['course_id'] = course.id
+        rtn['director_id'] = course.director_id
+        rtn['director_name'] = course.director_name
+        mentor_count = db.query(Mentors).filter(
+        Mentors.shushi_id==course.director_id,
+        Mentors.end_time!=None
+        ).count()
+        rtn['mentor_count'] = mentor_count
+        
+    seles = []
+    if finished_selections:
+        for f_sele in finished_selections:
+            mentor_count = db.query(Mentors).filter(
+            Mentors.shushi_id==f_sele.user_id,
+            Mentors.end_time!=None
+            ).count()
+            if mentor_count<3:
+                sele_dict = f_sele.__dict__
+                if "_sa_instance_state" in sele_dict:
+                    del sele_dict["_sa_instance_state"]
+                sele_dict['shushi_name'] = db.query(Users).filter_by(id=f_sele.user_id).first().username
+                seles.append(sele_dict)
+    rtn['mentors'] = seles
+    return rtn
+
+@course.post("/select_mentor")
+async def select_mentor(shushi_id: int = Form(...), 
+                        courseid: int = Form(...), 
+                        user: UserBase = Depends(check_jwt_token), 
+                        db: Session = Depends(get_db)):
+    selection = db.query(Selection).filter_by(
+        course_id=courseid,
+        user_id=user.id,
+        finish_time=None
+    )
+    if selection:
+        selection.shushi_id = shushi_id
+    mentor = db.query(Mentors).filter_by(
+        shushi_id=shushi_id,
+        shusheng_id=user.id,
+        end_time=None
+        ).first()
+    if mentor:
+        mentor.course_id = courseid
+        mentor.status = '改课'
+    else:
+        new_mentor = Mentors(
+            shushi_id=shushi_id,
+            shusheng_id=user.id,
+            course_id=courseid,
+            status='新选',
+            start_time=datetime.now(),
+            update_time=datetime.now(),
+        )
+        db.add(new_mentor)
+    db.commit()
+    return {"code": "200"}
+
+
+
+@course.get("/fetch_mentors")
+async def fetch_mentors(user: UserBase = Depends(check_jwt_token), db: Session = Depends(get_db)):
+    mentors = db.query(Mentors).filter(
+        Mentors.shusheng_id==user.id,
+        Mentors.end_time==None
+        ).all()
+    rtn = []
+    for mentor in mentors:
+        mentor_dict = mentor.__dict__
+        if "_sa_instance_state" in mentor_dict:
+            del mentor_dict["_sa_instance_state"]
+        mentor_dict['shushi_name'] = db.query(Users).filter_by(id=mentor.shushi_id).first().username
+        mentor_dict['course_title'] = db.query(Course).filter_by(id=mentor.course_id).first().title
     return rtn

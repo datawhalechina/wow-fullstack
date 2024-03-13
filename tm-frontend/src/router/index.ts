@@ -87,6 +87,12 @@ const routes: Array<RouteRecordRaw> = [
           component: () => import("../views/user/Learn.vue"),
         },
         {
+          path: "/user/mentor",
+          // 命名
+          name: "Mentor",
+          component: () => import("../views/user/Mentor.vue"),
+        },
+        {
           path: "/user/supervise",
           // 命名
           name: "Supervise",

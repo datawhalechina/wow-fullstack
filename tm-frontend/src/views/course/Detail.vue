@@ -34,7 +34,7 @@ const course = reactive({
 
 <template>
   <h3>{{ course.title }}</h3>
-  <h5>塾师：<el-link type="primary" :href="'/user/profile/'+course.director_id" target="_blank">{{ course.director_name }}</el-link></h5>
+  <h5>塾主：<el-link type="primary" :href="'/user/profile/'+course.director_id" target="_blank">{{ course.director_name }}</el-link></h5>
   <h5 v-if="course.director_id==userid"><el-link type="primary" :href="'/course/edit/'+course.id" target="_blank">编辑课程</el-link></h5>
   <div>{{ course.desc }}</div>
  <el-table 

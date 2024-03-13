@@ -59,13 +59,13 @@ const selection = async (title:string,id:number) => {
     let data = {id:loginstate.id,courseid:id}
     let res = await selectCourseAPI(data)
     console.log(res)
-    router.push('/user/learn/')
+    router.push('/user/mentor/')
   }
 }
 
 // 补充selection函数
 const deselection = async () => {
-  alert("不要轻言放弃，请找塾师谈心。")
+  alert("不要轻言放弃，请找您的塾师咨询。")
 }
 </script>
 
@@ -75,6 +75,12 @@ const deselection = async () => {
     <el-table-column label="课程名称" width="100">
       <template #default="scope">
         <el-link :href="'/course/'+scope.row.course_id" target="_blank" type="primary">{{ scope.row.course_title }}</el-link>
+      </template>
+    </el-table-column>
+    <el-table-column label="塾师">
+      <template #default="scope">
+        <el-link v-if="scope.row.shushi_id" :href="'/user/profile/'+scope.row.shushi_id" target="_blank" type="primary">{{ scope.row.shushi_name }}</el-link>
+        <el-link v-else href='/user/mentor' type="primary">选塾师</el-link>
       </template>
     </el-table-column>
     <el-table-column label="章节名称">
@@ -102,7 +108,7 @@ const deselection = async () => {
         <el-link :href="'/course/'+scope.row.id" target="_blank" type="primary">{{ scope.row.title }}</el-link>
       </template>
     </el-table-column>
-    <el-table-column label="塾师">
+    <el-table-column label="塾主">
       <template #default="scope">
         <el-link :href="'/user/profile/'+scope.row.director_id" target="_blank" type="primary">{{ scope.row.director_name }}</el-link>
       </template>

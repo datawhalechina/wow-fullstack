@@ -21,3 +21,9 @@ export const fetchAllSelectionAPI = (): Promise<any> =>
 
 export const reportLearnAPI = (data:Course.IReportLearn): Promise<any> =>
     instance.post("/course/report_learn", data);
+
+export const calMentorsAPI = (): Promise<any> =>
+    instance.get("/course/cal_mentors");
+
+export const selectMentorAPI = (data:Course.ISelectMentor): Promise<any> =>
+    instance.post("/course/select_mentor", data);

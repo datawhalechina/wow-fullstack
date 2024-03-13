@@ -30,3 +30,8 @@ export interface IReportLearn {
     sele_id:number
     reported_hour:string
 }
+
+export interface ISelectMentor {
+    shushi_id:number
+    courseid:number
+}

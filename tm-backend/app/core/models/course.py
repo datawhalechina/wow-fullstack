@@ -30,6 +30,7 @@ class Selection(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer)
+    shushi_id = Column(Integer)
     course_id = Column(Integer)
     create_time = Column(DateTime)
     current_serial = Column(Integer)

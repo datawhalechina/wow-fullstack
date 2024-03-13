@@ -20,5 +20,6 @@ class Project(Base):
     half_progress = Column(VARCHAR(32))
     finish_date = Column(DateTime)
     actual_hour = Column(Float)
+    sln_url= Column(VARCHAR(500))
     total_hour = Column(Float)
     update_date = Column(DateTime)

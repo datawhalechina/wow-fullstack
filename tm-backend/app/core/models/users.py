@@ -31,3 +31,29 @@ class Register(Base):
     phone = Column(VARCHAR(80))
     notes = Column(VARCHAR(500))
     register_time = Column(DateTime)
+
+
+class Mentors(Base):
+    __tablename__ = 'mentors'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    shushi_id = Column(Integer)
+    course_id = Column(Integer)
+    shusheng_id = Column(Integer)
+    start_time = Column(DateTime)
+    end_time = Column(DateTime)
+    status = Column(VARCHAR(32))
+    update_time = Column(DateTime)
+    end_reason = Column(VARCHAR(500))
+
+class Goals(Base):
+    __tablename__ = 'goals'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    user_id = Column(Integer)
+    content = Column(VARCHAR(500))
+    start_time = Column(DateTime)
+    deadline = Column(DateTime)
+    process = Column(Integer)
+    end_time = Column(DateTime)
+    review = Column(VARCHAR(500))
