@@ -41,7 +41,7 @@ const selection = async (title:string,shushi_id:number,course_id:number) => {
     let data = {shushi_id:shushi_id,courseid:course_id}
     let res = await selectMentorAPI(data)
     console.log(res)
-    router.push('/learn/')
+    // router.push('/learn/')
   }
 }
 </script>

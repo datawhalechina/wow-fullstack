@@ -9,7 +9,7 @@ import glob
 from typing import Optional
 from app.core.schemas.users import UserBase, TokenModel
 from sqlalchemy.orm import Session
-from app.core.models.users import Base, Users, Register
+from app.core.models.users import Base, Users, Register, Goals
 from app.database import engine
 
 Base.metadata.create_all(bind=engine)
@@ -216,6 +216,50 @@ async def submit_profile(info: str = Form(...),
     useritem.desc = userinfo["desc"]
     db.commit()
     return {"code": 200, "message":"OK"}
+
+@router.get("/fetch_goal")
+async def fetch_goal(user: UserBase = Depends(check_jwt_token), db: Session = Depends(get_db)):
+    goalitem = db.query(Goals).filter_by(user_id=user.id, end_time=None).first()
+    goal_dict = {}
+    if goalitem:
+        goal_dict = goalitem.__dict__
+        if "_sa_instance_state" in goal_dict:
+            del goal_dict["_sa_instance_state"]
+    return goal_dict
+
+@router.post("/save_goal")
+async def save_goal(request: Request,
+                      user: UserBase = Depends(check_jwt_token), 
+                      db: Session = Depends(get_db)):
+    form_data = await request.form()
+    goal_id =  form_data.get("goal_id")
+    content =  form_data.get("content")
+    deadline = form_data.get("deadline")
+    process = form_data.get("process")
+    review = form_data.get("review")
+    action = form_data.get("action")
+    if int(goal_id) == 0:
+        new_goal = Goals(
+            content=content,
+            deadline=deadline,
+            process=int(process),
+            review=review,
+            start_time=datetime.now()
+        )
+        db.add(new_goal)
+        db.flush()
+        db.commit()
+        goal_id = new_goal.id
+    else:
+        goalitem = db.query(Goals).filter_by(id=goal_id, user_id=user.id).first()
+        if goalitem:
+            goalitem.content = content
+            goalitem.deadline = deadline
+            goalitem.process = int(process)
+            goalitem.review = review
+            if action=="完成":
+                goalitem.end_time = datetime.now()
+    return {"code": 200, "goal_id":goal_id}
 
 # 定义返回数据格式为UserBase模型格式数据
 # 把校验token函数当做依赖项进行赋值给user

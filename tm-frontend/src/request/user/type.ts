@@ -52,3 +52,12 @@ export interface IDeleteProfile {
 export interface ISubmitProfile {
     info:string
 }
+
+export interface ISaveGoal {
+    goal_id:number
+    content:string
+    deadline:string
+    process:number
+    review:string
+    action:string
+}
