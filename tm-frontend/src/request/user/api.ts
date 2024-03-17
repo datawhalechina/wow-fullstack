@@ -26,8 +26,8 @@ export const deleteProfileAPI = (data: User.IDeleteProfile): Promise<any> =>
 export const submitProfileAPI = (data: User.ISubmitProfile): Promise<any> =>
     instance.post("/users/submit_profile", data);
 
-export const fetchGoalAPI = (): Promise<any> =>
-    instance.get("/users/fetch_goal");
+export const fetchGoalAPI = (params: User.IGetProfile): Promise<any> =>
+    instance.get(`/users/fetch_goal/${params.userid}`, { params });
 
 export const saveGoalAPI = (data: User.ISaveGoal): Promise<any> =>
     instance.post("/users/save_goal", data);

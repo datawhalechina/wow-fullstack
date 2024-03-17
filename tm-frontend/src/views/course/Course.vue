@@ -25,7 +25,7 @@ onMounted(getCurrentSelection)
 
 function isFloat(str:string) {
     // 定义浮点数的正则表达式
-    var reg = /^[-+]?(\d+)?\.\d+$/;
+    var reg = /^[-+]?(\d+)?\.?\d+$/;
     
     return reg.test(str);
 }
@@ -36,6 +36,10 @@ const report = async (row:any) => {
   
   if (reported_hour != null){
     if (isFloat(reported_hour)){
+      if (Number(reported_hour)>5){
+        alert("申报得多了点儿，少报点儿吧！")
+        return false
+      }
       let data = {chapter_id:row.chapter_id,course_id:row.course_id,chapter_title:row.chapter_title,sele_id:row.sele_id,reported_hour:reported_hour}
       let res = await reportLearnAPI(data)
       console.log(res)

@@ -8,7 +8,7 @@ from app.core.schemas.course import CourseModel
 from app.core.schemas.users import UserBase
 from sqlalchemy.orm import Session
 from app.core.models.course import Base, Course, Chapter, Selection, Report
-from app.core.models.users import Users, Mentors
+from app.core.models.users import Users, Mentors, Shuzhi
 from app.database import engine
 import json
 
@@ -174,6 +174,7 @@ async def report_learn(
     user: UserBase = Depends(check_jwt_token), 
     db: Session = Depends(get_db)):
     selection = db.query(Selection).filter_by(id=sele_id).first()
+    useritem = db.query(Users).filter_by(id=user.id).first()
     new_report = Report(
         user_id=user.id,
         chapter_id=chapter_id,
@@ -184,6 +185,55 @@ async def report_learn(
         grant_time=datetime.now()
     )
     db.add(new_report)
+    
+    
+    if selection.shushi_id>0:
+        new_shuzhi = Shuzhi(
+            user_id=user.id,
+            user_type="塾生",
+            target_type="章节",
+            target_id=chapter_id,
+            target_title=chapter_title,
+            change = 1,
+            amount =float(reported_hour) * 5,
+            balance = useritem.shuzhi + float(reported_hour) * 5,
+            comments = useritem.username + "申报学习" + chapter_title,
+            create_time=datetime.now()
+        )
+        db.add(new_shuzhi)
+        shushiitem = db.query(Users).filter_by(id=selection.shushi_id).first()
+        shushi_shuzhi = Shuzhi(
+            user_id=selection.shushi_id,
+            user_type="塾师",
+            target_type="章节",
+            target_id=chapter_id,
+            target_title=chapter_title,
+            change = 1,
+            amount =float(reported_hour) * 5,
+            balance = useritem.shuzhi + float(reported_hour) * 5,
+            comments = useritem.username + "申报学习" + chapter_title,
+            create_time=datetime.now()
+        )
+        db.add(shushi_shuzhi)
+        shushiitem.shuzhi = shushiitem.shuzhi + float(reported_hour) * 5
+        useritem.shuzhi = useritem.shuzhi + float(reported_hour) * 5
+        useritem.learn_hour = useritem.learn_hour + float(reported_hour)
+    else:
+        new_shuzhi = Shuzhi(
+            user_id=user.id,
+            user_type="塾生",
+            target_type="章节",
+            target_id=chapter_id,
+            target_title=chapter_title,
+            change = 1,
+            amount =float(reported_hour) * 10,
+            balance = useritem.shuzhi + float(reported_hour) * 10,
+            comments = useritem.username + "申报学习" + chapter_title,
+            create_time=datetime.now()
+        )
+        db.add(new_shuzhi)
+        useritem.shuzhi = useritem.shuzhi + float(reported_hour) * 10
+        useritem.learn_hour = useritem.learn_hour + float(reported_hour)
     next_serial = selection.current_serial + 1
     next_chapter = db.query(Chapter).filter_by(course_id=course_id,serial=next_serial).first()
     if next_chapter:

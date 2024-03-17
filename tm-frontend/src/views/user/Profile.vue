@@ -1,10 +1,12 @@
 <script setup lang="ts">
+import { useLoginStore } from "../../store";
 import {getProfileAPI, fetchGoalAPI, saveGoalAPI} from '../../request/user/api'
 import { ISaveGoal } from  '../../request/user/type'
 import { ref, reactive, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
-
+const loginstate = useLoginStore();
+const current_userid = loginstate.id
 const userid = Number(route.params.id)
 const diaglogwidth = '600px'
 const formLabelWidth = '100px'
@@ -44,7 +46,7 @@ const getProfile = async () => {
   fileList.length = 0
   fileList.push(...res.profiles)
   console.log(res.profiles)
-  let rtn = await fetchGoalAPI()
+  let rtn = await fetchGoalAPI({userid:userid})
   console.log(rtn)
   if (rtn.id>0) {
     goal.goal_id = rtn.id
@@ -119,8 +121,11 @@ const goal_complete = async() => {
         </div>
     </div>
     <div>自我描述：{{ form.desc }}</div>
-    <h2>我的目标</h2>
-    <el-button type="primary" @click="edit()">编辑</el-button>
+    <h2 v-if="current_userid==userid">我的目标</h2>
+    <h2 v-else-if="current_userid!=userid && form.gender=='男'">他的目标</h2>
+    <h2 v-else-if="current_userid!=userid && form.gender=='女'">她的目标</h2>
+    <h2 v-else>TA的目标</h2>
+    <el-button v-if="current_userid==userid" type="primary" @click="edit()">编辑</el-button>
     <div style="white-space: pre-wrap;">{{ goal.content }}</div>
     <div>阶段：{{ goal.start_date?goal.start_date.slice(0,10):'' }}到{{ goal.deadline?goal.deadline.slice(0,10):'' }}</div>
     <div>进度：{{ goal.process }}</div>

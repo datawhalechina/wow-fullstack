@@ -217,9 +217,9 @@ async def submit_profile(info: str = Form(...),
     db.commit()
     return {"code": 200, "message":"OK"}
 
-@router.get("/fetch_goal")
-async def fetch_goal(user: UserBase = Depends(check_jwt_token), db: Session = Depends(get_db)):
-    goalitem = db.query(Goals).filter_by(user_id=user.id, end_time=None).first()
+@router.get("/fetch_goal/{user_id}")
+async def fetch_goal(user_id:int, db: Session = Depends(get_db)):
+    goalitem = db.query(Goals).filter_by(user_id=user_id, end_time=None).first()
     goal_dict = {}
     if goalitem:
         goal_dict = goalitem.__dict__
