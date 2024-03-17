@@ -240,6 +240,7 @@ async def save_goal(request: Request,
     action = form_data.get("action")
     if int(goal_id) == 0:
         new_goal = Goals(
+            user_id=user.id,
             content=content,
             deadline=deadline,
             process=int(process),
@@ -251,7 +252,7 @@ async def save_goal(request: Request,
         db.commit()
         goal_id = new_goal.id
     else:
-        goalitem = db.query(Goals).filter_by(id=goal_id, user_id=user.id).first()
+        goalitem = db.query(Goals).filter_by(id=int(goal_id), user_id=user.id).first()
         if goalitem:
             goalitem.content = content
             goalitem.deadline = deadline
@@ -259,6 +260,7 @@ async def save_goal(request: Request,
             goalitem.review = review
             if action=="完成":
                 goalitem.end_time = datetime.now()
+        db.commit()
     return {"code": 200, "goal_id":goal_id}
 
 # 定义返回数据格式为UserBase模型格式数据

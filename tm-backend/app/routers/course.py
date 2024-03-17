@@ -271,7 +271,7 @@ async def select_mentor(shushi_id: int = Form(...),
         course_id=courseid,
         user_id=user.id,
         finish_time=None
-    )
+    ).first()
     if selection:
         selection.shushi_id = shushi_id
     mentor = db.query(Mentors).filter_by(

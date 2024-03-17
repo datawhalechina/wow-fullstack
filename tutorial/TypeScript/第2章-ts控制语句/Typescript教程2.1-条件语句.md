@@ -1,3 +1,7 @@
+代码运行地址：
+
+https://www.runoob.com/try/runcode.php?filename=ts-hw&type=typescript
+
 条件语句用于基于不同的条件来执行不同的动作。
 
 TypeScript 条件语句是通过一条或多条语句的执行结果（True 或 False）来决定执行的代码块。

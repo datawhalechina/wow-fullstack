@@ -1,3 +1,7 @@
+代码运行地址：
+
+https://www.runoob.com/try/runcode.php?filename=ts-hw&type=typescript
+
 ## 6.TypeScript 联合类型
 在 TypeScript 中，联合类型（Union Types）是指一个变量可以具有多种不同的类型。由于联合类型可以是多个类型的集合，因此直接使用联合类型的属性和方法需要确保这些属性和方法在所有可能的类型中都是共有的。以下是 TypeScript 中常见的适用于联合类型的属性和方法：
 ### 内置方法：

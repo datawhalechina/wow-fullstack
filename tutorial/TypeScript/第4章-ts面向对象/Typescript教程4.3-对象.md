@@ -1,3 +1,7 @@
+代码运行地址：
+
+https://www.runoob.com/try/runcode.php?filename=ts-hw&type=typescript
+
 # TypeScript 对象
 
 对象是包含一组键值对的实例。 值可以是标量、函数、数组、对象等，如下实例：

@@ -1,3 +1,7 @@
+代码运行地址：
+
+https://www.runoob.com/try/runcode.php?filename=ts-hw&type=typescript
+
 ## 3.TypeScript Array(数组)
 在 TypeScript 中，数组（Array）是一种用来表示一系列相同类型元素的数据结构。以下是 TypeScript 中数组常用的一些内置属性和方法：
 ### 内置属性：

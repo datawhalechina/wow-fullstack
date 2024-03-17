@@ -1,3 +1,7 @@
+代码运行地址：
+
+https://www.runoob.com/try/runcode.php?filename=ts-hw&type=typescript
+
 # TypeScript 函数
 
 函数是一组一起执行一个任务的语句。

@@ -2,20 +2,6 @@
 import { calMentorsAPI, selectMentorAPI } from '../../request/course/api';
 import { reactive, onMounted } from 'vue'
 import router from '../../router'
-import { useLoginStore } from "../../store";
-const loginstate = useLoginStore();
-
-const shushidata = reactive([
-    {
-        id:1,
-        mentor_id:1,
-        mentor_name:"黎伟",
-        course_id:1,
-        course_title:"前端开发",
-    },
-])
-
-
 const tableData:any = reactive([])
 const getAllMentor = async () => {
     let res = await calMentorsAPI()
@@ -41,7 +27,7 @@ const selection = async (title:string,shushi_id:number,course_id:number) => {
     let data = {shushi_id:shushi_id,courseid:course_id}
     let res = await selectMentorAPI(data)
     console.log(res)
-    // router.push('/learn/')
+    router.push('/learn/')
   }
 }
 </script>

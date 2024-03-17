@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import {fetchCourseAPI, selectCourseAPI, fetchCurrentSelectionAPI, reportLearnAPI} from '../../request/course/api'
-import { ref, reactive, onMounted } from 'vue'
+import { reactive, onMounted } from 'vue'
 import router from '../../router'
 import { useLoginStore } from "../../store";
 const loginstate = useLoginStore();
 const tableData:any = reactive([])
 const getAllCourse = async () => {
   let res = await fetchCourseAPI()
-  console.log(res)
+  //console.log(res)
   tableData.push(...res)
 }
 onMounted(getAllCourse)
@@ -18,7 +18,6 @@ const getCurrentSelection = async () => {
   let res2 = await fetchCurrentSelectionAPI()
   currentTableData.push(...res2)
   res2.forEach((course:any) => {
-    console.log(course.course_id)
     currentSelections.push(course.course_id)
   })
 }

@@ -1,3 +1,7 @@
+代码运行地址：
+
+https://www.runoob.com/try/runcode.php?filename=ts-hw&type=typescript
+
 # TypeScript 循环
 
 有的时候，我们可能需要多次执行同一块代码。一般情况下，语句是按顺序执行的：函数中的第一个语句先执行，接着是第二个语句，依此类推。
@@ -79,27 +83,46 @@ for (let entry of someArray) {
 
 forEach、every 和 some 是 JavaScript 的循环语法，TypeScript 作为 JavaScript 的语法超集，当然默认也是支持的。
 
-因为 forEach 在 iteration 中是无法返回的，所以可以使用 every 和 some 来取代 forEach。
 
+
+forEach方法用于遍历数组的每个元素，并对每个元素执行相同的操作。
 ```typescript
 let list = [4, 5, 6];
 list.forEach((val, idx, array) => {
     // val: 当前值
     // idx：当前index
     // array: Array
+    console.log(`元素: ${val}, 索引: ${idx}, 数组: ${array}`);
 });
 ```
 
+
+因为 forEach 在 iteration 中是无法返回值的，所以可以使用 every 和 some 来取代 forEach。
+
+every方法用于测试数组的所有元素是否都通过了由提供的函数实现的测试。
 ```typescript
-let list = [4, 5, 6];
-list.every((val, idx, array) => {
+let list:number[] = [1, 2, 3, 4, 5]; 
+let allPositive = list.every((val, idx, array) => {
     // val: 当前值
     // idx：当前index
     // array: Array
-    return true; // Continues
+    return val > 0;
     // Return false will quit the iteration
 });
+console.log(allPositive); // 输出: true
 ```
+some方法用于测试数组中是否至少有一个元素通过了由提供的函数实现的测试。
+```typescript
+let numbers: number[] = [1, 2, 3, 4, 5];  
+  
+let hasEven = numbers.some((val) => {  
+    return val % 2 === 0;  
+});  
+  
+console.log(hasEven); // 输出: true
+```
+
+
 
 ## while 循环
 

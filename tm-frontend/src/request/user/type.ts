@@ -56,8 +56,9 @@ export interface ISubmitProfile {
 export interface ISaveGoal {
     goal_id:number
     content:string
+    start_date:string
     deadline:string
     process:number
     review:string
-    action:string
+    action?:string
 }

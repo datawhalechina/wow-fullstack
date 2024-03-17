@@ -1,3 +1,8 @@
+代码运行地址：
+
+https://www.runoob.com/try/runcode.php?filename=ts-hw&type=typescript
+
+
 # TypeScript 类
 
 TypeScript 是面向对象的 JavaScript。

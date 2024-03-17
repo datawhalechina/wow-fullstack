@@ -1,3 +1,8 @@
+代码运行地址：
+
+https://www.runoob.com/try/runcode.php?filename=ts-hw&type=typescript
+
+
 接口是一系列抽象方法的声明，是一些方法特征的集合，这些方法都应该是抽象的，需要由具体的类去实现，然后第三方就可以通过这组抽象方法调用，让具体的类执行具体的方法。需要注意接口不能转换为 JavaScript。 它只是 TypeScript 的一部分。
 
 TypeScript 接口定义如下：

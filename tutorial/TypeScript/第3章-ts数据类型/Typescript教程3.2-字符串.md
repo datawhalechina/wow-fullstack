@@ -1,3 +1,7 @@
+代码运行地址：
+
+https://www.runoob.com/try/runcode.php?filename=ts-hw&type=typescript
+
 ## 2.TypeScript String
 在 TypeScript 中，String 是一个基本数据类型，用于表示文本数据。你可以使用单引号`'`或双引号`"`来创建字符串。还可以使用反引号```创建模板字符串，这种字符串可以跨越多行并嵌入表达式。以下是一些使用 String` 类型的例子：
 ```typescript

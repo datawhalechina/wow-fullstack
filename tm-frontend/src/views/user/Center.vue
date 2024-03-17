@@ -17,7 +17,7 @@ const userid = loginstate.id
     <br />
     <el-link type="primary" href="/user/supervise" target="_blank">学习监督</el-link>
     <br />
-    <el-link type="primary" href="/user/followup" target="_blank">项目跟进</el-link>
+    <el-link type="primary" href="/user/followup" target="_blank">项目回顾</el-link>
 
     
 </template>
