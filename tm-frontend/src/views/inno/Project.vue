@@ -1,17 +1,30 @@
 <script setup lang="ts">
 import { useLoginStore } from "../../store";
-import {fetchProjectsAPI, getNextSerialAPI, addProjectAPI, updateProjectAPI} from '../../request/create/api'
+import {fetchProjectsAPI, getNextSerialAPI, addProjectAPI, updateProjectAPI} from '../../request/inno/api'
 import { ElTable } from 'element-plus'
 import { onMounted, ref, reactive } from 'vue'
 const loginstate = useLoginStore();
 const userid = loginstate.id
 const diaglogwidth = '400px'
 const formLabelWidth = '100px'
+const applyFormVisible = ref(false)
 const addTaskFormVisible = ref(false)
 const editTaskFormVisible = ref(false)
 const halfReportFormVisible = ref(false)
 const finishReportFormVisible = ref(false)
+const radio_performer = ref('')
+const radio_shusheng = ref(0)
 const radio_half_process = ref('')
+const shusheng_list = [
+  {
+    id:1,
+    name:"张三"
+  },
+  {
+    id:2,
+    name:"李四"
+  }
+]
 const taskdata = [
     {
         id: 1,
@@ -231,8 +244,16 @@ const edit_confirm = async() => {
     currentRow.value.update_date=now.toISOString().slice(0, 10)
 }
 
+const apply_confirm = async ()=> {
+  console.log(radio_shusheng.value)
+  applyFormVisible.value = false
+}
 
 const apply = async ()=> {
+  applyFormVisible.value = true
+}
+
+const apply2 = async ()=> {
     let msg = "确定要认领《"+currentRow.value.title+"》吗？"
     if (confirm(msg)==true) {
         console.log("认领")
@@ -383,6 +404,23 @@ style="width: 100%"
     </template>
 </el-dialog>
 
+<el-dialog v-model="applyFormVisible" :width="diaglogwidth" :center="true" title="认领任务">
+    <el-radio-group v-model="radio_performer" class="ml-4">
+        <el-radio label="自己" size="large">自己做</el-radio>
+        <el-radio label="塾生" size="large">带塾生做</el-radio>
+    </el-radio-group>
+    <br />
+    <el-radio-group v-if="shusheng_list.length>0 && radio_performer=='塾生'" v-model="radio_shusheng" class="ml-4">
+        <span v-for="item in shusheng_list">
+          <el-radio :label="item.id" size="large">{{ item.name }}</el-radio>&nbsp;&nbsp;&nbsp;&nbsp;
+        </span>
+    </el-radio-group>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button type="primary" @click="apply_confirm()">确定</el-button>
+      </span>
+    </template>
+</el-dialog>
 
 <el-dialog v-model="halfReportFormVisible" :width="diaglogwidth" :center="true" title="半程汇报">
     <el-radio-group v-model="radio_half_process" class="ml-4">

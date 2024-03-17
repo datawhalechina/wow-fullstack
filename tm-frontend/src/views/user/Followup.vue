@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useLoginStore } from "../../store";
-import {fetchFinishedProjectsAPI} from '../../request/create/api'
+import {fetchFinishedProjectsAPI} from '../../request/inno/api'
 import { ref, reactive, onMounted, computed } from 'vue'
 const loginstate = useLoginStore();
 const tableData:any = reactive([])
@@ -96,4 +96,4 @@ function getDeadlineColor(deadline: string) {
 .red {  
   color: red;  
 }  
-</style>
+</style>../../request/inno/api

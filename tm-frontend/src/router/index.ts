@@ -39,10 +39,10 @@ const routes: Array<RouteRecordRaw> = [
           component: () => import("../views/course/Edit.vue"),
        },
         {
-          path: "/create",
+          path: "/inno",
           // 命名
-          name: "Create",
-          component: () => import("../views/create/Project.vue"),
+          name: "Inno",
+          component: () => import("../views/inno/Project.vue"),
         },
         {
             path: "/articles",

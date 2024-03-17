@@ -25,7 +25,7 @@ const handleSelect = (key: string, keyPath: string[]) => {
         router
       >
         <el-menu-item index="/learn">学习</el-menu-item>
-        <el-menu-item index="/create">创造</el-menu-item>
+        <el-menu-item index="/inno">创新</el-menu-item>
       </el-menu>
     </el-col>
 
