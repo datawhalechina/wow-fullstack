@@ -4,7 +4,7 @@ from app.dependencies import check_jwt_token, get_db
 from sqlalchemy.orm import Session
 from app.core.schemas.users import UserBase
 from app.core.models.create import Base, Project
-from app.core.models.users import Users
+from app.core.models.users import Users, Shuzhi
 from app.database import engine
 import json
 
@@ -92,6 +92,11 @@ async def edit_project(request: Request,
     elif form_data.get("params[action]") == "apply":
         project_obj.taker=user.username
         project_obj.taker_id=user.id
+    elif form_data.get("params[action]") == "allo":
+        project_obj.taker=db.query(Users).filter_by(id=int(form_data.get("params[shusheng_id]"))).first().username
+        project_obj.taker_id=int(form_data.get("params[shusheng_id]"))
+        project_obj.shushi=user.username
+        project_obj.shushi_id=user.id
     elif form_data.get("params[action]") == "half_report":
         project_obj.half_progress=form_data.get("params[half_progress]")
     elif form_data.get("params[action]") == "finish_report":
@@ -100,6 +105,53 @@ async def edit_project(request: Request,
         useritem = db.query(Users).filter_by(id=user.id).first()
         current_create_hours = useritem.create_hour or 0.0
         project_obj.total_hour=current_create_hours+float(form_data.get("params[actual_hour]"))
+        if project_obj.shushi_id>0:
+            new_shuzhi = Shuzhi(
+                user_id=user.id,
+                user_type="创新者",
+                target_type="任务",
+                target_id=project_obj.id,
+                target_title=project_obj.title,
+                change = 1,
+                amount = float(form_data.get("params[actual_hour]")) * 10,
+                balance = useritem.shuzhi + float(form_data.get("params[actual_hour]")) * 10,
+                comments = useritem.username + "申报创新" + project_obj.title,
+                create_time=datetime.now()
+            )
+            db.add(new_shuzhi)
+            shushiitem = db.query(Users).filter_by(id=project_obj.shushi_id).first()
+            shushi_shuzhi = Shuzhi(
+                user_id=project_obj.shushi_id,
+                user_type="塾师",
+                target_type="任务",
+                target_id=project_obj.id,
+                target_title=project_obj.title,
+                change = 1,
+                amount = float(form_data.get("params[actual_hour]")) * 10,
+                balance = useritem.shuzhi + float(form_data.get("params[actual_hour]")) * 10,
+                comments = useritem.username + "申报创新" + project_obj.title,
+                create_time=datetime.now()
+            )
+            db.add(shushi_shuzhi)
+            shushiitem.shuzhi = shushiitem.shuzhi + float(form_data.get("params[actual_hour]")) * 10
+            useritem.shuzhi = useritem.shuzhi + float(form_data.get("params[actual_hour]")) * 10
+            useritem.learn_hour = useritem.learn_hour + float(form_data.get("params[actual_hour]"))
+        else:
+            new_shuzhi = Shuzhi(
+                user_id=user.id,
+                user_type="创新者",
+                target_type="任务",
+                target_id=project_obj.id,
+                target_title=project_obj.title,
+                change = 1,
+                amount =float(form_data.get("params[actual_hour]")) * 20,
+                balance = useritem.shuzhi + float(form_data.get("params[actual_hour]")) * 20,
+                comments = useritem.username + "申报创新" + project_obj.title,
+                create_time=datetime.now()
+            )
+            db.add(new_shuzhi)
+            useritem.shuzhi = useritem.shuzhi + float(form_data.get("params[actual_hour]")) * 20
+            useritem.learn_hour = useritem.learn_hour + float(form_data.get("params[actual_hour]"))
     project_obj.update_date = datetime.now()
     db.commit()
     return {"code": "200"}

@@ -32,10 +32,6 @@ const deadlineColors = computed(() => {
   }, {} as { [key: string]: string });  
 });  
   
-// 函数，用于获取截止日期的颜色  
-function getDeadlineColor(deadline: string) {  
-  return deadlineColors.value[deadline] || '';  
-}  
 
 
 </script>
@@ -53,6 +49,11 @@ function getDeadlineColor(deadline: string) {
         <template #default="scope">
             <el-link type="primary" :href="'/user/profile/'+scope.row.taker_id" target="_blank">{{ scope.row.taker }}</el-link>
         </template>
+        </el-table-column>
+        <el-table-column label="塾师">
+          <template #default="scope">
+            <el-link type="primary" :href="'/user/profile/'+scope.row.shushi_id" target="_blank">{{ scope.row.shushi }}</el-link>
+          </template>
         </el-table-column>
         <el-table-column label="发布人">
         <template #default="scope">
@@ -96,4 +97,4 @@ function getDeadlineColor(deadline: string) {
 .red {  
   color: red;  
 }  
-</style>../../request/inno/api
+</style>

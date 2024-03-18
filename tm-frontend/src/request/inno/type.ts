@@ -14,6 +14,7 @@ export interface INextSerial {
 export interface IUpdateProject {
     project_id:number
     action:string
+    shusheng_id?:number
     title?:string
     url?: string
     desc?: string
@@ -23,4 +24,8 @@ export interface IUpdateProject {
     half_progress?:string
     finish_date?:string
     actual_hour?:string
+}
+
+export interface IFetchShushengs {
+    user_id:number
 }

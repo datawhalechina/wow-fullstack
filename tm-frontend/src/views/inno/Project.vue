@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useLoginStore } from "../../store";
-import {fetchProjectsAPI, getNextSerialAPI, addProjectAPI, updateProjectAPI} from '../../request/inno/api'
+import {fetchProjectsAPI, getNextSerialAPI, addProjectAPI, updateProjectAPI, fetchShushengsAPI} from '../../request/inno/api'
 import { ElTable } from 'element-plus'
 import { onMounted, ref, reactive } from 'vue'
 const loginstate = useLoginStore();
@@ -12,10 +12,10 @@ const addTaskFormVisible = ref(false)
 const editTaskFormVisible = ref(false)
 const halfReportFormVisible = ref(false)
 const finishReportFormVisible = ref(false)
-const radio_performer = ref('')
+const radio_performer = ref('自己')
 const radio_shusheng = ref(0)
 const radio_half_process = ref('')
-const shusheng_list = [
+const shusheng_list = reactive([
   {
     id:1,
     name:"张三"
@@ -24,7 +24,8 @@ const shusheng_list = [
     id:2,
     name:"李四"
   }
-]
+])
+
 const taskdata = [
     {
         id: 1,
@@ -247,10 +248,31 @@ const edit_confirm = async() => {
 const apply_confirm = async ()=> {
   console.log(radio_shusheng.value)
   applyFormVisible.value = false
+  let data;
+  if (radio_performer.value == "自己") {
+    currentRow.value.taker = loginstate.name
+    currentRow.value.taker_id = loginstate.id
+    data = {project_id:currentRow.value.id, action:'apply'}
+  } else {
+    currentRow.value.shushi = loginstate.name
+    currentRow.value.shushi_id = loginstate.id
+    currentRow.value.taker = shusheng_list[radio_shusheng.value].name
+    currentRow.value.taker_id = shusheng_list[radio_shusheng.value].id
+    data = {project_id:currentRow.value.id, action:'allo', shusheng_id:shusheng_list[radio_shusheng.value].id}
+  }
+  console.log(data)
+  let res = await updateProjectAPI(data)
+  console.log(res)
+  let now = new Date();
+  currentRow.value.update_date=now.toISOString().slice(0, 10)
+
 }
 
 const apply = async ()=> {
   applyFormVisible.value = true
+  let res = await fetchShushengsAPI({user_id:userid})
+  shusheng_list.length = 0
+  shusheng_list.push(...res)
 }
 
 const apply2 = async ()=> {
@@ -312,6 +334,11 @@ style="width: 100%"
     <el-table-column label="执行人">
       <template #default="scope">
         <el-link type="primary" :href="'/user/profile/'+scope.row.taker_id" target="_blank">{{ scope.row.taker }}</el-link>
+      </template>
+    </el-table-column>
+    <el-table-column label="塾师">
+      <template #default="scope">
+        <el-link type="primary" :href="'/user/profile/'+scope.row.shushi_id" target="_blank">{{ scope.row.shushi }}</el-link>
       </template>
     </el-table-column>
     <el-table-column label="发布人">
@@ -411,8 +438,8 @@ style="width: 100%"
     </el-radio-group>
     <br />
     <el-radio-group v-if="shusheng_list.length>0 && radio_performer=='塾生'" v-model="radio_shusheng" class="ml-4">
-        <span v-for="item in shusheng_list">
-          <el-radio :label="item.id" size="large">{{ item.name }}</el-radio>&nbsp;&nbsp;&nbsp;&nbsp;
+        <span v-for="(item, index) in shusheng_list">
+          <el-radio :label="index" size="large">{{ item.name }}</el-radio>&nbsp;&nbsp;&nbsp;&nbsp;
         </span>
     </el-radio-group>
     <template #footer>
@@ -436,7 +463,7 @@ style="width: 100%"
 </el-dialog>
 
 
-<el-dialog v-model="finishReportFormVisible" :width="diaglogwidth" :center="true" title="编辑任务">
+<el-dialog v-model="finishReportFormVisible" :width="diaglogwidth" :center="true" title="结束汇报">
     <el-form :model="currentRow">
       <el-form-item label="实际用时" :label-width="formLabelWidth">
         <el-input type="number" v-model="currentRow.actual_hour" autocomplete="off" />

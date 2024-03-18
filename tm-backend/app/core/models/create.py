@@ -9,6 +9,8 @@ class Project(Base):
     publisher_id = Column(Integer)
     taker = Column(VARCHAR(32))
     taker_id = Column(Integer)
+    shushi = Column(VARCHAR(32))
+    shushi_id = Column(Integer)
     task_serial = Column(VARCHAR(32))
     title = Column(VARCHAR(100))
     url= Column(VARCHAR(500))

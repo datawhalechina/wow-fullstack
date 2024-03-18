@@ -9,7 +9,7 @@ import glob
 from typing import Optional
 from app.core.schemas.users import UserBase, TokenModel
 from sqlalchemy.orm import Session
-from app.core.models.users import Base, Users, Register, Goals
+from app.core.models.users import Base, Users, Register, Mentors, Goals
 from app.database import engine
 
 Base.metadata.create_all(bind=engine)
@@ -262,6 +262,20 @@ async def save_goal(request: Request,
                 goalitem.end_time = datetime.now()
         db.commit()
     return {"code": 200, "goal_id":goal_id}
+
+
+@router.get("/fetch_shushengs/{user_id}")
+async def fetch_goal(user_id:int, db: Session = Depends(get_db)):
+    mentors = db.query(Mentors).filter_by(shushi_id=user_id, end_time=None).all()
+    shushengs = []
+    if mentors:
+        for mentoritem in mentors:
+            shusheng_dict = {
+                "id":mentoritem.shusheng_id,
+                "name":db.query(Users).filter_by(id=mentoritem.shusheng_id).first().username
+                }
+            shushengs.append(shusheng_dict)
+    return shushengs
 
 # 定义返回数据格式为UserBase模型格式数据
 # 把校验token函数当做依赖项进行赋值给user
