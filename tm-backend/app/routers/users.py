@@ -9,7 +9,7 @@ import glob
 from typing import Optional
 from app.core.schemas.users import UserBase, TokenModel
 from sqlalchemy.orm import Session
-from app.core.models.users import Base, Users, Register, Mentors, Goals
+from app.core.models.users import Base, Users, Register, Mentors, Goals, Shuzhi
 from app.database import engine
 
 Base.metadata.create_all(bind=engine)
@@ -217,6 +217,19 @@ async def submit_profile(info: str = Form(...),
     db.commit()
     return {"code": 200, "message":"OK"}
 
+
+@router.get("/fetch_all_users")
+async def fetch_all_users(db: Session = Depends(get_db)):
+    users = db.query(Users).order_by(Users.id.desc).all()
+    rtn = []
+    for user in users:
+        user_dict = user.__dict__
+        if "_sa_instance_state" in user_dict:
+            del user_dict["_sa_instance_state"]
+        rtn.append(user_dict)
+    return rtn
+
+
 @router.get("/fetch_goal/{user_id}")
 async def fetch_goal(user_id:int, db: Session = Depends(get_db)):
     goalitem = db.query(Goals).filter_by(user_id=user_id, end_time=None).first()
@@ -265,7 +278,7 @@ async def save_goal(request: Request,
 
 
 @router.get("/fetch_shushengs/{user_id}")
-async def fetch_goal(user_id:int, db: Session = Depends(get_db)):
+async def fetch_shushengs(user_id:int, db: Session = Depends(get_db)):
     mentors = db.query(Mentors).filter_by(shushi_id=user_id, end_time=None).all()
     shushengs = []
     if mentors:
@@ -276,6 +289,31 @@ async def fetch_goal(user_id:int, db: Session = Depends(get_db)):
                 }
             shushengs.append(shusheng_dict)
     return shushengs
+
+@router.get("/fetch_shushis/{user_id}")
+async def fetch_shushengs(user_id:int, db: Session = Depends(get_db)):
+    mentors = db.query(Mentors).filter_by(shusheng_id=user_id, end_time=None).all()
+    shushis = []
+    if mentors:
+        for mentoritem in mentors:
+            shushi_dict = {
+                "id":mentoritem.shushi_id,
+                "name":db.query(Users).filter_by(id=mentoritem.shushi_id).first().username
+                }
+            shushis.append(shushi_dict)
+    return shushis
+
+@router.get("/fetch_shuzhi/{user_id}")
+async def fetch_shuzhi(user_id:int, db: Session = Depends(get_db)):
+    shuzhis = db.query(Shuzhi).filter_by(user_id=user_id).order_by(Shuzhi.id.desc).all()
+    rtn = []
+    for shuzhi in shuzhis:
+        shuzhi_dict = shuzhi.__dict__
+        if "_sa_instance_state" in shuzhi_dict:
+            del shuzhi_dict["_sa_instance_state"]
+        rtn.append(shuzhi_dict)
+    return rtn
+
 
 # 定义返回数据格式为UserBase模型格式数据
 # 把校验token函数当做依赖项进行赋值给user
