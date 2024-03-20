@@ -9,7 +9,9 @@ import glob
 from typing import Optional
 from app.core.schemas.users import UserBase, TokenModel
 from sqlalchemy.orm import Session
+from sqlalchemy import func 
 from app.core.models.users import Base, Users, Register, Mentors, Goals, Shuzhi
+from app.core.models.course import Report
 from app.database import engine
 
 Base.metadata.create_all(bind=engine)
@@ -222,8 +224,14 @@ async def submit_profile(info: str = Form(...),
 async def fetch_all_users(db: Session = Depends(get_db)):
     users = db.query(Users).order_by(Users.id.desc).all()
     rtn = []
+    seven_days_ago = datetime.now() - timedelta(days=7) 
     for user in users:
+        total_hours_7d = db.query(func.sum(Report.time_granted)).filter(
+            Report.grant_time >= seven_days_ago,
+            Report.user_id == user.id
+            ).scalar() 
         user_dict = user.__dict__
+        user_dict["total_hours_7d"] = total_hours_7d
         if "_sa_instance_state" in user_dict:
             del user_dict["_sa_instance_state"]
         rtn.append(user_dict)
@@ -239,6 +247,17 @@ async def fetch_goal(user_id:int, db: Session = Depends(get_db)):
         if "_sa_instance_state" in goal_dict:
             del goal_dict["_sa_instance_state"]
     return goal_dict
+
+@router.get("/fetch_reports/{user_id}")
+async def fetch_reports(user_id:int, db: Session = Depends(get_db)):
+    reportitem = db.query(Report).filter_by(user_id=user_id).order_by(Report.id.desc).all()
+    report_list = []
+    if reportitem:
+        report_dict = reportitem.__dict__
+        if "_sa_instance_state" in report_dict:
+            del report_dict["_sa_instance_state"]
+        report_list.append(report_dict)
+    return report_list
 
 @router.post("/save_goal")
 async def save_goal(request: Request,

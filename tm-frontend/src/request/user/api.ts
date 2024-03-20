@@ -29,8 +29,20 @@ export const submitProfileAPI = (data: User.ISubmitProfile): Promise<any> =>
 export const fetchGoalAPI = (params: User.IGetProfile): Promise<any> =>
     instance.get(`/users/fetch_goal/${params.userid}`, { params });
 
+export const fetchShushisAPI = (params: User.IGetProfile): Promise<any> =>
+    instance.get(`/users/fetch_shushis/${params.userid}`, { params });
+
+export const fetchShuzhiAPI = (params: User.IGetProfile): Promise<any> =>
+    instance.get(`/users/fetch_shuzhi/${params.userid}`, { params });
+
+export const fetchReportsAPI = (params: User.IGetProfile): Promise<any> =>
+    instance.get(`/users/fetch_reports/${params.userid}`, { params });
+
 export const saveGoalAPI = (data: User.ISaveGoal): Promise<any> =>
     instance.post("/users/save_goal", data);
+
+export const fetchAllUsersAPI = (): Promise<any> =>
+    instance.get("/users/fetch_all_users");
 
 export const checkAPI = (): Promise<User.ProData> =>
     instance.get("/users/pro");

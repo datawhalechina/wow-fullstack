@@ -177,8 +177,9 @@ async def report_learn(
     useritem = db.query(Users).filter_by(id=user.id).first()
     new_report = Report(
         user_id=user.id,
-        chapter_id=chapter_id,
-        chapter_title=chapter_title,
+        target_type='学习',
+        target_id=chapter_id,
+        target_title=chapter_title,
         time_reported=float(reported_hour),
         report_time=datetime.now(),
         time_granted=float(reported_hour),

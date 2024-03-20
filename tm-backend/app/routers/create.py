@@ -4,6 +4,7 @@ from app.dependencies import check_jwt_token, get_db
 from sqlalchemy.orm import Session
 from app.core.schemas.users import UserBase
 from app.core.models.create import Base, Project
+from app.core.models.course import Report
 from app.core.models.users import Users, Shuzhi
 from app.database import engine
 import json
@@ -105,6 +106,17 @@ async def edit_project(request: Request,
         useritem = db.query(Users).filter_by(id=user.id).first()
         current_create_hours = useritem.create_hour or 0.0
         project_obj.total_hour=current_create_hours+float(form_data.get("params[actual_hour]"))
+        new_report = Report(
+            user_id=user.id,
+            target_type='创新',
+            target_id=project_obj.id,
+            target_title=project_obj.title,
+            time_reported=float(form_data.get("params[actual_hour]")),
+            report_time=datetime.now(),
+            time_granted=float(form_data.get("params[actual_hour]")),
+            grant_time=datetime.now()
+        )
+        db.add(new_report)
         if project_obj.shushi_id>0:
             new_shuzhi = Shuzhi(
                 user_id=user.id,
