@@ -81,10 +81,22 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import("../views/user/Profile.vue"),
         },
         {
-          path: "/user/learn",
+          path: "/user/report",
           // 命名
-          name: "Learn",
-          component: () => import("../views/user/Learn.vue"),
+          name: "Report",
+          component: () => import("../views/user/Report.vue"),
+        },
+        {
+          path: "/user/shuzhi",
+          // 命名
+          name: "Shuzhi",
+          component: () => import("../views/user/Shuzhi.vue"),
+        },
+        {
+          path: "/user/all",
+          // 命名
+          name: "All",
+          component: () => import("../views/user/All.vue"),
         },
         {
           path: "/user/mentor",

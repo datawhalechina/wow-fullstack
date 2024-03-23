@@ -4,10 +4,11 @@ from app.dependencies import check_jwt_token, get_db
 from sqlalchemy.orm import Session
 from app.core.schemas.users import UserBase
 from app.core.models.create import Base, Project
-from app.core.models.course import Report
+from app.core.models.course import Report, Selection, Course
 from app.core.models.users import Users, Shuzhi
 from app.database import engine
-import json
+import json, os, ast
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -117,17 +118,17 @@ async def edit_project(request: Request,
             grant_time=datetime.now()
         )
         db.add(new_report)
-        if project_obj.shushi_id>0:
+        if project_obj.shushi_id:
             new_shuzhi = Shuzhi(
                 user_id=user.id,
                 user_type="创新者",
-                target_type="任务",
+                target_type="创新",
                 target_id=project_obj.id,
                 target_title=project_obj.title,
                 change = 1,
                 amount = float(form_data.get("params[actual_hour]")) * 10,
                 balance = useritem.shuzhi + float(form_data.get("params[actual_hour]")) * 10,
-                comments = useritem.username + "申报创新" + project_obj.title,
+                comments = useritem.username + "申报-创新-" + project_obj.title,
                 create_time=datetime.now()
             )
             db.add(new_shuzhi)
@@ -135,13 +136,13 @@ async def edit_project(request: Request,
             shushi_shuzhi = Shuzhi(
                 user_id=project_obj.shushi_id,
                 user_type="塾师",
-                target_type="任务",
+                target_type="创新",
                 target_id=project_obj.id,
                 target_title=project_obj.title,
                 change = 1,
                 amount = float(form_data.get("params[actual_hour]")) * 10,
                 balance = useritem.shuzhi + float(form_data.get("params[actual_hour]")) * 10,
-                comments = useritem.username + "申报创新" + project_obj.title,
+                comments = useritem.username + "申报-创新-" + project_obj.title,
                 create_time=datetime.now()
             )
             db.add(shushi_shuzhi)
@@ -152,13 +153,13 @@ async def edit_project(request: Request,
             new_shuzhi = Shuzhi(
                 user_id=user.id,
                 user_type="创新者",
-                target_type="任务",
+                target_type="创新",
                 target_id=project_obj.id,
                 target_title=project_obj.title,
                 change = 1,
                 amount =float(form_data.get("params[actual_hour]")) * 20,
                 balance = useritem.shuzhi + float(form_data.get("params[actual_hour]")) * 20,
-                comments = useritem.username + "申报创新" + project_obj.title,
+                comments = useritem.username + "申报-创新-" + project_obj.title,
                 create_time=datetime.now()
             )
             db.add(new_shuzhi)
@@ -166,4 +167,70 @@ async def edit_project(request: Request,
             useritem.learn_hour = useritem.learn_hour + float(form_data.get("params[actual_hour]"))
     project_obj.update_date = datetime.now()
     db.commit()
+    return {"code": "200"}
+
+@create.get("/fetch_dockets/{user_id}")
+async def fetch_dockets(user_id:int, db: Session = Depends(get_db)):
+    dockets = []
+    selections = db.query(Selection).filter_by(user_id=user_id,finish_time=None).all()
+    if selections:
+        for sele in selections:
+            sele_dict = {}
+            course = db.query(Course).filter_by(id=sele.course_id).first()
+            sele_dict["value"] = course.title+"_"+str(sele.current_serial)
+            dockets.append(sele_dict)
+    projects = db.query(Project).filter_by(taker_id=user_id,finish_date=None).all()
+    if projects:
+        for pro in projects:
+            pro_dict = {}
+            pro_dict["value"] = pro.task_serial
+            dockets.append(pro_dict)
+    return dockets
+
+
+@create.get('/get_tm/{user_id}')
+async def get_tm(user_id:int):
+    userid = str(user_id)
+    pr = []
+    fn = []
+    if os.path.exists(f"static/tm/t{userid}.txt"):
+        with open(f"static/tm/t{userid}.txt", "r", encoding="utf-8") as f:
+            pr=f.readlines()
+    pr = [ast.literal_eval(x) for x in pr]
+    if os.path.exists(f"static/tm/f{userid}.txt"):
+        with open(f"static/tm/f{userid}.txt", "r", encoding="utf-8") as f:
+            fn=f.readlines()
+    fn = [ast.literal_eval(x) for x in fn]
+    fn.reverse()
+    return {"pr":pr, "fn":fn}
+
+@create.get('/get_pr/{user_id}')
+async def get_pr(user_id:int):
+    userid = str(user_id)
+    pr = []
+    if os.path.exists(f"static/tm/t{userid}.txt"):
+        with open(f"static/tm/t{userid}.txt", "r", encoding="utf-8") as f:
+            pr=f.readlines()
+    pr = [ast.literal_eval(x) for x in pr]
+    return pr
+
+@create.put('/save_pr/{user_id}')
+async def save_pr(request: Request, user_id:int):
+    userid = str(user_id)
+    form_data = await request.form()
+    tasklist = json.loads(form_data.get("params[taskinfo]"))
+    with open(f"static/tm/t{userid}.txt", "w", encoding="utf-8") as f:
+        for line in tasklist:
+            f.write(str(line) + "\n")
+    return {"code": "200"}
+
+@create.put('/finish_tm/{user_id}')
+async def finish_tm(request: Request, user_id:int):
+    userid = str(user_id)
+    form_data = await request.form()
+    finishitem = json.loads(form_data.get("params[finishitem]"))
+    finishitem.reverse()
+    with open(f"static/tm/f{userid}.txt", "a", encoding="utf-8") as f:
+        for line in finishitem:
+            f.write(str(line) + "\n")
     return {"code": "200"}

@@ -11,6 +11,12 @@ export interface INextSerial {
     task_type:string
 }
 
+export interface Itm {
+    user_id:number
+    taskinfo?:string
+    finishitem?:string
+}
+
 export interface IUpdateProject {
     project_id:number
     action:string
@@ -24,8 +30,4 @@ export interface IUpdateProject {
     half_progress?:string
     finish_date?:string
     actual_hour?:string
-}
-
-export interface IFetchShushengs {
-    user_id:number
 }

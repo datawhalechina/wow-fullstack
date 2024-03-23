@@ -45,6 +45,11 @@ export interface IGetProfile {
     userid:number
 }
 
+export interface IGetShumen {
+    id:number
+    name:string
+}
+
 export interface IDeleteProfile {
     filename:string
 }

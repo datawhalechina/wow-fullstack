@@ -9,7 +9,7 @@ import glob
 from typing import Optional
 from app.core.schemas.users import UserBase, TokenModel
 from sqlalchemy.orm import Session
-from sqlalchemy import func 
+from sqlalchemy import func, desc 
 from app.core.models.users import Base, Users, Register, Mentors, Goals, Shuzhi
 from app.core.models.course import Report
 from app.database import engine
@@ -152,11 +152,6 @@ async def handle_changepass(newpass: str = Form(...), name: str = Form(...), db:
 @router.post("/save_profile")
 async def save_profile(request: Request):
     form: UploadFile = await request.form()
-    for k,v in form.items():
-        print("准备接收k")
-        print(k)
-        print("准备接收v")
-        print(v)
     file = form.get('file')
     contents = await file.read()
     save_base_dir = "static/uploads/profiles/"
@@ -222,7 +217,7 @@ async def submit_profile(info: str = Form(...),
 
 @router.get("/fetch_all_users")
 async def fetch_all_users(db: Session = Depends(get_db)):
-    users = db.query(Users).order_by(Users.id.desc).all()
+    users = db.query(Users).order_by(desc(Users.id)).all()
     rtn = []
     seven_days_ago = datetime.now() - timedelta(days=7) 
     for user in users:
@@ -250,13 +245,14 @@ async def fetch_goal(user_id:int, db: Session = Depends(get_db)):
 
 @router.get("/fetch_reports/{user_id}")
 async def fetch_reports(user_id:int, db: Session = Depends(get_db)):
-    reportitem = db.query(Report).filter_by(user_id=user_id).order_by(Report.id.desc).all()
+    reports = db.query(Report).filter_by(user_id=user_id).order_by(desc(Report.id)).all()
     report_list = []
-    if reportitem:
-        report_dict = reportitem.__dict__
-        if "_sa_instance_state" in report_dict:
-            del report_dict["_sa_instance_state"]
-        report_list.append(report_dict)
+    if reports:
+        for reportitem in reports:
+            report_dict = reportitem.__dict__
+            if "_sa_instance_state" in report_dict:
+                del report_dict["_sa_instance_state"]
+            report_list.append(report_dict)
     return report_list
 
 @router.post("/save_goal")
@@ -324,7 +320,7 @@ async def fetch_shushengs(user_id:int, db: Session = Depends(get_db)):
 
 @router.get("/fetch_shuzhi/{user_id}")
 async def fetch_shuzhi(user_id:int, db: Session = Depends(get_db)):
-    shuzhis = db.query(Shuzhi).filter_by(user_id=user_id).order_by(Shuzhi.id.desc).all()
+    shuzhis = db.query(Shuzhi).filter_by(user_id=user_id).order_by(desc(Shuzhi.id)).all()
     rtn = []
     for shuzhi in shuzhis:
         shuzhi_dict = shuzhi.__dict__

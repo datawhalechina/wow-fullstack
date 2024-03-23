@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import { useLoginStore } from "../../store";
 import {getProfileAPI, fetchGoalAPI, saveGoalAPI} from '../../request/user/api'
-import { ISaveGoal } from  '../../request/user/type'
-import { ref, reactive, onMounted } from 'vue'
+import {fetchShushisAPI, fetchShushengsAPI} from '../../request/user/api'
+import { ISaveGoal, IGetShumen } from  '../../request/user/type'
+import { ref, reactive, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 const loginstate = useLoginStore();
@@ -35,7 +36,19 @@ const goal = reactive<ISaveGoal>({
   action:''
 })
 
-
+const shushis = reactive<IGetShumen[]>([])
+const shushengs = reactive<IGetShumen[]>([])
+const who =computed(()=>{
+  if (current_userid==userid){
+    return '我'
+  } else if (current_userid!=userid && form.gender=='男'){
+    return '他'
+  } else if (current_userid!=userid && form.gender=='女'){
+    return '她'
+  } else {
+    return 'TA'
+  }
+})
 
 const getProfile = async () => {
   let res = await getProfileAPI({userid:userid})
@@ -63,11 +76,19 @@ const getProfile = async () => {
     goal.process = 0
     goal.review = ""
   }
-  
-  
 }
 
-onMounted(getProfile)
+const getShumen = async () => {
+  let res1 = await fetchShushisAPI({userid:userid})
+  shushis.push(...res1)
+  let res2 = await fetchShushengsAPI({userid:userid})
+  shushengs.push(...res2)
+}
+
+onMounted(()=>{
+  getProfile()
+  getShumen()
+})
 
 const edit = async ()=> {
     editGoalFormVisible.value = true
@@ -121,15 +142,27 @@ const goal_complete = async() => {
         </div>
     </div>
     <div>自我描述：{{ form.desc }}</div>
-    <h2 v-if="current_userid==userid">我的目标</h2>
-    <h2 v-else-if="current_userid!=userid && form.gender=='男'">他的目标</h2>
-    <h2 v-else-if="current_userid!=userid && form.gender=='女'">她的目标</h2>
-    <h2 v-else>TA的目标</h2>
+    <h2>{{ who }}的目标</h2>
     <el-button v-if="current_userid==userid" type="primary" @click="edit()">编辑</el-button>
     <div style="white-space: pre-wrap;">{{ goal.content }}</div>
     <div>阶段：{{ goal.start_date?goal.start_date.slice(0,10):'' }}到{{ goal.deadline?goal.deadline.slice(0,10):'' }}</div>
     <div>进度：{{ goal.process }}</div>
     <div style="white-space: pre-wrap;">{{ goal.review }}</div>
+
+    <h2>{{ who }}的塾门</h2>
+    <div>
+      塾师：
+      <span style="margin-right: 20px;" v-for="item in shushis">
+        <el-link type="primary" :href="'/user/profile/'+item.id" target="_blank">{{ item.name }}</el-link>
+      </span>
+    </div>
+
+    <div>
+      塾生：
+      <span style="margin-right: 20px;" v-for="item in shushengs">
+        <el-link type="primary" :href="'/user/profile/'+item.id" target="_blank">{{ item.name }}</el-link>
+      </span>
+    </div>
 
   <el-dialog v-model="editGoalFormVisible" :width="diaglogwidth" :center="true" title="编辑目标">
     <el-form :model="goal">

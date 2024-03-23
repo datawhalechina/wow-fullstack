@@ -192,13 +192,13 @@ async def report_learn(
         new_shuzhi = Shuzhi(
             user_id=user.id,
             user_type="塾生",
-            target_type="章节",
+            target_type="学习",
             target_id=chapter_id,
             target_title=chapter_title,
             change = 1,
             amount =float(reported_hour) * 5,
             balance = useritem.shuzhi + float(reported_hour) * 5,
-            comments = useritem.username + "申报学习" + chapter_title,
+            comments = useritem.username + "申报-学习-" + chapter_title,
             create_time=datetime.now()
         )
         db.add(new_shuzhi)
@@ -206,13 +206,13 @@ async def report_learn(
         shushi_shuzhi = Shuzhi(
             user_id=selection.shushi_id,
             user_type="塾师",
-            target_type="章节",
+            target_type="学习",
             target_id=chapter_id,
             target_title=chapter_title,
             change = 1,
             amount =float(reported_hour) * 5,
             balance = useritem.shuzhi + float(reported_hour) * 5,
-            comments = useritem.username + "申报学习" + chapter_title,
+            comments = useritem.username + "申报-学习-" + chapter_title,
             create_time=datetime.now()
         )
         db.add(shushi_shuzhi)
@@ -223,13 +223,13 @@ async def report_learn(
         new_shuzhi = Shuzhi(
             user_id=user.id,
             user_type="塾生",
-            target_type="章节",
+            target_type="学习",
             target_id=chapter_id,
             target_title=chapter_title,
             change = 1,
             amount =float(reported_hour) * 10,
             balance = useritem.shuzhi + float(reported_hour) * 10,
-            comments = useritem.username + "申报学习" + chapter_title,
+            comments = useritem.username + "申报-学习-" + chapter_title,
             create_time=datetime.now()
         )
         db.add(new_shuzhi)

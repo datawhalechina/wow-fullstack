@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useLoginStore } from "../../store";
-import {fetchProjectsAPI, getNextSerialAPI, addProjectAPI, updateProjectAPI, fetchShushengsAPI} from '../../request/inno/api'
+import {fetchShushengsAPI} from '../../request/user/api'
+import {fetchProjectsAPI, getNextSerialAPI, addProjectAPI, updateProjectAPI} from '../../request/inno/api'
 import { ElTable } from 'element-plus'
 import { onMounted, ref, reactive } from 'vue'
 const loginstate = useLoginStore();
@@ -308,6 +309,9 @@ const finish_confirm = async() => {
     let data = {project_id:currentRow.value.id, action:'finish_report', actual_hour:currentRow.value.actual_hour}
     let res = await updateProjectAPI(data)
     console.log(res)
+    if (res.code == "200"){
+      alert("成功申报"+currentRow.value.actual_hour+"小时！")
+    }
     let now = new Date();
     currentRow.value.finish_date=now.toISOString().slice(0, 10)
     currentRow.value.update_date=now.toISOString().slice(0, 10)
@@ -432,16 +436,18 @@ style="width: 100%"
 </el-dialog>
 
 <el-dialog v-model="applyFormVisible" :width="diaglogwidth" :center="true" title="认领任务">
+  <div v-if="shusheng_list.length>0">
     <el-radio-group v-model="radio_performer" class="ml-4">
         <el-radio label="自己" size="large">自己做</el-radio>
         <el-radio label="塾生" size="large">带塾生做</el-radio>
     </el-radio-group>
     <br />
-    <el-radio-group v-if="shusheng_list.length>0 && radio_performer=='塾生'" v-model="radio_shusheng" class="ml-4">
+    <el-radio-group v-if="radio_performer=='塾生'" v-model="radio_shusheng" class="ml-4">
         <span v-for="(item, index) in shusheng_list">
           <el-radio :label="index" size="large">{{ item.name }}</el-radio>&nbsp;&nbsp;&nbsp;&nbsp;
         </span>
     </el-radio-group>
+  </div>
     <template #footer>
       <span class="dialog-footer">
         <el-button type="primary" @click="apply_confirm()">确定</el-button>

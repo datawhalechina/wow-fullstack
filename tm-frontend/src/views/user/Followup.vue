@@ -37,7 +37,10 @@ const deadlineColors = computed(() => {
 </script>
 
 <template>
-  <h5>所有项目</h5>
+  <div class="centered-text">
+    <h5>创新结项</h5>
+  </div>
+  
   <el-table 
     :data="tableData" 
     stripe 
@@ -97,4 +100,8 @@ const deadlineColors = computed(() => {
 .red {  
   color: red;  
 }  
+
+.centered-text {
+  text-align: center;
+}
 </style>

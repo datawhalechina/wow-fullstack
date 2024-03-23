@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import Manager2 from './Manager2.vue'
+import Manager from './Manager.vue'
 
 </script>
 
 <template>
-  <Manager2 />
+  <Manager />
 </template>
 
 <style lang="scss" scoped>

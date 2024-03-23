@@ -10,24 +10,24 @@
         <div style="display: inline-block; margin: auto">
           <div>
             <button
-              class="btn btn-primary"
+              class="btn btn-primary spaced"
               @click="start"
               :disabled="cur == -1">
               开始
             </button>
             <button 
-              class="btn btn-primary" 
+              class="btn btn-primary spaced" 
               @click="end" 
               :disabled="cur == -1">
               结束
             </button>
             <button 
-              class="btn btn-primary" 
+              class="btn btn-primary spaced" 
               @click="addWorks">
               新增
             </button>
             <button
-              class="btn btn-primary"
+              class="btn btn-primary spaced"
               @click="deleteWorks"
               :disabled="cur == -1"
             >
@@ -35,7 +35,7 @@
             </button>
 
             <button
-              class="btn btn-primary"
+              class="btn btn-primary spaced"
               @click="finish"
               :disabled="validTime == 0 || no_time"
             >
@@ -66,7 +66,8 @@
               >
                 <td class="row1" :name="index">{{ index + 1 }}</td>
                 <td class="row2">
-                  <input class="editable" v-model="item[0]" @input="submit" />
+                  <!-- <input class="editable" v-model="item[0]" @input="submit" /> -->
+                  <el-autocomplete style="padding:0px;" v-model="item[0]" @input="submit" :fetch-suggestions="querySearch" class="editable"/>
                 </td>
                 <td class="row3">
                   <input class="editable" v-model="item[1]" @input="submit" />
@@ -205,49 +206,67 @@
 </template>
 
 
-<script lang="ts">
-// @ts-nocheck
-import { ref, onMounted, watchEffect, defineComponent } from "vue";
+<script setup lang="ts">
+import { useLoginStore } from "../store";
+import { ref, reactive, onMounted, watchEffect } from "vue";
+import {fetchDocketsAPI} from '../request/inno/api'
+import {fetchTmAPI, fetchPrAPI, savePrAPI, finishTmAPI} from '../request/inno/api'
+const loginstate = useLoginStore();
+const tasks = JSON.parse(localStorage.getItem("zishu_active")) || [];
+const finished = JSON.parse(localStorage.getItem("zishu_archive")) || [];
+const now = new Date();
 
-export default defineComponent({
-  setup() {
-    const tasks = JSON.parse(localStorage.getItem("zishu_active")) || [];
-    const finished = JSON.parse(localStorage.getItem("zishu_archive")) || [];
-    const now = new Date();
+const year = ref(now.getFullYear());
+const month = ref((now.getMonth() + 1).toString().padStart(2, "0"));
+const day = ref(now.getDate().toString().padStart(2, "0"));
 
-    const year = ref(now.getFullYear());
-    const month = ref((now.getMonth() + 1).toString().padStart(2, "0"));
-    const day = ref(now.getDate().toString().padStart(2, "0"));
+const formattedDate = `${year.value}-${month.value}-${day.value}`;
 
-    const formattedDate = `${year.value}-${month.value}-${day.value}`;
+const taskList = ref(tasks)
+const finishList = ref(finished)
+const searchList = ref(finished)
+const searchItems = ref(["", "", "", ""])
+const cur = ref(-1)
+const cur_archive = ref(-1)
+const cur_ID = ref("")
+const cur_subject = ref("")
+const cur_date = ref("")
+const validTime_archive = ref(0.0)
+const spentTime = ref(0.0)
+const planTime = ref(0.0)
+const targetTime = ref(0)
+const key = ref(0)
+const skey = ref(0)
+const no_time = ref(false)
+const total_time = ref('')
 
-    const state = {
-      taskList: ref(tasks),
-      finishList: ref(finished),
-      searchList: ref(finished),
-      searchItems: ref(["", "", "", ""]),
-      cur: ref(-1),
-      cur_archive: ref(-1),
-      cur_ID: ref(""),
-      cur_subject: ref(""),
-      cur_date: ref(""),
-      validTime_archive: ref(0),
-      spentTime: ref(0),
-      planTime: ref(0),
-      targetTime: ref(0),
-      key: ref(0),
-      skey: ref(0),
-      no_time: ref(false),
-      total_time: ref(0),
-    };
+const validTime = ref('')
 
-    const validTime = ref(0);
+
+interface IDockets{
+  value:string
+}
+const dockets = reactive<IDockets[]>([])
+
+const querySearch = (queryString: string, cb: any) => {
+  const results:any = queryString?[]:dockets
+  cb(results)
+}
+
+
+const getDockets = async () => {
+  if (loginstate.logined = true) {
+    let res = await fetchDocketsAPI({user_id:loginstate.id})
+    dockets.push(...res)
+    console.log(dockets)
+  }
+}
 
     watchEffect(() => {
       let sumTime = 0;
-      for (let i = 0; i < state.taskList.value.length; i++) {
-        if (state.taskList.value[i][7] > 0) {
-          sumTime += state.taskList.value[i][7];
+      for (let i = 0; i < taskList.value.length; i++) {
+        if (taskList.value[i][7] > 0) {
+          sumTime += taskList.value[i][7];
         }
       }
       validTime.value = sumTime.toFixed(2);
@@ -255,20 +274,21 @@ export default defineComponent({
 
     onMounted(() => {
       if (tasks && tasks.length > 0) {
-        state.taskList.value = tasks;
+        taskList.value = tasks;
       }
 
       if (finished && finished.length > 0) {
-        state.finishList.value = finished;
-        state.searchList.value = finished;
+        finishList.value = finished;
+        searchList.value = finished;
       }
-      state.total_time.value = cal_total_time(state.finishList.value);
+      total_time.value = cal_total_time(finishList.value);
       submit();
+      getDockets();
     });
 
     const addWorks = () => {
-      if (state.cur.value > -1) {
-        const curList = state.taskList.value[state.cur.value];
+      if (cur.value > -1) {
+        const curList = taskList.value[cur.value];
         const newList = [
           curList[0],
           curList[1],
@@ -280,9 +300,9 @@ export default defineComponent({
           "",
           "",
         ];
-        state.taskList.value.splice(state.cur.value + 1, 0, newList);
-      } else if (state.cur_archive.value > -1) {
-        const curList = state.finishList.value[state.cur_archive.value];
+        taskList.value.splice(cur.value + 1, 0, newList);
+      } else if (cur_archive.value > -1) {
+        const curList = finishList.value[cur_archive.value];
         const newList = [
           curList[0],
           curList[1],
@@ -294,14 +314,14 @@ export default defineComponent({
           "",
           "",
         ];
-        state.taskList.value.push(newList);
+        taskList.value.push(newList);
       } else {
-        state.taskList.value.push(["", "", "", "", "", "", "", "", ""]);
+        taskList.value.push(["", "", "", "", "", "", "", "", ""]);
       }
       submit();
     };
 
-    const getHour = (s1, s2) => {
+    const getHour = (s1:any, s2:any) => {
       const reDate = /\d{4}-\d{1,2}-\d{1,2} /;
       s1 = new Date(
         (reDate.test(s1) ? s1 : "2018-1-1 " + s1).replace(/-/g, "/")
@@ -321,48 +341,49 @@ export default defineComponent({
       const dateString = newDate.toLocaleDateString();
       console.log(dateString);
 
-      state.taskList.value[state.cur.value][5] = timeString;
-      state.taskList.value[state.cur.value][8] = dateString;
-      state.key.value += 1;
+      taskList.value[cur.value][5] = timeString;
+      taskList.value[cur.value][8] = dateString;
+      key.value += 1;
       submit();
     };
 
     const end = () => {
       const newDate = new Date();
       const timeString = newDate.toLocaleTimeString().substring(0, 8);
-      state.taskList.value[state.cur.value][6] = timeString;
-      const startingTime = state.taskList.value[state.cur.value][5];
+      taskList.value[cur.value][6] = timeString;
+      const startingTime = taskList.value[cur.value][5];
       console.log(startingTime);
       console.log(timeString);
       const hour = getHour(startingTime, timeString);
       console.log(hour);
-      state.taskList.value[state.cur.value][7] = hour;
-      state.no_time.value = false;
-      state.key.value += 1;
+      taskList.value[cur.value][7] = hour;
+      no_time.value = false;
+      key.value += 1;
       submit();
     };
 
     const deleteWorks = () => {
       if (confirm("确定删除此记录？")) {
-        const deletetemp = state.taskList.value.splice(state.cur.value, 1);
+        taskList.value.splice(cur.value, 1);
         submit();
         Unhighlight();
-        state.key.value += 1;
+        key.value += 1;
       }
     };
 
-    const cal_total_time = (tmpList) => {
+    const cal_total_time = (tmpList:any) => {
       let tmp_time = ref(0.0);
+      let rtn_time = ref('')
       for (let i = 0; i < tmpList.length; i++) {
         tmp_time.value += parseFloat(tmpList[i][7] || 0);
       }
-      tmp_time.value = tmp_time.value.toFixed(2);
-      return tmp_time.value;
+      rtn_time.value = tmp_time.value.toFixed(2);
+      return rtn_time.value;
     };
 
-    const finish = () => {
+    const finish = async () => {
       let alertInfo;
-      if (state.cur.value == -1) {
+      if (cur.value == -1) {
         alertInfo = "确定批量归档这些记录？";
       } else {
         alertInfo = "确定归档此记录？";
@@ -370,77 +391,78 @@ export default defineComponent({
       if (confirm(alertInfo)) {
         let deletetemp = [];
         const remaintemp = [];
-        if (state.cur.value == -1) {
-          for (let i = 0; i < state.taskList.value.length; i++) {
-            if (state.taskList.value[i][7] > 0) {
-              deletetemp.push(state.taskList.value[i]);
+        if (cur.value == -1) {
+          for (let i = 0; i < taskList.value.length; i++) {
+            if (taskList.value[i][7] > 0) {
+              deletetemp.push(taskList.value[i]);
             } else {
-              remaintemp.push(state.taskList.value[i]);
+              remaintemp.push(taskList.value[i]);
             }
           }
-          state.taskList.value = remaintemp;
+          taskList.value = remaintemp;
         } else {
-          deletetemp = state.taskList.value.splice(state.cur.value, 1);
+          deletetemp = taskList.value.splice(cur.value, 1);
         }
-
-        const newArr = deletetemp.concat(state.finishList.value);
-        state.finishList.value = newArr;
-        state.searchList.value = newArr;
-        state.total_time.value = cal_total_time(state.finishList.value);
+        let res = await finishTmAPI({user_id:loginstate.id, finishitem:JSON.stringify(deletetemp)})
+        console.log(res)
+        const newArr = deletetemp.concat(finishList.value);
+        finishList.value = newArr;
+        searchList.value = newArr;
+        total_time.value = cal_total_time(finishList.value);
         localStorage.setItem(
           "zishu_archive",
-          JSON.stringify(state.finishList.value)
+          JSON.stringify(finishList.value)
         );
-        state.cur.value = -1;
+        cur.value = -1;
         submit();
       }
     };
 
-    const highlight = (ind) => {
+    const highlight = (ind:number) => {
       const cur_row = document.getElementsByName(ind.toString())[0];
-      if (ind !== state.cur.value) {
-        if (state.cur.value !== -1) {
+      if (ind !== cur.value) {
+        if (cur.value !== -1) {
           const old_row = document.getElementsByName(
-            state.cur.value.toString()
+            cur.value.toString()
           )[0];
           old_row.style.backgroundColor = "";
         }
-        state.cur.value = ind;
-        if (state.taskList.value[ind][7] > 0) {
-          state.no_time.value = false;
+        cur.value = ind;
+        if (taskList.value[ind][7] > 0) {
+          no_time.value = false;
         } else {
-          state.no_time.value = true;
+          no_time.value = true;
         }
       }
       cur_row.style.backgroundColor = "#a0f";
 
-      state.skey.value += 1;
+      skey.value += 1;
     };
 
     const Unhighlight = () => {
-      if (state.cur.value !== -1) {
+      if (cur.value !== -1) {
         const old_row = document.getElementsByName(
-          state.cur.value.toString()
+          cur.value.toString()
         )[0];
         old_row.style.backgroundColor = "";
-        state.cur.value = -1;
-        state.no_time.value = false;
+        cur.value = -1;
+        no_time.value = false;
       }
     };
 
-    const highlight_archive = (ind) => {
-      state.cur_ID.value = state.finishList.value[ind][0];
-      state.cur_subject.value = state.finishList.value[ind][1];
-      state.cur_date.value = state.finishList.value[ind][8];
-      state.validTime_archive.value = 0;
-      state.targetTime.value = state.finishList.value[ind][2];
-      state.planTime.value = 0;
-      state.spentTime.value = 0;
-      if (ind !== state.cur_archive.value) {
-        state.cur_archive.value = ind;
+    const highlight_archive = (ind:number) => {
+      cur_ID.value = finishList.value[ind][0];
+      cur_subject.value = finishList.value[ind][1];
+      cur_date.value = finishList.value[ind][8];
+      validTime_archive.value = 0;
+      targetTime.value = finishList.value[ind][2];
+      planTime.value = 0;
+      spentTime.value = 0;
+      if (ind !== cur_archive.value) {
+        cur_archive.value = ind;
       }
 
-      for (let i = 0; i < state.finishList.value.length; i++) {
+      for (let i = 0; i < finishList.value.length; i++) {
         const cur_row_ID = document.getElementById("ID" + i);
         const cur_row_subject = document.getElementById("subject" + i);
         const cur_row_date = document.getElementById("date" + i);
@@ -448,28 +470,28 @@ export default defineComponent({
         cur_row_subject.style.backgroundColor = "";
         cur_row_date.style.backgroundColor = "";
         if (
-          state.finishList.value[i][0] === state.cur_ID.value &&
-          state.finishList.value[i][1] === state.cur_subject.value
+          finishList.value[i][0] === cur_ID.value &&
+          finishList.value[i][1] === cur_subject.value
         ) {
           cur_row_ID.style.backgroundColor = "#a9f";
           cur_row_subject.style.backgroundColor = "#a9f";
-          state.planTime.value += parseFloat(
-            state.finishList.value[i][4] || 0
+          planTime.value += parseFloat(
+            finishList.value[i][4] || 0
           );
-          state.spentTime.value += state.finishList.value[i][7];
+          spentTime.value += finishList.value[i][7];
         }
-        if (state.finishList.value[i][8] === state.cur_date.value) {
+        if (finishList.value[i][8] === cur_date.value) {
           cur_row_date.style.backgroundColor = "#d7f";
-          state.validTime_archive.value += state.finishList.value[i][7];
+          validTime_archive.value += finishList.value[i][7];
         }
       }
-      state.validTime_archive.value = state.validTime_archive.value.toFixed(2);
-      state.planTime.value = state.planTime.value.toFixed(2);
-      state.spentTime.value = state.spentTime.value.toFixed(2);
+      validTime_archive.value = Number(validTime_archive.value.toFixed(2));
+      planTime.value = Number(planTime.value.toFixed(2));
+      spentTime.value = Number(spentTime.value.toFixed(2));
     };
 
     const Unhighlight_archive = () => {
-      for (let i = 0; i < state.finishList.value.length; i++) {
+      for (let i = 0; i < finishList.value.length; i++) {
         const cur_row_ID = document.getElementById("ID" + i);
         const cur_row_subject = document.getElementById("subject" + i);
         const cur_row_date = document.getElementById("date" + i);
@@ -477,25 +499,27 @@ export default defineComponent({
         cur_row_subject.style.backgroundColor = "";
         cur_row_date.style.backgroundColor = "";
       }
-      state.cur_archive.value = -1;
+      cur_archive.value = -1;
     };
 
-    const submit = () => {
-      for (let i = 0; i < state.taskList.value.length; i++) {
+    const submit = async () => {
+      for (let i = 0; i < taskList.value.length; i++) {
         if (
-          state.taskList.value[i][5].length === 8 &&
-          state.taskList.value[i][6].length === 8
+          taskList.value[i][5].length === 8 &&
+          taskList.value[i][6].length === 8
         ) {
-          state.taskList.value[i][7] = getHour(
-            state.taskList.value[i][5],
-            state.taskList.value[i][6]
+          taskList.value[i][7] = getHour(
+            taskList.value[i][5],
+            taskList.value[i][6]
           );
         }
       }
       localStorage.setItem(
         "zishu_active",
-        JSON.stringify(state.taskList.value)
+        JSON.stringify(taskList.value)
       );
+      let res = await savePrAPI({user_id:loginstate.id, taskinfo:JSON.stringify(taskList.value)})
+      console.log(res)
     };
 
     const compare_data = (data, filter) => {
@@ -520,13 +544,13 @@ export default defineComponent({
 
     const filterfn = () => {
       const temp = [];
-      for (let i = 0; i < state.searchList.value.length; i++) {
-        if (compare_data(state.searchList.value[i], state.searchItems.value)) {
-          temp.push(state.searchList.value[i]);
+      for (let i = 0; i < searchList.value.length; i++) {
+        if (compare_data(searchList.value[i], searchItems.value)) {
+          temp.push(searchList.value[i]);
         }
       }
-      state.finishList.value = temp;
-      state.total_time.value = cal_total_time(state.finishList.value);
+      finishList.value = temp;
+      total_time.value = cal_total_time(finishList.value);
     };
 
     const export_list = () => {
@@ -543,8 +567,8 @@ export default defineComponent({
       ];
       const str = [];
       str.push(title.join(",") + "\n");
-      for (let i = 0; i < state.finishList.value.length; i++) {
-        str.push(state.finishList.value[i].join(",") + "\n");
+      for (let i = 0; i < finishList.value.length; i++) {
+        str.push(finishList.value[i].join(",") + "\n");
       }
       const blob = new Blob(["\uFEFF" + str.join("")], {
         type: "text/plain;charset=utf-8",
@@ -555,25 +579,6 @@ export default defineComponent({
       downloadLink.click();
     };
 
-    return {
-      ...state,
-      validTime,
-      start,
-      end,
-      addWorks,
-      deleteWorks,
-      finish,
-      highlight,
-      Unhighlight,
-      highlight_archive,
-      Unhighlight_archive,
-      submit,
-      compare_data,
-      filterfn,
-      export_list,
-    };
-  },
-});
 </script>
 
 <style scoped>
@@ -638,6 +643,10 @@ table td {
 
 .divfont { 
   font-size: 18px;
+}
+
+.spaced {
+  margin:0 5px;
 }
 
 </style> 

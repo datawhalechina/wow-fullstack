@@ -73,7 +73,7 @@ const deselection = async () => {
 </script>
 
 <template>
-  <h5>我的选课</h5>
+  <h5 class="centered-text">我的选课</h5>
   <el-table :data="currentTableData" style="width: 100%">
     <el-table-column label="课程名称" width="100">
       <template #default="scope">
@@ -104,7 +104,8 @@ const deselection = async () => {
     </el-table-column>
   </el-table>
 
-  <h5>全部课程</h5>
+  <br>
+  <h5 class="centered-text">全部课程</h5>
   <el-table :data="tableData" style="width: 100%">
     <el-table-column label="课程名称" width="100">
       <template #default="scope">
@@ -127,4 +128,7 @@ const deselection = async () => {
 </template>
 
 <style lang="scss" scoped>
+.centered-text {
+  text-align: center;
+}
 </style>

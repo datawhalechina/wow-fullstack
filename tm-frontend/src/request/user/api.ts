@@ -32,6 +32,9 @@ export const fetchGoalAPI = (params: User.IGetProfile): Promise<any> =>
 export const fetchShushisAPI = (params: User.IGetProfile): Promise<any> =>
     instance.get(`/users/fetch_shushis/${params.userid}`, { params });
 
+export const fetchShushengsAPI = (params: User.IGetProfile): Promise<any> =>
+    instance.get(`/users/fetch_shushengs/${params.userid}`, { params });
+
 export const fetchShuzhiAPI = (params: User.IGetProfile): Promise<any> =>
     instance.get(`/users/fetch_shuzhi/${params.userid}`, { params });
 

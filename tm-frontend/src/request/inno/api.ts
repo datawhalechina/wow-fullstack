@@ -16,5 +16,17 @@ export const fetchFinishedProjectsAPI = (): Promise<any> =>
 export const updateProjectAPI = (params: Create.IUpdateProject): Promise<any> =>
     instance.put(`/create/edit_project/${params.project_id}`, { params });
 
-export const fetchShushengsAPI = (params: Create.IFetchShushengs): Promise<any> =>
-    instance.get(`/users/fetch_shushengs/${params.user_id}`, { params });
+export const fetchDocketsAPI = (params: {user_id:number}): Promise<any> =>
+    instance.get(`/create/fetch_dockets/${params.user_id}`, { params });
+
+export const fetchTmAPI = (params: Create.Itm): Promise<any> =>
+    instance.get(`/create/get_tm/${params.user_id}`, { params });
+
+export const fetchPrAPI = (params: Create.Itm): Promise<any> =>
+    instance.get(`/create/get_pr/${params.user_id}`, { params });
+
+export const savePrAPI = (params: Create.Itm): Promise<any> =>
+    instance.put(`/create/save_pr/${params.user_id}`, { params });
+
+export const finishTmAPI = (params: Create.Itm): Promise<any> =>
+    instance.put(`/create/finish_tm/${params.user_id}`, { params });
