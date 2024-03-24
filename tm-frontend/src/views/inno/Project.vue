@@ -27,46 +27,7 @@ const shusheng_list = reactive([
   }
 ])
 
-const taskdata = [
-    {
-        id: 1,
-        publisher: "黎伟",
-        publisher_id: 1,
-        taker: "Tom",
-        taker_id: 3,
-        task_serial: "B001",
-        title: "后端架构调整",
-        url: "https://www.baidu.com",
-        desc: "采用ts、vue3、element-plus等框架",
-        start_date: "2024-01-09",
-        deadline: "2024-01-29",
-        planed_hour: 3,
-        half_progress: "刚好",
-        finish_date: "2024-01-28",
-        actual_hour: 3,
-        total_hour: 3,
-        update_date: "2024-01-28",
-    },
-    {
-        id: 2,
-        publisher: "Lime",
-        publisher_id: 2,
-        taker: "",
-        taker_id: 0,
-        task_serial: "B002",
-        title: "改变量名",
-        url: "https://www.baidu.com",
-        desc: "改成英文变量名",
-        start_date: "2024-01-19",
-        deadline: "2024-01-29",
-        planed_hour: 3,
-        half_progress: "",
-        finish_date: "",
-        actual_hour: 0,
-        total_hour: 0,
-        update_date: "",
-    }
-]
+
 let tableData:any = reactive([])
 // tableData.push(...taskdata)
 const getAllProjects = async () => {
@@ -169,13 +130,6 @@ const select_options = [
   }
 ]
 
-function padding(num:number, length:number) {
-        let tmpnum = num.toString();
-        for(var len = (tmpnum + "").length; len < length; len = tmpnum.length) {
-            tmpnum = "0" + tmpnum;            
-        }
-        return tmpnum;
-    }
 
 const add_confirm = async() => {
     let tmpserial = ""
@@ -271,24 +225,11 @@ const apply_confirm = async ()=> {
 
 const apply = async ()=> {
   applyFormVisible.value = true
-  let res = await fetchShushengsAPI({user_id:userid})
+  let res = await fetchShushengsAPI({userid:userid})
   shusheng_list.length = 0
   shusheng_list.push(...res)
 }
 
-const apply2 = async ()=> {
-    let msg = "确定要认领《"+currentRow.value.title+"》吗？"
-    if (confirm(msg)==true) {
-        console.log("认领")
-        currentRow.value.taker = loginstate.name
-        currentRow.value.taker_id = loginstate.id
-        let now = new Date();
-        let data = {project_id:currentRow.value.id, action:'apply'}
-        let res = await updateProjectAPI(data)
-        console.log(res)
-        currentRow.value.update_date=now.toISOString().slice(0, 10)
-    }
-}
 
 
 // 补充 half_confirm 函数

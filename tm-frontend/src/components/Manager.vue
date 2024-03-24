@@ -37,7 +37,7 @@
             <button
               class="btn btn-primary spaced"
               @click="finish"
-              :disabled="validTime == 0 || no_time"
+              :disabled="validTime == '0' || no_time"
             >
               归档
             </button>
@@ -488,22 +488,34 @@ const handleSelect = () => {
         const cur_row_ID = document.getElementById("ID" + i);
         const cur_row_subject = document.getElementById("subject" + i);
         const cur_row_date = document.getElementById("date" + i);
-        cur_row_ID.style.backgroundColor = "";
-        cur_row_subject.style.backgroundColor = "";
-        cur_row_date.style.backgroundColor = "";
+        if (cur_row_ID != null) {
+          cur_row_ID.style.backgroundColor = "";
+        }
+        if (cur_row_subject != null) {
+          cur_row_subject.style.backgroundColor = "";
+        }
+        if (cur_row_date != null) {
+          cur_row_date.style.backgroundColor = "";
+        }
         if (
           finishList.value[i][0] === cur_ID.value &&
           finishList.value[i][1] === cur_subject.value
         ) {
-          cur_row_ID.style.backgroundColor = "#a9f";
-          cur_row_subject.style.backgroundColor = "#a9f";
+          if (cur_row_ID != null) {
+            cur_row_ID.style.backgroundColor = "#a9f";
+          }
+          if (cur_row_subject != null) {
+            cur_row_subject.style.backgroundColor = "#a9f";
+          }
           planTime.value += parseFloat(
             finishList.value[i][4] || 0
           );
           spentTime.value += finishList.value[i][7];
         }
         if (finishList.value[i][8] === cur_date.value) {
+          if (cur_row_date != null) {
           cur_row_date.style.backgroundColor = "#d7f";
+        }
           validTime_archive.value += finishList.value[i][7];
         }
       }
@@ -517,9 +529,15 @@ const handleSelect = () => {
         const cur_row_ID = document.getElementById("ID" + i);
         const cur_row_subject = document.getElementById("subject" + i);
         const cur_row_date = document.getElementById("date" + i);
-        cur_row_ID.style.backgroundColor = "";
-        cur_row_subject.style.backgroundColor = "";
-        cur_row_date.style.backgroundColor = "";
+        if (cur_row_ID != null) {
+          cur_row_ID.style.backgroundColor = "";
+        }
+        if (cur_row_subject != null) {
+          cur_row_subject.style.backgroundColor = "";
+        }
+        if (cur_row_date != null) {
+          cur_row_date.style.backgroundColor = "";
+        }
       }
       cur_archive.value = -1;
     };
@@ -551,7 +569,7 @@ const handleSelect = () => {
       console.log(res)
     };
 
-    const compare_data = (data, filter) => {
+    const compare_data = (data:any, filter:any) => {
       let ind = true;
       if (filter[0].length > 0 && ind) {
         if (!data[0].includes(filter[0])) {

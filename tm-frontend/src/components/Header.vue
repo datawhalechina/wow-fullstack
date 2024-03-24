@@ -3,7 +3,6 @@ import { ref } from 'vue'
 import Login from './Login.vue'
 
 const activeIndex = ref('1')
-const input = ref('')
 const handleSelect = (key: string, keyPath: string[]) => {
   console.log(key, keyPath)
 }

@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { useLoginStore } from "../../store";
 import {fetchAllSelectionAPI} from '../../request/course/api'
 import { ref, reactive, onMounted, computed } from 'vue'
-const loginstate = useLoginStore();
 const tableData:any = reactive([])
 const today = ref(new Date());  
 const getAllSelection = async () => {
@@ -14,9 +12,10 @@ onMounted(getAllSelection)
 
 // 计算属性，根据截止日期返回颜色  
 const deadlineColors = computed(() => {  
-  return tableData.reduce((colors, row) => {  
+  return tableData.reduce((colors:any, row:any) => {  
     const deadlineDate = new Date(row.deadline);  
-    const diffDays = (deadlineDate - today.value) / (1000 * 60 * 60 * 24);  
+    const diffMilliseconds = (deadlineDate.getTime() - (today.value as Date).getTime());
+    const diffDays = diffMilliseconds / (1000 * 60 * 60 * 24);  
   
     if (diffDays === 0) {  
       colors[row.deadline] = 'orange';  
@@ -62,7 +61,7 @@ function getDeadlineColor(deadline: string) {
     <el-table-column label="截止日期">
       <template #default="scope">
         <span :class="getDeadlineColor(scope.row.deadline)">  
-          {{ scope.row.deadline.slice(0, 10) }}  
+          {{ scope.row.deadline?scope.row.deadline.slice(0,10):'' }} 
         </span>  
       </template>
     </el-table-column>

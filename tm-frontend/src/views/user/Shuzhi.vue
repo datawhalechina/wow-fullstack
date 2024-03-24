@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useLoginStore } from "../../store";
 import {fetchShuzhiAPI} from '../../request/user/api'
-import { onMounted, ref, reactive } from 'vue'
+import { onMounted, reactive } from 'vue'
 const loginstate = useLoginStore();
 let tableData:any = reactive([])
 const fetchShuZhi = async() => {

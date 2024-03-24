@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import { useLoginStore } from "../../store";
 import {fetchCurrentSelectionAPI, reportLearnAPI} from '../../request/course/api'
 import { ref, reactive, onMounted } from 'vue'
-const loginstate = useLoginStore();
 const currentTableData:any = reactive([])
 const getCurrentSelection = async () => {
   let res = await fetchCurrentSelectionAPI()

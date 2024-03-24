@@ -22,6 +22,7 @@ const validatePass2 = (rule: any, value: any, callback: any) => {
     callback(new Error('请再次输入密码'))
   } else if (value !== formRegi.password) {
     console.log("密码不一致")
+    console.log(rule)
     callback(new Error("密码不一致!"))
   } else {
     callback()
