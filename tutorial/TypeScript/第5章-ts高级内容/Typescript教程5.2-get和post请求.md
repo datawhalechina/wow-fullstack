@@ -8,6 +8,7 @@ import axios from 'axios';
 
 ## 3. 发起网络请求
 使用Axios提供的方法（get、post等）去发送网络请求
+```html
 <script setup lang='ts'>
 // 发起 GET 请求
 axios.get('https://api.example.com/data')
@@ -27,7 +28,7 @@ axios.post('https://api.example.com/data', { name: 'John', age: 25 })
     console.error(error);
   });
 </script>
-
+```
 
 
 后端测试代码：
@@ -63,6 +64,7 @@ if __name__ == '__main__':
 
 
 把原来的HelloWorld.vue内容清空，换成下面这些代码。
+```html
 <template>
     <button @click="get_query()">发起GET请求</button>
 </template>
@@ -84,7 +86,7 @@ const get_query = ()=>{
   });
 }
 </script>
-
+```
 点击按钮后控制台会看到Hello World
 
 
@@ -127,6 +129,7 @@ if __name__ == '__main__':
 
 
 把原来的HelloWorld.vue内容清空，换成下面这些代码。
+```html
 <template>
     <button @click="get_query()">发起POST请求</button>
 </template>
@@ -150,7 +153,7 @@ const get_query = ()=>{
   });
 }
 </script>
-
+```
 点击按钮后控制台会看到
 5
 hello

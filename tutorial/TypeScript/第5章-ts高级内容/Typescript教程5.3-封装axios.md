@@ -207,7 +207,7 @@ export const checkAPI = (): Promise<ProData> =>
 在要请求的组件上使用
 使用方式一：直接使用(setup自带async，await在顶层可以直接使用)
 
-```typescript
+```html
 <script setup lang="ts">
 import { checkAPI} from "../../request/api";
 //直接使用，一般用在进入页面入请求数据的接口
@@ -217,7 +217,7 @@ console.log(res);
 ```
 
 使用方式二：使用 async / await，（setup虽然自带async，但单独用await只能在顶层使用，如果在函数下还是要async / await一起写）
-```typescript
+```html
 <script setup lang="ts">
 import {loginAPI} from '../request/user/api'
 const data = {username: "mockuser", password: "123456"}

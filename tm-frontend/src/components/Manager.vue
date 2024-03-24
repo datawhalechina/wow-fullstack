@@ -67,7 +67,7 @@
                 <td class="row1" :name="index">{{ index + 1 }}</td>
                 <td class="row2">
                   <!-- <input class="editable" v-model="item[0]" @input="submit" /> -->
-                  <el-autocomplete style="padding:0px;" v-model="item[0]" @input="submit" :fetch-suggestions="querySearch" class="editable"/>
+                  <el-autocomplete style="padding:0px;" v-model="item[0]" @select="handleSelect" @change="submit" :fetch-suggestions="querySearch" class="editable"/>
                 </td>
                 <td class="row3">
                   <input class="editable" v-model="item[1]" @input="submit" />
@@ -212,8 +212,8 @@ import { ref, reactive, onMounted, watchEffect } from "vue";
 import {fetchDocketsAPI} from '../request/inno/api'
 import {fetchTmAPI, fetchPrAPI, savePrAPI, finishTmAPI} from '../request/inno/api'
 const loginstate = useLoginStore();
-const tasks = JSON.parse(localStorage.getItem("zishu_active")) || [];
-const finished = JSON.parse(localStorage.getItem("zishu_archive")) || [];
+//const tasks = JSON.parse(localStorage.getItem("zishu_active")) || [];
+//const finished = JSON.parse(localStorage.getItem("zishu_archive")) || [];
 const now = new Date();
 
 const year = ref(now.getFullYear());
@@ -222,9 +222,12 @@ const day = ref(now.getDate().toString().padStart(2, "0"));
 
 const formattedDate = `${year.value}-${month.value}-${day.value}`;
 
-const taskList = ref(tasks)
-const finishList = ref(finished)
-const searchList = ref(finished)
+// const taskList = ref(tasks)
+// const finishList = ref(finished)
+// const searchList = ref(finished)
+const taskList:any = ref([])
+const finishList:any = ref([])
+const searchList:any = ref([])
 const searchItems = ref(["", "", "", ""])
 const cur = ref(-1)
 const cur_archive = ref(-1)
@@ -262,6 +265,24 @@ const getDockets = async () => {
   }
 }
 
+const getTm = async () => {
+  if (loginstate.logined = true) {
+    let res = await fetchTmAPI({user_id:loginstate.id})
+    let pr = res.pr
+    let fn = res.fn
+    taskList.value = pr
+    finishList.value = fn
+    searchList.value = fn
+    if (taskList.value.length==0){
+      addWorks();
+    }
+  }
+}
+
+const handleSelect = () => {
+  submit();
+}
+
     watchEffect(() => {
       let sumTime = 0;
       for (let i = 0; i < taskList.value.length; i++) {
@@ -273,16 +294,16 @@ const getDockets = async () => {
     });
 
     onMounted(() => {
-      if (tasks && tasks.length > 0) {
-        taskList.value = tasks;
-      }
+      // if (tasks && tasks.length > 0) {
+      //   taskList.value = tasks;
+      // }
 
-      if (finished && finished.length > 0) {
-        finishList.value = finished;
-        searchList.value = finished;
-      }
+      // if (finished && finished.length > 0) {
+      //   finishList.value = finished;
+      //   searchList.value = finished;
+      // }
+      getTm();
       total_time.value = cal_total_time(finishList.value);
-      submit();
       getDockets();
     });
 
@@ -409,10 +430,10 @@ const getDockets = async () => {
         finishList.value = newArr;
         searchList.value = newArr;
         total_time.value = cal_total_time(finishList.value);
-        localStorage.setItem(
-          "zishu_archive",
-          JSON.stringify(finishList.value)
-        );
+        // localStorage.setItem(
+        //   "zishu_archive",
+        //   JSON.stringify(finishList.value)
+        // );
         cur.value = -1;
         submit();
       }
@@ -435,7 +456,7 @@ const getDockets = async () => {
         }
       }
       cur_row.style.backgroundColor = "#a0f";
-
+      fetch();
       skey.value += 1;
     };
 
@@ -447,6 +468,7 @@ const getDockets = async () => {
         old_row.style.backgroundColor = "";
         cur.value = -1;
         no_time.value = false;
+        fetch();
       }
     };
 
@@ -502,6 +524,13 @@ const getDockets = async () => {
       cur_archive.value = -1;
     };
 
+    const fetch = async () => {
+      let res = await fetchPrAPI({user_id:loginstate.id})
+      if (taskList.value.toString() != res.toString()){
+        taskList.value = res;
+      }
+    };
+
     const submit = async () => {
       for (let i = 0; i < taskList.value.length; i++) {
         if (
@@ -514,10 +543,10 @@ const getDockets = async () => {
           );
         }
       }
-      localStorage.setItem(
-        "zishu_active",
-        JSON.stringify(taskList.value)
-      );
+      // localStorage.setItem(
+      //   "zishu_active",
+      //   JSON.stringify(taskList.value)
+      // );
       let res = await savePrAPI({user_id:loginstate.id, taskinfo:JSON.stringify(taskList.value)})
       console.log(res)
     };

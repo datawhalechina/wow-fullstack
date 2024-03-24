@@ -21,21 +21,21 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import("../views/course/Course.vue"),
         },
         {
+          path: "/course/add",
+          // 命名
+          name: "Addcourse",
+          component: () => import("../views/course/Add.vue"),
+        },
+        {
           path: "/course/:id",
           // 命名
           name: "Coursedetail",
           component: () => import("../views/course/Detail.vue"),
         },
         {
-            path: "/course/add",
-            // 命名
-            name: "Addcourse",
-            component: () => import("../views/course/Add.vue"),
-        },
-        {
           path: "/course/edit/:id",
           // 命名
-          name: "Addcourse",
+          name: "Editcourse",
           component: () => import("../views/course/Edit.vue"),
        },
         {

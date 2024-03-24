@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import {SaveCourseAPI} from '../../request/course/api'
 import {Chapter} from '../../request/course/type'
-import { onMounted, ref, reactive } from 'vue'
+import { ref, reactive } from 'vue'
 import { ElTable } from 'element-plus'
-//const input = ref('')
 const courseid = ref(0)
 const desc = ref('')
 const input = ref('')
@@ -12,22 +11,11 @@ const editChapterFormVisible = ref(false)
 const diaglogwidth = '400px'
 const formLabelWidth = '100px'
 let tableData:Chapter[] = reactive([])
-const getCourse = async() => {
-    // let res = await fetchCourseAPI()
-    // tableData.push(...res)
-}
-// onMounted(getCourse)
+
 
 const currentRow = ref()
 const singleTableRef = ref<InstanceType<typeof ElTable>>()
-// interface Chapter {
-//     id:number
-//     title: string
-//     author_id: number
-//     author_name: string
-//     period: string
-//     url:string
-// }
+
 
 let newChapter = reactive<Chapter>({
   id: 0,
@@ -41,25 +29,7 @@ let newChapter = reactive<Chapter>({
 const handleCurrentChange = (val: Chapter | undefined) => {
   currentRow.value = val
 }
-// const temp:Chapter[] = [
-//   {
-//     id:1,
-//     title: 'Chapter1',
-//     author_id: 1,
-//     author_name: '黎伟',
-//     period: '7天',
-//     url:'https:zishu.co'
-//   },
-//   {
-//     id:2,
-//     title: 'Chapter2',
-//     author_id: 1,
-//     author_name: '黎伟',
-//     period: '7天',
-//     url:'https:zishu.co'
-//   }
-// ]
-// tableData.push(...temp)
+
 
 const add_chapter = async() => {
   addChapterFormVisible.value = true
