@@ -15,7 +15,7 @@ import json
 Base.metadata.create_all(bind=engine)
 
 course = APIRouter(
-    prefix="/course",
+    prefix="/api/course",
     tags=["course"],
     responses={404: {"description": "Not found"}},
 )

@@ -45,12 +45,6 @@ const routes: Array<RouteRecordRaw> = [
           component: () => import("../views/inno/Project.vue"),
         },
         {
-            path: "/articles",
-            // 命名
-            name: "Articles",
-            component: () => import("../views/Articles.vue"),
-        },
-        {
           path: "/user",
           // 命名
           name: "User",

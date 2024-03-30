@@ -17,7 +17,7 @@ from app.database import engine
 Base.metadata.create_all(bind=engine)
 
 router = APIRouter(
-    prefix="/users",
+    prefix="/api/users",
     tags=["users"],
     responses={404: {"description": "Not found"}},
 )

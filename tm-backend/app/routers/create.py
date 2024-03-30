@@ -13,7 +13,7 @@ import json, os, ast
 Base.metadata.create_all(bind=engine)
 
 create = APIRouter(
-    prefix="/create",
+    prefix="/api/create",
     tags=["create"],
     responses={404: {"description": "Not found"}},
 )
