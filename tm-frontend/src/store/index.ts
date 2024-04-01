@@ -7,10 +7,10 @@ export const useLoginStore = defineStore('login',{
       id:0,
       logined: false,
       dialogFormVisible: false,
-      name: '黎伟',
+      name: '',
       atoken: '',
       rtoken: '',
-      iframeurl:'',
+      iframeurl:'http://127.0.0.1:8008',
     }
   },
   persist: {

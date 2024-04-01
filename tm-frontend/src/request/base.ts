@@ -3,7 +3,7 @@ import { useLoginStore } from "../store";
 const loginstate = useLoginStore();
 // 创建axios实例
 const instance = axios.create({
-    baseURL: 'http://127.0.0.1:8008',// 所有的请求地址前缀部分(没有后端请求不用写)
+    baseURL: loginstate.iframeurl,// 所有的请求地址前缀部分(没有后端请求不用写)
     timeout: 80000, // 请求超时时间(毫秒)
     withCredentials: false,// 异步请求携带cookie
     headers: {

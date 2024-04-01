@@ -134,10 +134,10 @@ const goal_complete = async() => {
         <div v-for="pic in fileList" :key="pic.name" class="block">
         <el-image 
         style="width: 100px; height: 100px" 
-        :preview-src-list="[pic.url]"
+        :preview-src-list="[loginstate.iframeurl+'/'+pic.url]"
         :max-scale="7"
         :min-scale="0.2"
-        :src="pic.url" 
+        :src="loginstate.iframeurl+'/'+pic.url" 
         :fit="'scale-down'"/>
         </div>
     </div>

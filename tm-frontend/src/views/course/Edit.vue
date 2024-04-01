@@ -4,6 +4,7 @@ import {Chapter} from '../../request/course/type'
 import { onMounted, ref, reactive } from 'vue'
 import { ElTable } from 'element-plus'
 import { useRoute } from 'vue-router'
+import router from '../../router'
 const route = useRoute()
 const courseid = Number(route.params.id)
 const addChapterFormVisible = ref(false)
@@ -146,6 +147,9 @@ const save_course = async() => {
   }
   let res = await SaveCourseAPI(data)
   console.log(res)
+  if (res.code == '200'){
+    router.push('/course/detail'+courseid)
+  }
 }
 
 </script>

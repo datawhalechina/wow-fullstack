@@ -3,6 +3,7 @@ import {SaveCourseAPI} from '../../request/course/api'
 import {Chapter} from '../../request/course/type'
 import { ref, reactive } from 'vue'
 import { ElTable } from 'element-plus'
+import router from '../../router'
 const courseid = ref(0)
 const desc = ref('')
 const input = ref('')
@@ -109,6 +110,9 @@ const save_course = async() => {
   }
   let res = await SaveCourseAPI(data)
   console.log(res)
+  if (res.code == '200'){
+    router.push('/learn')
+  }
 }
 
 </script>

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Form, Depends, HTTPException, status, Request, Up
 from datetime import datetime, timedelta
 from app.dependencies import check_jwt_token, get_db, verify_password, get_password_hash
 from app.config import settings
-import jwt
+from jose import jwt
 import os
 import json
 import glob
@@ -188,7 +188,7 @@ async def get_profile(*, user_id: int, db: Session = Depends(get_db)):
         if findfile:
             tmpdict = {
                 "name":findfile[0],
-                "url":"http://127.0.0.1:8008/"+findfile[0]
+                "url":findfile[0]
                 }
             tmplist.append(tmpdict)
     rtn["profiles"]=tmplist

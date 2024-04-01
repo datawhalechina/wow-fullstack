@@ -2,7 +2,7 @@ from fastapi import APIRouter, Form, Depends, HTTPException, status, Request
 from datetime import datetime, timedelta
 from app.dependencies import check_jwt_token, get_db
 from app.config import settings
-import jwt
+from jose import jwt
 from typing import Optional
 from app.core.schemas.course import CourseModel
 from app.core.schemas.users import UserBase
@@ -188,7 +188,7 @@ async def report_learn(
     db.add(new_report)
     
     
-    if selection.shushi_id>0:
+    if selection.shushi_id:
         new_shuzhi = Shuzhi(
             user_id=user.id,
             user_type="塾生",
@@ -304,7 +304,7 @@ async def cal_mentors(user: UserBase = Depends(check_jwt_token), db: Session = D
             Mentors.shushi_id==f_sele.user_id,
             Mentors.end_time!=None
             ).count()
-            if mentor_count<3:
+            if mentor_count<3 and f_sele.user_id!=user.id:
                 sele_dict = f_sele.__dict__
                 if "_sa_instance_state" in sele_dict:
                     del sele_dict["_sa_instance_state"]
