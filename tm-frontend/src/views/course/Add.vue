@@ -1,18 +1,39 @@
 <script setup lang="ts">
 import {SaveCourseAPI} from '../../request/course/api'
 import {Chapter} from '../../request/course/type'
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import { ElTable } from 'element-plus'
 import router from '../../router'
 const courseid = ref(0)
 const desc = ref('')
 const input = ref('')
+
 const addChapterFormVisible = ref(false)
 const editChapterFormVisible = ref(false)
 const diaglogwidth = '400px'
 const formLabelWidth = '100px'
 let tableData:Chapter[] = reactive([])
 
+const course_text = ref('')
+
+const update_course = async() => {
+  tableData.length = 0
+  let chapter_split = course_text.value.split("\n")
+  chapter_split.forEach((row)=>{
+    let fields = row.split("\t")
+    if (fields.length==4){
+      let temp = {
+        id: 0,
+        title: fields[0],
+        author_id: 0,
+        author_name: fields[1],
+        period: fields[2],
+        url:fields[3]
+      }
+      tableData.push(temp)
+    }
+  })
+}
 
 const currentRow = ref()
 const singleTableRef = ref<InstanceType<typeof ElTable>>()
@@ -155,6 +176,15 @@ const save_course = async() => {
   </el-table>
   <el-button v-if="tableData.length>0" type="primary" @click="save_course">保存课程</el-button>
 
+  <br><br>
+  <el-input
+    v-model="course_text"
+    placeholder="请输入课程详细信息"
+    :rows="5"
+    type="textarea"
+    @blur="update_course"
+    v-if="input.length>1 && desc.length>1"
+  />
 
   <el-dialog v-model="addChapterFormVisible" :width="diaglogwidth" :center="true" title="新增章节">
     <el-form :model="newChapter" ref="ruleFormRef" status-icon>

@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from app.dependencies import check_jwt_token, get_db
 from sqlalchemy.orm import Session
 from app.core.schemas.users import UserBase
-from app.core.models.create import Base, Project
+from app.core.models.inno import Base, Project
 from app.core.models.course import Report, Selection, Course
 from app.core.models.users import Users, Shuzhi
 from app.database import engine
@@ -12,14 +12,14 @@ import json, os, ast
 
 Base.metadata.create_all(bind=engine)
 
-create = APIRouter(
-    prefix="/api/create",
-    tags=["create"],
+inno = APIRouter(
+    prefix="/api/inno",
+    tags=["inno"],
     responses={404: {"description": "Not found"}},
 )
 
 
-@create.get("/fetch_current_projects")
+@inno.get("/fetch_current_projects")
 async def fetch_current_projects(db: Session = Depends(get_db)):
     projects = db.query(Project).filter_by(finish_date=None).all()
     rtn = []
@@ -30,7 +30,7 @@ async def fetch_current_projects(db: Session = Depends(get_db)):
         rtn.append(project_dict)
     return rtn
 
-@create.get("/fetch_finished_projects")
+@inno.get("/fetch_finished_projects")
 async def fetch_finished_projects(db: Session = Depends(get_db)):
     projects = db.query(Project).filter(Project.finish_date!=None).order_by(Project.id.desc()).all()
     rtn = []
@@ -41,7 +41,7 @@ async def fetch_finished_projects(db: Session = Depends(get_db)):
         rtn.append(project_dict)
     return rtn
 
-@create.get("/fetch_next_serial/{task_type}")
+@inno.get("/fetch_next_serial/{task_type}")
 async def fetch_next_serial(task_type:str, db: Session = Depends(get_db)):
     serial_type = task_type[0]
     current_project = db.query(Project).filter(Project.task_serial.like(serial_type+'%')).order_by(Project.id.desc()).first()
@@ -53,7 +53,7 @@ async def fetch_next_serial(task_type:str, db: Session = Depends(get_db)):
         next_serial = task_type + '001'
     return next_serial
 
-@create.post("/add_project")
+@inno.post("/add_project")
 async def add_project(request: Request, 
                       user: UserBase = Depends(check_jwt_token), 
                       db: Session = Depends(get_db)):
@@ -76,7 +76,7 @@ async def add_project(request: Request,
     db.commit()
     return {"code": "200", "project_id":new_project.id}
 
-@create.put("/edit_project/{project_id}")
+@inno.put("/edit_project/{project_id}")
 async def edit_project(request: Request, 
                       project_id:int,
                       user: UserBase = Depends(check_jwt_token), 
@@ -169,7 +169,7 @@ async def edit_project(request: Request,
     db.commit()
     return {"code": "200"}
 
-@create.get("/fetch_dockets/{user_id}")
+@inno.get("/fetch_dockets/{user_id}")
 async def fetch_dockets(user_id:int, db: Session = Depends(get_db)):
     dockets = []
     selections = db.query(Selection).filter_by(user_id=user_id,finish_time=None).all()
@@ -188,7 +188,7 @@ async def fetch_dockets(user_id:int, db: Session = Depends(get_db)):
     return dockets
 
 
-@create.get('/get_tm/{user_id}')
+@inno.get('/get_tm/{user_id}')
 async def get_tm(user_id:int):
     userid = str(user_id)
     pr = []
@@ -204,7 +204,7 @@ async def get_tm(user_id:int):
     fn.reverse()
     return {"pr":pr, "fn":fn}
 
-@create.get('/get_pr/{user_id}')
+@inno.get('/get_pr/{user_id}')
 async def get_pr(user_id:int):
     userid = str(user_id)
     pr = []
@@ -214,7 +214,7 @@ async def get_pr(user_id:int):
     pr = [ast.literal_eval(x) for x in pr]
     return pr
 
-@create.put('/save_pr/{user_id}')
+@inno.put('/save_pr/{user_id}')
 async def save_pr(request: Request, user_id:int):
     userid = str(user_id)
     form_data = await request.form()
@@ -224,7 +224,7 @@ async def save_pr(request: Request, user_id:int):
             f.write(str(line) + "\n")
     return {"code": "200"}
 
-@create.put('/finish_tm/{user_id}')
+@inno.put('/finish_tm/{user_id}')
 async def finish_tm(request: Request, user_id:int):
     userid = str(user_id)
     form_data = await request.form()

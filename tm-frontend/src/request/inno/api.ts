@@ -1,32 +1,32 @@
 import instance from "../base";
-import  * as Create from "./type";
+import  * as Inno from "./type";
 
-export const getNextSerialAPI = (params: Create.INextSerial): Promise<any> =>
-    instance.get(`/api/create/fetch_next_serial/${params.task_type}`, { params });
+export const getNextSerialAPI = (params: Inno.INextSerial): Promise<any> =>
+    instance.get(`/api/inno/fetch_next_serial/${params.task_type}`, { params });
 
-export const addProjectAPI = (data: Create.ISaveProject): Promise<any> =>
-    instance.post("/api/create/add_project", data);
+export const addProjectAPI = (data: Inno.ISaveProject): Promise<any> =>
+    instance.post("/api/inno/add_project", data);
 
 export const fetchProjectsAPI = (): Promise<any> =>
-    instance.get("/api/create/fetch_current_projects");
+    instance.get("/api/inno/fetch_current_projects");
 
 export const fetchFinishedProjectsAPI = (): Promise<any> =>
-    instance.get("/api/create/fetch_finished_projects");
+    instance.get("/api/inno/fetch_finished_projects");
 
-export const updateProjectAPI = (params: Create.IUpdateProject): Promise<any> =>
-    instance.put(`/api/create/edit_project/${params.project_id}`, { params });
+export const updateProjectAPI = (params: Inno.IUpdateProject): Promise<any> =>
+    instance.put(`/api/inno/edit_project/${params.project_id}`, { params });
 
 export const fetchDocketsAPI = (params: {user_id:number}): Promise<any> =>
-    instance.get(`/api/create/fetch_dockets/${params.user_id}`, { params });
+    instance.get(`/api/inno/fetch_dockets/${params.user_id}`, { params });
 
-export const fetchTmAPI = (params: Create.Itm): Promise<any> =>
-    instance.get(`/api/create/get_tm/${params.user_id}`, { params });
+export const fetchTmAPI = (params: Inno.Itm): Promise<any> =>
+    instance.get(`/api/inno/get_tm/${params.user_id}`, { params });
 
-export const fetchPrAPI = (params: Create.Itm): Promise<any> =>
-    instance.get(`/api/create/get_pr/${params.user_id}`, { params });
+export const fetchPrAPI = (params: Inno.Itm): Promise<any> =>
+    instance.get(`/api/inno/get_pr/${params.user_id}`, { params });
 
-export const savePrAPI = (params: Create.Itm): Promise<any> =>
-    instance.put(`/api/create/save_pr/${params.user_id}`, { params });
+export const savePrAPI = (params: Inno.Itm): Promise<any> =>
+    instance.put(`/api/inno/save_pr/${params.user_id}`, { params });
 
-export const finishTmAPI = (params: Create.Itm): Promise<any> =>
-    instance.put(`/api/create/finish_tm/${params.user_id}`, { params });
+export const finishTmAPI = (params: Inno.Itm): Promise<any> =>
+    instance.put(`/api/inno/finish_tm/${params.user_id}`, { params });
