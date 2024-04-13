@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import {fetchFinishedProjectsAPI} from '../../request/inno/api'
-import { ref, reactive, onMounted, computed } from 'vue'
+import { reactive, onMounted, computed } from 'vue'
 
 document.title = "创新结项"
 const tableData:any = reactive([])
