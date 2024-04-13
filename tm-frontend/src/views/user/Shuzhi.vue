@@ -2,6 +2,8 @@
 import { useLoginStore } from "../../store";
 import {fetchShuzhiAPI} from '../../request/user/api'
 import { onMounted, reactive } from 'vue'
+
+document.title = "塾值"
 const loginstate = useLoginStore();
 let tableData:any = reactive([])
 const fetchShuZhi = async() => {

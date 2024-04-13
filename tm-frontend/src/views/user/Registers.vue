@@ -2,7 +2,7 @@
 import {fetchRigiAPI, handleRigiAPI} from '../../request/user/api'
 import { onMounted, ref, reactive } from 'vue'
 import { ElTable } from 'element-plus'
-
+document.title = "注册列表"
 let tableData:any = reactive([])
 const doRegister = async() => {
     let res = await fetchRigiAPI()

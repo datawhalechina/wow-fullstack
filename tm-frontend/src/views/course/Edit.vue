@@ -5,6 +5,8 @@ import { onMounted, ref, reactive } from 'vue'
 import { ElTable } from 'element-plus'
 import { useRoute } from 'vue-router'
 import router from '../../router'
+
+document.title = "编辑课程"
 const route = useRoute()
 const courseid = Number(route.params.id)
 const addChapterFormVisible = ref(false)
@@ -29,6 +31,7 @@ const getCourse = async () => {
   course.director_name=res.course.director_name
   course.desc=res.course.desc
   tableData.push(...res.chapters)
+  document.title = course.title
 }
 
 onMounted(getCourse)
@@ -148,7 +151,7 @@ const save_course = async() => {
   let res = await SaveCourseAPI(data)
   console.log(res)
   if (res.code == '200'){
-    router.push('/course/detail'+courseid)
+    router.push('/course/'+courseid)
   }
 }
 

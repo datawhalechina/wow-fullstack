@@ -4,6 +4,7 @@ import { ref, reactive } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { useLoginStore } from "../../store";
 
+document.title = "修改密码"
 const loginstate = useLoginStore();
 const formLabelWidth = '70px'
 const ruleFormRef = ref<FormInstance>()

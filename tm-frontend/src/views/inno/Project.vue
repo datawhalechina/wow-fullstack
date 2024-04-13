@@ -3,7 +3,9 @@ import { useLoginStore } from "../../store";
 import {fetchShushengsAPI} from '../../request/user/api'
 import {fetchProjectsAPI, getNextSerialAPI, addProjectAPI, updateProjectAPI} from '../../request/inno/api'
 import { ElTable } from 'element-plus'
-import { onMounted, ref, reactive } from 'vue'
+import { onMounted, ref, reactive, computed } from 'vue'
+
+document.title = "创新"
 const loginstate = useLoginStore();
 const userid = loginstate.id
 const diaglogwidth = '400px'
@@ -258,6 +260,38 @@ const finish_confirm = async() => {
     currentRow.value.update_date=now.toISOString().slice(0, 10)
 }
 
+
+
+
+// 计算属性，根据截止日期返回颜色  
+const deadlineColors = computed(() => {  
+  return tableData.reduce((colors:any, row:any) => {  
+    const deadlineDate = new Date(row.deadline);  
+    const today = ref(new Date()); 
+    const diffMilliseconds = (deadlineDate.getTime() - (today.value as Date).getTime());
+    const diffDays = diffMilliseconds / (1000 * 60 * 60 * 24);  
+  
+    if (diffDays === 0) {  
+      colors[row.deadline] = 'orange';  
+    } else if (diffDays > 0 && diffDays <= 3) {  
+      colors[row.deadline] = 'blue';  
+    } else if (diffDays < 0) {  
+      colors[row.deadline] = 'red';  
+    } else {  
+      colors[row.deadline] = '';  
+    }  
+  
+    return colors;  
+  }, {} as { [key: string]: string });  
+});  
+  
+// 函数，用于获取截止日期的颜色  
+function getDeadlineColor(deadline: string) {  
+  return deadlineColors.value[deadline] || '';  
+}  
+
+
+
 </script>
 <template>
 <div>
@@ -303,7 +337,9 @@ style="width: 100%"
     </el-table-column>
     <el-table-column label="截止日期">
       <template #default="scope">
-        {{ scope.row.deadline?scope.row.deadline.slice(0,10):'' }}
+        <span :class="getDeadlineColor(scope.row.deadline)">  
+          {{ scope.row.deadline?scope.row.deadline.slice(0,10):'' }} 
+        </span>  
       </template>
     </el-table-column>
     <el-table-column prop="planed_hour" label="计划用时" />
@@ -427,4 +463,13 @@ style="width: 100%"
 </template>
 
 <style lang="scss" scoped>
+.orange {  
+  color: orange;  
+}  
+.blue {  
+  color: blue;  
+}  
+.red {  
+  color: red;  
+} 
 </style>

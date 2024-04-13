@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import {SaveCourseAPI} from '../../request/course/api'
 import {Chapter} from '../../request/course/type'
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive } from 'vue'
 import { ElTable } from 'element-plus'
 import router from '../../router'
+
+document.title = "新增课程"
 const courseid = ref(0)
 const desc = ref('')
 const input = ref('')

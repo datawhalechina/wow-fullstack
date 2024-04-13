@@ -5,6 +5,7 @@ import {fetchShushisAPI, fetchShushengsAPI} from '../../request/user/api'
 import { ISaveGoal, IGetShumen } from  '../../request/user/type'
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
+document.title = "个人信息"
 const route = useRoute()
 const loginstate = useLoginStore();
 const current_userid = loginstate.id

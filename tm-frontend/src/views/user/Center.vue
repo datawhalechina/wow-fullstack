@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useLoginStore } from "../../store";
+document.title = "个人中心"
 const loginstate = useLoginStore();
 const userid = loginstate.id
 </script>
@@ -23,7 +24,7 @@ const userid = loginstate.id
     <br />
     <el-link type="primary" href="/user/supervise" target="_blank">学习监督</el-link>
     <br />
-    <el-link type="primary" href="/course/add" target="_blank">新增课程</el-link>
+    <el-link v-if="loginstate.id==1" type="primary" href="/course/add" target="_blank">新增课程</el-link>
     <br />
     <el-link type="primary" href="/user/followup" target="_blank">创新结项</el-link>
 

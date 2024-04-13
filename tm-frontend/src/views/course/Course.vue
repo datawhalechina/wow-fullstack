@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import {fetchCourseAPI, selectCourseAPI, fetchCurrentSelectionAPI, reportLearnAPI} from '../../request/course/api'
-import { reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, computed } from 'vue'
 import router from '../../router'
 import { useLoginStore } from "../../store";
+document.title = "学习"
 const loginstate = useLoginStore();
 const tableData:any = reactive([])
 const getAllCourse = async () => {
@@ -70,6 +71,37 @@ const selection = async (title:string,id:number) => {
 const deselection = async () => {
   alert("不要轻言放弃，请找您的塾师咨询。")
 }
+
+
+// 计算属性，根据截止日期返回颜色  
+const deadlineColors = computed(() => {  
+  return tableData.reduce((colors:any, row:any) => {  
+    const deadlineDate = new Date(row.deadline); 
+    const today = ref(new Date());   
+    const diffMilliseconds = (deadlineDate.getTime() - (today.value as Date).getTime());
+    const diffDays = diffMilliseconds / (1000 * 60 * 60 * 24);  
+  
+    if (diffDays === 0) {  
+      colors[row.deadline] = 'orange';  
+    } else if (diffDays > 0 && diffDays <= 3) {  
+      colors[row.deadline] = 'blue';  
+    } else if (diffDays < 0) {  
+      colors[row.deadline] = 'red';  
+    } else {  
+      colors[row.deadline] = '';  
+    }  
+  
+    return colors;  
+  }, {} as { [key: string]: string });  
+});  
+  
+// 函数，用于获取截止日期的颜色  
+function getDeadlineColor(deadline: string) {  
+  return deadlineColors.value[deadline] || '';  
+}  
+
+
+
 </script>
 
 <template>
@@ -94,7 +126,9 @@ const deselection = async () => {
     <el-table-column prop="current_serial" label="课次" />
     <el-table-column label="截止日期">
       <template #default="scope">
-        {{ scope.row.deadline.slice(0,10) }}
+        <span :class="getDeadlineColor(scope.row.deadline)">  
+          {{ scope.row.deadline?scope.row.deadline.slice(0,10):'' }} 
+        </span>
       </template>
     </el-table-column>
     <el-table-column prop="period" label="操作" width="180">
@@ -131,4 +165,13 @@ const deselection = async () => {
 .centered-text {
   text-align: center;
 }
+.orange {  
+  color: orange;  
+}  
+.blue {  
+  color: blue;  
+}  
+.red {  
+  color: red;  
+}  
 </style>

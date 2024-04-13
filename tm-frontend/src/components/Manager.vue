@@ -212,6 +212,8 @@ import { ref, reactive, onMounted, watchEffect } from "vue";
 import {fetchDocketsAPI} from '../request/inno/api'
 import {fetchTmAPI, fetchPrAPI, savePrAPI, finishTmAPI} from '../request/inno/api'
 const loginstate = useLoginStore();
+
+document.title = "自塾时间管理"
 //const tasks = JSON.parse(localStorage.getItem("zishu_active")) || [];
 //const finished = JSON.parse(localStorage.getItem("zishu_archive")) || [];
 const now = new Date();

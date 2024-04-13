@@ -2,6 +2,7 @@
 import { useLoginStore } from "../../store";
 import {getProfileAPI, deleteProfileAPI, submitProfileAPI} from '../../request/user/api'
 const loginstate = useLoginStore();
+document.title = "编辑个人信息"
 import { reactive, onMounted } from 'vue'
 import router from '../../router'
 import { ref } from 'vue'
@@ -59,7 +60,10 @@ const getProfile = async () => {
   form.desc = res.desc
   fileList.value.length = 0
   console.log(res.profiles)
-  fileList.value.push(...res.profiles)
+  res.profiles.forEach((item:any) => {
+    item.url = loginstate.iframeurl+'/'+ item.url
+    fileList.value.push(item)
+  });
 }
 
 onMounted(getProfile)
@@ -93,7 +97,7 @@ const onSubmit = async () => {
     <el-form-item label="">
       <el-upload
         v-model:file-list="fileList"
-        action="http://127.0.0.1:8008/users/save_profile"
+        :action="loginstate.iframeurl+'/'+ 'api/users/save_profile'"
         list-type="picture-card"
         drag
         :data={id:userid}

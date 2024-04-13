@@ -2,8 +2,9 @@
 import { useLoginStore } from "../../store";
 import {getCourseAPI} from '../../request/course/api'
 import {Chapter} from '../../request/course/type'
-import { reactive, onMounted } from 'vue'
+import { reactive, onMounted} from 'vue'
 const loginstate = useLoginStore();
+document.title  = "课程明细"
 import { useRoute } from 'vue-router'
 const tableData:Chapter[] = reactive([])
 const route = useRoute()
@@ -19,6 +20,7 @@ const getCourse = async () => {
   course.director_name=res.course.director_name
   course.desc=res.course.desc
   tableData.push(...res.chapters)
+  document.title  = course.title
 }
 
 onMounted(getCourse)
@@ -30,6 +32,7 @@ const course = reactive({
   director_id: 0,
   desc: '',
 })
+
 </script>
 
 <template>

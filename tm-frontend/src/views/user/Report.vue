@@ -2,6 +2,8 @@
 import { useLoginStore } from "../../store";
 import {fetchReportsAPI} from '../../request/user/api'
 import { onMounted, reactive } from 'vue'
+
+document.title = "汇报"
 const loginstate = useLoginStore();
 let tableData:any = reactive([])
 const fetchReports = async() => {

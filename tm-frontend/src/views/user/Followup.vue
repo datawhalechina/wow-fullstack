@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import {fetchFinishedProjectsAPI} from '../../request/inno/api'
 import { ref, reactive, onMounted, computed } from 'vue'
+
+document.title = "创新结项"
 const tableData:any = reactive([])
-const today = ref(new Date());  
+
 const getAllFinishedProjects = async () => {
   let res = await fetchFinishedProjectsAPI()
   console.log(res)
@@ -14,17 +16,18 @@ onMounted(getAllFinishedProjects)
 const deadlineColors = computed(() => {  
   return tableData.reduce((colors:any, row:any) => {  
     const deadlineDate = new Date(row.deadline);  
-    const diffMilliseconds = (deadlineDate.getTime() - (today.value as Date).getTime());
+    const finishDate = new Date(row.finish_date);  
+    const diffMilliseconds = (deadlineDate.getTime() - finishDate.getTime());
     const diffDays = diffMilliseconds / (1000 * 60 * 60 * 24); 
   
     if (diffDays === 0) {  
-      colors[row.deadline] = 'orange';  
+      colors[row.finish_date] = 'orange';  
     } else if (diffDays > 0 && diffDays <= 3) {  
-      colors[row.deadline] = 'blue';  
+      colors[row.finish_date] = 'blue';  
     } else if (diffDays < 0) {  
-      colors[row.deadline] = 'red';  
+      colors[row.finish_date] = 'red';  
     } else {  
-      colors[row.deadline] = '';  
+      colors[row.finish_date] = '';  
     }  
   
     return colors;  
@@ -32,8 +35,8 @@ const deadlineColors = computed(() => {
 });  
   
 // 函数，用于获取截止日期的颜色  
-function getDeadlineColor(deadline: string) {  
-  return deadlineColors.value[deadline] || '';  
+function getDeadlineColor(finish_date: string) {  
+  return deadlineColors.value[finish_date] || '';  
 }  
 
 </script>
@@ -77,9 +80,7 @@ function getDeadlineColor(deadline: string) {
         </el-table-column>
         <el-table-column label="截止日期">
         <template #default="scope">
-          <span :class="getDeadlineColor(scope.row.deadline)">  
             {{ scope.row.deadline?scope.row.deadline.slice(0,10):'' }}
-          </span>  
         </template>
         </el-table-column>
         <el-table-column prop="planed_hour" label="计划用时" />
@@ -87,7 +88,9 @@ function getDeadlineColor(deadline: string) {
         <el-table-column prop="half_progress" label="半程进度" />
         <el-table-column label="完成日期">
         <template #default="scope">
+          <span :class="getDeadlineColor(scope.row.finish_date)">  
             {{ scope.row.finish_date?scope.row.finish_date.slice(0,10):'' }}
+          </span>  
         </template>
         </el-table-column>
     </el-table>

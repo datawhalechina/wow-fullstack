@@ -2,10 +2,20 @@
 import { calMentorsAPI, selectMentorAPI } from '../../request/course/api';
 import { reactive, onMounted } from 'vue'
 import router from '../../router'
+
+document.title = "选塾师"
 const tableData:any = reactive([])
 const getAllMentor = async () => {
     let res = await calMentorsAPI()
     console.log(res)
+    let tmp = {
+      shushi_id:res.director_id,
+      shushi_name:res.director_name,
+      course_id:res.course_id
+    }
+    if (res.mentor_count <10) {
+      tableData.push(tmp)
+    }
     let mentors = res.mentors
     tableData.push(...mentors)
 }
@@ -22,8 +32,8 @@ const getCurrentSelection = async () => {
 onMounted(getCurrentSelection)
 
 // 补充selection函数
-const selection = async (title:string,shushi_id:number,course_id:number) => {
-  if(confirm("确定要选择"+title+"作为塾师吗？")==true){
+const selection = async (shushi_name:string,shushi_id:number,course_id:number) => {
+  if(confirm("确定要选择"+shushi_name+"作为塾师吗？")==true){
     let data = {shushi_id:shushi_id,courseid:course_id}
     let res = await selectMentorAPI(data)
     console.log(res)
@@ -34,7 +44,7 @@ const selection = async (title:string,shushi_id:number,course_id:number) => {
 
 <template>
   <h5 class="tablecss">选择塾师</h5>
-  <h5 v-if="tableData.length==0" class="tablecss">请先选课再选塾师</h5>
+  <h5 v-if="tableData.length==0" class="tablecss">当前没有塾师可供选择</h5>
   <el-table v-if="tableData.length>0" class="tablecss" :data="tableData">
     <el-table-column label="塾师">
       <template #default="scope">
@@ -43,7 +53,7 @@ const selection = async (title:string,shushi_id:number,course_id:number) => {
     </el-table-column>
     <el-table-column label="操作" width="180">
       <template #default="scope">
-        <el-button link type="primary" @click="selection(scope.row.shushi_name, scope.row.shushi_id, scope.row.id)">选择</el-button>
+        <el-button link type="primary" @click="selection(scope.row.shushi_name, scope.row.shushi_id, scope.row.course_id)">选择</el-button>
       </template>
     </el-table-column>
   </el-table>

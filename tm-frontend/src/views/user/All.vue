@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import {fetchAllUsersAPI} from '../../request/user/api'
 import { onMounted, reactive } from 'vue'
+document.title = "全塾"
 let tableData:any = reactive([])
 const fetchAll = async() => {
     let res = await fetchAllUsersAPI()

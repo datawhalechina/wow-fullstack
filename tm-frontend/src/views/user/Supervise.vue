@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import {fetchAllSelectionAPI} from '../../request/course/api'
 import { ref, reactive, onMounted, computed } from 'vue'
+
+document.title = "学习管理"
 const tableData:any = reactive([])
 const today = ref(new Date());  
 const getAllSelection = async () => {
