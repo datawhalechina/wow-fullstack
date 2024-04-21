@@ -16,7 +16,7 @@ const instance = axios.create({
 })
  
 async function refreshToken() {
-    const res:any = await instance.get("/users/refresh");
+    const res:any = await instance.get("/api/users/refresh");
     if(res.id > 0) {
         loginstate.atoken = res.atoken;
         loginstate.rtoken = res.rtoken;

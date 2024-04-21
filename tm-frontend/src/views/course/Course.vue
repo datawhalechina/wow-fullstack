@@ -44,10 +44,12 @@ const report = async (row:any) => {
       let data = {chapter_id:row.chapter_id,course_id:row.course_id,chapter_title:row.chapter_title,sele_id:row.sele_id,reported_hour:reported_hour}
       let res = await reportLearnAPI(data)
       console.log(res)
-      if(res.code==200){
+      if(res){
         alert("已成功申报《"+row.chapter_title+"》"+reported_hour+"小时")
         currentTableData.length=0
         getCurrentSelection()
+      } else {
+        alert("出错了，请重试一次...")
       }
     } else {
       alert("请输入整数或小数")
