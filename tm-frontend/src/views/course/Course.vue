@@ -154,7 +154,7 @@ function getDeadlineColor(deadline: string) {
     <el-table-column label="操作" width="180">
       <template #default="scope">
         <el-button v-if="currentSelections.includes(scope.row.id)" link type="primary" @click="deselection()">退选</el-button>
-        <el-button v-else-if="currentSelections.length<4" link type="primary" @click="selection(scope.row.title, scope.row.id)">选课</el-button>
+        <el-button v-else-if="currentSelections.length<4 && loginstate.name.length>0" link type="primary" @click="selection(scope.row.title, scope.row.id)">选课</el-button>
         <span v-else>禁选</span>
       </template>
     </el-table-column>

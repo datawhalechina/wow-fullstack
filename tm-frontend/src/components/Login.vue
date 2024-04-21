@@ -1,7 +1,7 @@
 <template>
 
   <!-- Form -->
-  <span v-if="!loginstate.logined && loginstate.name.length==0">
+  <span v-if="!loginstate.logined || loginstate.name.length==0">
     <el-button text @click="loginstate.dialogFormVisible = true">登录</el-button>
     <el-button text @click="registerFormVisible = true">注册</el-button>
   </span>
@@ -143,6 +143,7 @@ const checklogin = async() => {
       loginstate.dialogFormVisible = false
       form.name = ""
       form.password = ""
+      window.location.reload();
     } else {
       alert("用户名或密码错误,请重新输入")
     }
@@ -151,11 +152,11 @@ const checklogin = async() => {
 }
 
 const logOut = () => {
-  loginstate.logined = false
   loginstate.id = 0
   loginstate.name = ""
   loginstate.atoken = "atoken"
   loginstate.rtoken = "rtoken"
+  loginstate.logined = !loginstate.logined
   router.push('/')
 }
 

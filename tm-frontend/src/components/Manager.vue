@@ -260,7 +260,7 @@ const querySearch = (queryString: string, cb: any) => {
 
 
 const getDockets = async () => {
-  if (loginstate.logined = true) {
+  if (loginstate.id > 0) {
     let res = await fetchDocketsAPI({user_id:loginstate.id})
     dockets.push(...res)
     console.log(dockets)
@@ -268,7 +268,7 @@ const getDockets = async () => {
 }
 
 const getTm = async () => {
-  if (loginstate.logined = true) {
+  if (loginstate.id > 0) {
     let res = await fetchTmAPI({user_id:loginstate.id})
     let pr = res.pr
     let fn = res.fn
