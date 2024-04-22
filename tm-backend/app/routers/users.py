@@ -187,8 +187,8 @@ async def get_profile(*, user_id: int, db: Session = Depends(get_db)):
         findfile = glob.glob(os.path.join(save_base_dir, pattern))
         if findfile:
             tmpdict = {
-                "name":findfile[0],
-                "url":findfile[0]
+                "name":'api/'+ findfile[0],
+                "url":'api/'+ findfile[0]
                 }
             tmplist.append(tmpdict)
     rtn["profiles"]=tmplist
