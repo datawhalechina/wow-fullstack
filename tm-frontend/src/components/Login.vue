@@ -14,8 +14,8 @@
 
   <el-dialog v-model="loginstate.dialogFormVisible" :width="diaglogwidth" :center="true" title="登录">
     <el-form :model="form">
-      <el-form-item label="用户名" :label-width="formLabelWidth">
-        <el-input v-model="form.name" autocomplete="off" />
+      <el-form-item label="手机号" :label-width="formLabelWidth">
+        <el-input v-model="form.phone" autocomplete="off" />
       </el-form-item>
       <el-form-item label="密码" :label-width="formLabelWidth">
         <el-input type="password" v-model="form.password" autocomplete="off" show-password/>
@@ -73,7 +73,7 @@ const diaglogwidth = '370px'
 const loginstate = useLoginStore();
 
 const form = reactive({
-  name: '',
+  phone: '',
   password: '',
 })
 
@@ -130,7 +130,7 @@ const rules = reactive<FormRules<RuleForm>>({
 
 const checklogin = async() => {
     console.log("发送请求")
-    let data = {username: form.name, password: form.password}
+    let data = {phone: form.phone, password: form.password}
     let res = await loginAPI(data)
     console.log(res);
     console.log("接收数据")
@@ -141,7 +141,7 @@ const checklogin = async() => {
       loginstate.rtoken = res.rtoken
       loginstate.logined = true
       loginstate.dialogFormVisible = false
-      form.name = ""
+      form.phone = ""
       form.password = ""
       window.location.reload();
     } else {
@@ -161,7 +161,7 @@ const logOut = () => {
 }
 
 const forgetPass = () => {
-  console.log(form.name);
+  console.log(form.phone);
 }
 
 

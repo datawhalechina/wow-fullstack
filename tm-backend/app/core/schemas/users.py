@@ -17,7 +17,7 @@ class TokenModel(UserBase):
     rtoken: str = None
 
 class LoginModel(BaseModel):
-    username: str = None
+    phone: str = None
     password: str = None
 
     class Config:

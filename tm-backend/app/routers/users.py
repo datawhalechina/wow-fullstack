@@ -42,14 +42,14 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     encoded_jwt = jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
-def check_user(db: Session, username, password):
+def check_user(db: Session, phone, password):
     """
     :param username:
     :param password:
     :return:
     """
     # user = users_db.get(username)
-    user = db.query(Users).filter(Users.username== username).first()
+    user = db.query(Users).filter(Users.phone== phone).first()
     if not user:
         return False
     # if not verify_password(password, user.get("password")):
@@ -60,8 +60,8 @@ def check_user(db: Session, username, password):
 
 # 使用表单格式参数需要安装模块：python-multipart
 @router.post("/token", response_model=TokenModel)
-async def login_for_access_token(username: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
-    user = check_user(db, username, password)
+async def login_for_access_token(phone: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+    user = check_user(db, phone, password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -73,10 +73,10 @@ async def login_for_access_token(username: str = Form(...), password: str = Form
     refresh_token_expires = timedelta(minutes=10080)
     # 把id进行username加密，要使用str类型
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": str(user.id)}, expires_delta=access_token_expires
     )
     refresh_token = create_access_token(
-        data={"sub": user.username}, expires_delta=refresh_token_expires
+        data={"sub": str(user.id)}, expires_delta=refresh_token_expires
     )
     user.atoken = access_token
     user.rtoken = refresh_token
@@ -90,10 +90,10 @@ async def get_refresh_token(*, user: TokenModel = Depends(check_jwt_token)):
     refresh_token_expires = timedelta(minutes=10080)
     # 把id进行username加密，要使用str类型
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": str(user.id)}, expires_delta=access_token_expires
     )
     refresh_token = create_access_token(
-        data={"sub": user.username}, expires_delta=refresh_token_expires
+        data={"sub": str(user.id)}, expires_delta=refresh_token_expires
     )
     user.atoken = access_token
     user.rtoken = refresh_token

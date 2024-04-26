@@ -148,7 +148,7 @@ async def edit_project(request: Request,
             db.add(shushi_shuzhi)
             shushiitem.shuzhi = shushiitem.shuzhi + float(form_data.get("params[actual_hour]")) * 10
             useritem.shuzhi = useritem.shuzhi + float(form_data.get("params[actual_hour]")) * 10
-            useritem.learn_hour = useritem.learn_hour + float(form_data.get("params[actual_hour]"))
+            useritem.create_hour = useritem.create_hour + float(form_data.get("params[actual_hour]"))
         else:
             new_shuzhi = Shuzhi(
                 user_id=user.id,
@@ -164,7 +164,7 @@ async def edit_project(request: Request,
             )
             db.add(new_shuzhi)
             useritem.shuzhi = useritem.shuzhi + float(form_data.get("params[actual_hour]")) * 20
-            useritem.learn_hour = useritem.learn_hour + float(form_data.get("params[actual_hour]"))
+            useritem.create_hour = useritem.create_hour + float(form_data.get("params[actual_hour]"))
     project_obj.update_date = datetime.now()
     db.commit()
     return {"code": "200"}
