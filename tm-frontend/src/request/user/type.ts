@@ -41,6 +41,11 @@ export interface IChangePass {
     name:string
 }
 
+export interface IHandleResetPass {
+    action:string
+    id:number
+}
+
 export interface IGetProfile {
     userid:number
 }

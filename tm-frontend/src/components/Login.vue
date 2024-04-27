@@ -63,7 +63,7 @@
 <script lang="ts" setup>
 import { reactive,ref } from 'vue'
 import { useLoginStore } from "../store";
-import {loginAPI,RegisterAPI} from '../request/user/api'
+import {loginAPI,RegisterAPI, resetPassAPI} from '../request/user/api'
 import router from "../router";
 import type { FormInstance, FormRules } from 'element-plus'
 
@@ -158,10 +158,26 @@ const logOut = () => {
   loginstate.rtoken = "rtoken"
   loginstate.logined = !loginstate.logined
   router.push('/')
+  window.location.reload();
 }
 
-const forgetPass = () => {
-  console.log(form.phone);
+const forgetPass = async () => {
+  let regex = /^1[3456789]\d{9}$/;
+  let res;
+  if (regex.test(form.phone)){
+    let data = {phone: form.phone, password: "unkown"}
+    res = await resetPassAPI(data)
+  } else {
+    alert("请输入正确的手机号！")
+    return false;
+  }
+  
+  if (res && res.code == '200'){
+    alert("已收到您的第"+res.times+"次重置密码申请，会尽快为您办理！")
+    loginstate.dialogFormVisible = false
+    form.phone = ""
+    form.password = ""
+  }
 }
 
 

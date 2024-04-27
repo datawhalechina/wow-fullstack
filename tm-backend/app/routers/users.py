@@ -6,6 +6,7 @@ from jose import jwt
 import os
 import json
 import glob
+import ast
 from typing import Optional
 from app.core.schemas.users import UserBase, TokenModel
 from sqlalchemy.orm import Session
@@ -143,10 +144,76 @@ async def handle_registrations(action: str = Form(...), id: int = Form(...), db:
     return {"code": 200, "message":"OK"}
 
 @router.post("/handle_changepass")
-async def handle_changepass(newpass: str = Form(...), name: str = Form(...), db: Session = Depends(get_db)):
-    useritem = db.query(Users).filter_by(username=name).first()
+async def handle_changepass(newpass: str = Form(...), name: str = Form(...), user: TokenModel = Depends(check_jwt_token), db: Session = Depends(get_db)):
+    useritem = db.query(Users).filter_by(id=user.id).first()
     useritem.password = get_password_hash(newpass)
     db.commit()
+    return {"code": 200, "message":"OK"}
+
+@router.post("/reset_pass")
+async def reset_pass(phone: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+    useritem = db.query(Users).filter_by(phone=phone).first()
+    reset_list = []
+    times = 0
+    found = 0
+    if not os.path.exists("static/am/"):
+        os.makedirs("static/am/")
+    if os.path.exists("static/am/reset_pass.txt"):
+        with open("static/am/reset_pass.txt", "r", encoding="utf-8") as f:
+            reset_list=f.readlines()
+    reset_list = [ast.literal_eval(x) for x in reset_list]
+    for item in reset_list:
+        if item["id"] == useritem.id:
+            item["times"] = item["times"] + 1
+            times = item["times"]
+            found = 1
+            item["update_time"] = datetime.now().strftime('%Y-%m-%d')
+    if found == 0:
+        tmp = {}
+        tmp["id"] = useritem.id
+        tmp["username"] = useritem.username
+        tmp["phone"] = useritem.phone
+        tmp["times"] = 1
+        times = 1
+        tmp["create_time"] = datetime.now().strftime('%Y-%m-%d')
+        tmp["update_time"] = datetime.now().strftime('%Y-%m-%d')
+        reset_list.append(tmp)
+    with open("static/am/reset_pass.txt", "w", encoding="utf-8") as f:
+        for line in reset_list:
+            f.write(str(line) + "\n")
+    return {"code": 200, "times":times}
+
+@router.get("/reset_list")
+async def reset_list():
+    reset_list = []
+    if os.path.exists("static/am/reset_pass.txt"):
+        with open("static/am/reset_pass.txt", "r", encoding="utf-8") as f:
+            reset_list=f.readlines()
+    reset_list = [ast.literal_eval(x) for x in reset_list]
+    return reset_list
+
+@router.post("/handle_reset_pass")
+async def handle_reset_pass(action: str = Form(...), id: int = Form(...), db: Session = Depends(get_db)):
+    k = -1
+    if os.path.exists("static/am/reset_pass.txt"):
+        with open("static/am/reset_pass.txt", "r", encoding="utf-8") as f:
+            reset_list=f.readlines()
+    reset_list = [ast.literal_eval(x) for x in reset_list]
+    for i,item in enumerate(reset_list):
+        if item["id"] == id:
+            k = i
+            break
+    if k > -1:
+        if action=="delete":
+            reset_list.pop(k)
+        elif action=="reset":
+            reset_list.pop(k)
+            useritem = db.query(Users).filter_by(id=id).first()
+            useritem.password = get_password_hash("zishu")
+            db.commit()
+    with open("static/am/reset_pass.txt", "w", encoding="utf-8") as f:
+        for line in reset_list:
+            f.write(str(line) + "\n")
     return {"code": 200, "message":"OK"}
 
 @router.post("/save_profile")

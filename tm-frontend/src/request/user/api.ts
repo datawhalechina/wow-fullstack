@@ -17,6 +17,15 @@ export const handleRigiAPI = (data: User.IHandleRegister): Promise<any> =>
 export const ChangePassAPI = (data: User.IChangePass): Promise<any> =>
     instance.post("/api/users/handle_changepass", data);
 
+export const resetPassAPI = (data: User.ReqLogin): Promise<any> =>
+    instance.post("/api/users/reset_pass", data);
+
+export const resetListAPI = (): Promise<any> =>
+    instance.get("/api/users/reset_list");
+
+export const handleResetPassAPI = (data: User.IHandleResetPass): Promise<any> =>
+    instance.post("/api/users/handle_reset_pass", data);
+
 export const getProfileAPI = (params: User.IGetProfile): Promise<any> =>
     instance.get(`/api/users/get_profile/${params.userid}`, { params });
 

@@ -63,6 +63,12 @@ const routes: Array<RouteRecordRaw> = [
           component: () => import("../views/user/Changepass.vue"),
         },
         {
+          path: "/user/resetpass",
+          // 命名
+          name: "Resetpass",
+          component: () => import("../views/user/Resetpass.vue"),
+        },
+        {
           path: "/user/editprofile",
             // 命名
             name: "Editprofile",
