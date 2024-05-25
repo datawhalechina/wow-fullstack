@@ -115,8 +115,8 @@ const onSubmit = async () => {
     </el-form-item>
     
     <br><br><br>
-    <el-form-item label="自我描述">
-      <el-input v-model="form.desc" type="textarea" />
+    <el-form-item label="知识资产">
+      <el-input rows="10" v-model="form.desc" type="textarea" />
     </el-form-item>
     <el-form-item>
       <el-button type="primary" @click="onSubmit">保存</el-button>

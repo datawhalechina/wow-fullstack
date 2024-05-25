@@ -12,7 +12,7 @@ from app.core.schemas.users import UserBase, TokenModel
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc 
 from app.core.models.users import Base, Users, Register, Mentors, Goals, Shuzhi
-from app.core.models.course import Report
+from app.core.models.course import Course, Report
 from app.database import engine
 
 Base.metadata.create_all(bind=engine)
@@ -367,7 +367,9 @@ async def fetch_shushengs(user_id:int, db: Session = Depends(get_db)):
         for mentoritem in mentors:
             shusheng_dict = {
                 "id":mentoritem.shusheng_id,
-                "name":db.query(Users).filter_by(id=mentoritem.shusheng_id).first().username
+                "name":db.query(Users).filter_by(id=mentoritem.shusheng_id).first().username,
+                "course_id": mentoritem.course_id,  # Add course_id to the dictionary
+                "course_title": db.query(Course).filter_by(id=mentoritem.course_id).first().title  # Add course_title to the dictionary
                 }
             shushengs.append(shusheng_dict)
     return shushengs
@@ -380,7 +382,9 @@ async def fetch_shushengs(user_id:int, db: Session = Depends(get_db)):
         for mentoritem in mentors:
             shushi_dict = {
                 "id":mentoritem.shushi_id,
-                "name":db.query(Users).filter_by(id=mentoritem.shushi_id).first().username
+                "name":db.query(Users).filter_by(id=mentoritem.shushi_id).first().username,
+                "course_id": mentoritem.course_id,  # Add course_id to the dictionary
+                "course_title": db.query(Course).filter_by(id=mentoritem.course_id).first().title  # Add course_title to the dictionary
                 }
             shushis.append(shushi_dict)
     return shushis

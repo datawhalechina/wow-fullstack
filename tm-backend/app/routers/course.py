@@ -110,10 +110,40 @@ async def get_course(course_id:int, db: Session = Depends(get_db)):
     chapters_list = []
     for chapter in chapters:
         chapter_dict = chapter.__dict__
-        if "_sa_instance_state" in chapter_dict:
-            del chapter_dict["_sa_instance_state"]
+        # 由于下面chapter_cur查询会报错，因此这里不删除_sa_instance_state了。
+        #if "_sa_instance_state" in chapter_dict:
+        #    del chapter_dict["_sa_instance_state"]
         chapters_list.append(chapter_dict)
-    return {"course":course_dict,"chapters":chapters_list}
+    current_selections = db.query(Selection).filter_by(course_id=course_id,finish_time=None).order_by(Selection.current_serial).all()
+    current_list = []
+    for sele in current_selections:
+        sele_dict = {}
+        chapter_cur = db.query(Chapter).filter_by(course_id=sele.course_id,serial=sele.current_serial).first()
+        sele_dict['sele_id'] = sele.id
+        sele_dict['user_id'] = sele.user_id
+        sele_dict['user_name'] = db.query(Users).filter_by(id=sele.user_id).first().username
+        sele_dict['current_serial'] = sele.current_serial
+        sele_dict['deadline'] = get_deadline(sele.update_time,chapter_cur.period)
+        if sele.shushi_id:
+            sele_dict['shushi_id'] = sele.shushi_id
+            sele_dict['shushi_name'] = db.query(Users).filter_by(id=sele.shushi_id).first().username
+        current_list.append(sele_dict)
+    finish_selections = db.query(Selection).filter(
+        Selection.course_id==course_id,
+        Selection.finish_time!=None
+        ).all()
+    finish_list = []
+    for sele in finish_selections:
+        sele_dict = {}
+        sele_dict['sele_id'] = sele.id
+        sele_dict['user_id'] = sele.user_id
+        sele_dict['user_name'] = db.query(Users).filter_by(id=sele.user_id).first().username
+        sele_dict['finish_date'] = sele.finish_time
+        if sele.shushi_id:
+            sele_dict['shushi_id'] = sele.shushi_id
+            sele_dict['shushi_name'] = db.query(Users).filter_by(id=sele.shushi_id).first().username
+        finish_list.append(sele_dict)
+    return {"course":course_dict,"chapters":chapters_list,"current":current_list,"finish":finish_list}
 
 @course.post("/select_course")
 async def select_course(id: int = Form(...), courseid: int = Form(...), db: Session = Depends(get_db)):

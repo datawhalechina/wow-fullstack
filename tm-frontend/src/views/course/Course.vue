@@ -83,7 +83,7 @@ const deadlineColors = computed(() => {
     const diffMilliseconds = (deadlineDate.getTime() - (today.value as Date).getTime());
     const diffDays = diffMilliseconds / (1000 * 60 * 60 * 24);  
   
-    if (diffDays === 0) {  
+    if (diffDays == 0) {  
       colors[row.deadline] = 'orange';  
     } else if (diffDays > 0 && diffDays <= 3) {  
       colors[row.deadline] = 'blue';  

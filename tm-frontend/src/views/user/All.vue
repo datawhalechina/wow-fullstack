@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import {fetchAllUsersAPI} from '../../request/user/api'
 import { onMounted, reactive } from 'vue'
+import { useLoginStore } from "../../store";
+const loginstate = useLoginStore();
 document.title = "全塾"
 let tableData:any = reactive([])
 const fetchAll = async() => {
@@ -26,7 +28,12 @@ onMounted(fetchAll)
     </el-table-column>
     <el-table-column prop="gender" label="性别" />
     <el-table-column prop="location" label="地点" />
-    <el-table-column prop="phone" label="手机" />
+    <el-table-column label="手机">
+        <template #default="scope">
+            <span v-if="loginstate.id==1">{{ scope.row.phone}}</span>
+            <span v-else>{{ scope.row.phone.slice(0,3) }}****{{ scope.row.phone.slice(-4) }}</span>
+        </template>
+    </el-table-column>
     <el-table-column prop="learn_hour" label="学时" />
     <el-table-column prop="create_hour" label="创时" />
     <el-table-column prop="shuzhi" label="塾值" />

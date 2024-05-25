@@ -53,6 +53,8 @@ export interface IGetProfile {
 export interface IGetShumen {
     id:number
     name:string
+    course_id:number
+    course_title:string
 }
 
 export interface IDeleteProfile {

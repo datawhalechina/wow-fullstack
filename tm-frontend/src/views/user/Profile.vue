@@ -142,7 +142,8 @@ const goal_complete = async() => {
         :fit="'scale-down'"/>
         </div>
     </div>
-    <div>自我描述：{{ form.desc }}</div>
+    <h2>{{ who }}的知识资产</h2>
+    <div style="white-space: pre-wrap;">{{ form.desc }}</div>
     <h2>{{ who }}的目标</h2>
     <el-button v-if="current_userid==userid" type="primary" @click="edit()">编辑</el-button>
     <div style="white-space: pre-wrap;">{{ goal.content }}</div>
@@ -153,16 +154,20 @@ const goal_complete = async() => {
     <h2>{{ who }}的塾门</h2>
     <div>
       塾师：
-      <span style="margin-right: 20px;" v-for="item in shushis">
+      <div style="margin-right: 20px;" v-for="item in shushis">
         <el-link type="primary" :href="'/user/profile/'+item.id" target="_blank">{{ item.name }}</el-link>
-      </span>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <el-link type="primary" :href="'/course/'+item.course_id" target="_blank">{{ item.course_title }}</el-link>
+      </div>
     </div>
 
     <div>
       塾生：
-      <span style="margin-right: 20px;" v-for="item in shushengs">
+      <div style="margin-right: 20px;" v-for="item in shushengs">
         <el-link type="primary" :href="'/user/profile/'+item.id" target="_blank">{{ item.name }}</el-link>
-      </span>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <el-link type="primary" :href="'/course/'+item.course_id" target="_blank">{{ item.course_title }}</el-link>
+      </div>
     </div>
 
   <el-dialog v-model="editGoalFormVisible" :width="diaglogwidth" :center="true" title="编辑目标">
