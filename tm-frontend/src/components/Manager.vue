@@ -77,7 +77,7 @@
                     class="editable"
                     v-model="item[2]"
                     type="number"
-                    step="0.01"
+                    step="1"
                     @input="submit"
                   />
                 </td>
@@ -89,7 +89,7 @@
                     class="editable"
                     v-model="item[4]"
                     type="number"
-                    step="0.01"
+                    step="1"
                     @input="submit"
                   />
                 </td>
@@ -292,6 +292,7 @@ const handleSelect = () => {
           sumTime += taskList.value[i][7];
         }
       }
+      sumTime = sumTime/60
       validTime.value = sumTime.toFixed(2);
     });
 
@@ -344,7 +345,7 @@ const handleSelect = () => {
       submit();
     };
 
-    const getHour = (s1:any, s2:any) => {
+    const getMin = (s1:any, s2:any) => {
       const reDate = /\d{4}-\d{1,2}-\d{1,2} /;
       s1 = new Date(
         (reDate.test(s1) ? s1 : "2018-1-1 " + s1).replace(/-/g, "/")
@@ -354,7 +355,7 @@ const handleSelect = () => {
       );
       const ms = s2.getTime() - s1.getTime();
       if (ms < 0) return 0;
-      return Math.floor(ms / 10 / 60 / 60) / 100; //小时
+      return Math.floor(ms / 1000 / 60); //分钟
     };
 
     const start = () => {
@@ -377,7 +378,7 @@ const handleSelect = () => {
       const startingTime = taskList.value[cur.value][5];
       console.log(startingTime);
       console.log(timeString);
-      const hour = getHour(startingTime, timeString);
+      const hour = getMin(startingTime, timeString);
       console.log(hour);
       taskList.value[cur.value][7] = hour;
       no_time.value = false;
@@ -400,6 +401,7 @@ const handleSelect = () => {
       for (let i = 0; i < tmpList.length; i++) {
         tmp_time.value += parseFloat(tmpList[i][7] || 0);
       }
+      tmp_time.value = Number(rtn_time.value)/60
       rtn_time.value = tmp_time.value.toFixed(2);
       return rtn_time.value;
     };
@@ -480,6 +482,8 @@ const handleSelect = () => {
       cur_date.value = finishList.value[ind][8];
       validTime_archive.value = 0;
       targetTime.value = finishList.value[ind][2];
+      targetTime.value = targetTime.value/60
+      targetTime.value = Number(targetTime.value.toFixed(2));
       planTime.value = 0;
       spentTime.value = 0;
       if (ind !== cur_archive.value) {
@@ -521,8 +525,11 @@ const handleSelect = () => {
           validTime_archive.value += finishList.value[i][7];
         }
       }
+      validTime_archive.value = validTime_archive.value/60
       validTime_archive.value = Number(validTime_archive.value.toFixed(2));
+      planTime.value = planTime.value/60
       planTime.value = Number(planTime.value.toFixed(2));
+      spentTime.value = spentTime.value/60
       spentTime.value = Number(spentTime.value.toFixed(2));
     };
 
@@ -557,7 +564,7 @@ const handleSelect = () => {
           taskList.value[i][5].length === 8 &&
           taskList.value[i][6].length === 8
         ) {
-          taskList.value[i][7] = getHour(
+          taskList.value[i][7] = getMin(
             taskList.value[i][5],
             taskList.value[i][6]
           );
