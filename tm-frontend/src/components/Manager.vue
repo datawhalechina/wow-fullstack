@@ -263,7 +263,6 @@ const getDockets = async () => {
   if (loginstate.id > 0) {
     let res = await fetchDocketsAPI({user_id:loginstate.id})
     dockets.push(...res)
-    console.log(dockets)
   }
 }
 
@@ -278,6 +277,7 @@ const getTm = async () => {
     if (taskList.value.length==0){
       addWorks();
     }
+    total_time.value = cal_total_time(finishList.value);
   }
 }
 
@@ -297,16 +297,7 @@ const handleSelect = () => {
     });
 
     onMounted(() => {
-      // if (tasks && tasks.length > 0) {
-      //   taskList.value = tasks;
-      // }
-
-      // if (finished && finished.length > 0) {
-      //   finishList.value = finished;
-      //   searchList.value = finished;
-      // }
       getTm();
-      total_time.value = cal_total_time(finishList.value);
       getDockets();
     });
 
@@ -401,8 +392,9 @@ const handleSelect = () => {
       for (let i = 0; i < tmpList.length; i++) {
         tmp_time.value += parseFloat(tmpList[i][7] || 0);
       }
-      tmp_time.value = Number(rtn_time.value)/60
+      tmp_time.value = Number(tmp_time.value)/60
       rtn_time.value = tmp_time.value.toFixed(2);
+      
       return rtn_time.value;
     };
 

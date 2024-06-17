@@ -13,6 +13,9 @@ export const getCourseAPI = (params: Course.IGetCourse): Promise<any> =>
 export const selectCourseAPI = (data:Course.ISelectCourse): Promise<any> =>
     instance.post("/api/course/select_course", data);
 
+export const quitCourseAPI = (data:Course.IQuitCourse): Promise<any> =>
+    instance.post("/api/course/quit_course", data);
+
 export const fetchCurrentSelectionAPI = (): Promise<any> =>
     instance.get("/api/course/fetch_current_selections");
 

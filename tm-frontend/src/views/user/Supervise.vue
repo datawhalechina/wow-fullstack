@@ -44,17 +44,22 @@ function getDeadlineColor(deadline: string) {
 <template>
   <h5>所有选课</h5>
   <el-table :data="tableData" style="width: 100%">
-    <el-table-column label="学习者">
+    <el-table-column label="塾生" width="80" prop="user_name" sortable>
       <template #default="scope">
         <el-link type="primary" :href="'/user/profile/'+scope.row.user_id" target="_blank">{{ scope.row.user_name }}</el-link>
       </template>
     </el-table-column>
-    <el-table-column label="课程名称" width="100">
+    <el-table-column label="塾师" width="80" prop="shushi_name" sortable>
+      <template #default="scope">
+        <el-link type="primary" :href="'/user/profile/'+scope.row.shushi_id" target="_blank">{{ scope.row.shushi_name }}</el-link>
+      </template>
+    </el-table-column>
+    <el-table-column label="课程名称" prop="course_title" sortable>
       <template #default="scope">
         <el-link :href="'/course/'+scope.row.course_id" target="_blank" type="primary">{{ scope.row.course_title }}</el-link>
       </template>
     </el-table-column>
-    <el-table-column label="章节名称">
+    <el-table-column label="章节名称" prop="chapter_title" sortable>
       <template #default="scope">
         <el-link type="primary" :href="scope.row.url" target="_blank">{{ scope.row.chapter_title }}</el-link>
       </template>

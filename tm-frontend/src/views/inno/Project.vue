@@ -129,6 +129,10 @@ const select_options = [
   {
     value: 'C',
     label: '课程',
+  },
+  {
+    value: 'W',
+    label: '文件',
   }
 ]
 

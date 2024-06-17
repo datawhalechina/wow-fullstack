@@ -11,6 +11,7 @@ from app.core.models.course import Base, Course, Chapter, Selection, Report
 from app.core.models.users import Users, Mentors, Shuzhi
 from app.database import engine
 import json
+import os
 
 Base.metadata.create_all(bind=engine)
 
@@ -146,16 +147,31 @@ async def get_course(course_id:int, db: Session = Depends(get_db)):
     return {"course":course_dict,"chapters":chapters_list,"current":current_list,"finish":finish_list}
 
 @course.post("/select_course")
-async def select_course(id: int = Form(...), courseid: int = Form(...), db: Session = Depends(get_db)):
-    new_selection = Selection(
-        user_id=id,
-        course_id=courseid,
-        create_time=datetime.now(),
-        update_time=datetime.now(),
-        current_serial=1,
-    )
-    db.add(new_selection)
-    db.commit()
+async def select_course(id: int = Form(...), courseid: int = Form(...), user: UserBase = Depends(check_jwt_token), db: Session = Depends(get_db)):
+    if id == user.id:
+        new_selection = Selection(
+            user_id=id,
+            course_id=courseid,
+            create_time=datetime.now(),
+            update_time=datetime.now(),
+            current_serial=1,
+        )
+        db.add(new_selection)
+        db.commit()
+    return {"code": "200"}
+
+@course.post("/quit_course")
+async def quit_course(id: int = Form(...), courseid: int = Form(...), reason: str = Form(...), user: UserBase = Depends(check_jwt_token), db: Session = Depends(get_db)):
+    if id == user.id:
+        selection = db.query(Selection).filter_by(user_id=user.id,course_id=courseid,finish_time=None).first()
+        if not os.path.exists("static/am/"):
+            os.makedirs("static/am/")
+        nowtime = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        line = {"ID":user.id, "名字":user.username, "课程ID":courseid, "进度":selection.current_serial, "退课原因":reason, "退课时间":nowtime}
+        with open("static/am/quit_course.txt", "a", encoding="utf-8") as f:
+            f.write(str(line) + "\n")
+        db.delete(selection)
+        db.commit()
     return {"code": "200"}
 
 def get_deadline(start,period):
@@ -216,9 +232,15 @@ async def report_learn(
         grant_time=datetime.now()
     )
     db.add(new_report)
-    
-    
+    chapter = db.query(Chapter).filter_by(course_id=selection.course_id,serial=selection.current_serial).first()
+    deadline = get_deadline(selection.update_time,chapter.period)
+    # 超期的话，塾值变成十分之一
+    shuzhi_ratio = 1
+    if datetime.now() > deadline:
+        shuzhi_ratio = 0.1
+    # 如果有选塾师，塾值要分一半给塾师
     if selection.shushi_id:
+        cal_amount = float(reported_hour) * 5 * shuzhi_ratio
         new_shuzhi = Shuzhi(
             user_id=user.id,
             user_type="塾生",
@@ -226,8 +248,8 @@ async def report_learn(
             target_id=chapter_id,
             target_title=chapter_title,
             change = 1,
-            amount =float(reported_hour) * 5,
-            balance = useritem.shuzhi + float(reported_hour) * 5,
+            amount = cal_amount,
+            balance = useritem.shuzhi + cal_amount,
             comments = useritem.username + "申报-学习-" + chapter_title,
             create_time=datetime.now()
         )
@@ -240,16 +262,17 @@ async def report_learn(
             target_id=chapter_id,
             target_title=chapter_title,
             change = 1,
-            amount =float(reported_hour) * 5,
-            balance = useritem.shuzhi + float(reported_hour) * 5,
+            amount = cal_amount,
+            balance = useritem.shuzhi + cal_amount,
             comments = useritem.username + "申报-学习-" + chapter_title,
             create_time=datetime.now()
         )
         db.add(shushi_shuzhi)
-        shushiitem.shuzhi = shushiitem.shuzhi + float(reported_hour) * 5
-        useritem.shuzhi = useritem.shuzhi + float(reported_hour) * 5
+        shushiitem.shuzhi = shushiitem.shuzhi + cal_amount
+        useritem.shuzhi = useritem.shuzhi + cal_amount
         useritem.learn_hour = useritem.learn_hour + float(reported_hour)
     else:
+        cal_amount = float(reported_hour) * 10 * shuzhi_ratio
         new_shuzhi = Shuzhi(
             user_id=user.id,
             user_type="塾生",
@@ -257,16 +280,17 @@ async def report_learn(
             target_id=chapter_id,
             target_title=chapter_title,
             change = 1,
-            amount =float(reported_hour) * 10,
-            balance = useritem.shuzhi + float(reported_hour) * 10,
+            amount = cal_amount,
+            balance = useritem.shuzhi + cal_amount,
             comments = useritem.username + "申报-学习-" + chapter_title,
             create_time=datetime.now()
         )
         db.add(new_shuzhi)
-        useritem.shuzhi = useritem.shuzhi + float(reported_hour) * 10
+        useritem.shuzhi = useritem.shuzhi + cal_amount
         useritem.learn_hour = useritem.learn_hour + float(reported_hour)
     next_serial = selection.current_serial + 1
     next_chapter = db.query(Chapter).filter_by(course_id=course_id,serial=next_serial).first()
+    # 有下一章节就跳到下一章节，找不到下一章节就结课。
     if next_chapter:
         selection.current_serial=next_serial
         selection.update_time=datetime.now()

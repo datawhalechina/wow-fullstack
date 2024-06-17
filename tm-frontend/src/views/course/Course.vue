@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import {fetchCourseAPI, selectCourseAPI, fetchCurrentSelectionAPI, reportLearnAPI} from '../../request/course/api'
+import {fetchCourseAPI, selectCourseAPI, quitCourseAPI, fetchCurrentSelectionAPI, reportLearnAPI} from '../../request/course/api'
 import { ref, reactive, onMounted, computed } from 'vue'
 import router from '../../router'
 import { useLoginStore } from "../../store";
@@ -69,9 +69,15 @@ const selection = async (title:string,id:number) => {
   }
 }
 
-// 补充selection函数
-const deselection = async () => {
-  alert("不要轻言放弃，请找您的塾师咨询。")
+// 补充deselection函数
+const deselection = async (title:string,id:number) => {
+  let quit_reason = prompt("请给出退选"+title+"的理由。")
+  if (quit_reason){
+    let data = {id:loginstate.id,courseid:id,reason:quit_reason}
+    let res = await quitCourseAPI(data)
+    console.log(res)
+    alert("已退选，可以继续选其他课程！")
+  }
 }
 
 
@@ -155,7 +161,7 @@ function getDeadlineColor(deadline: string) {
     </el-table-column>
     <el-table-column label="操作" width="180">
       <template #default="scope">
-        <el-button v-if="currentSelections.includes(scope.row.id)" link type="primary" @click="deselection()">退选</el-button>
+        <el-button v-if="currentSelections.includes(scope.row.id)" link type="primary" @click="deselection(scope.row.title, scope.row.id)">退选</el-button>
         <el-button v-else-if="currentSelections.length<4 && loginstate.name.length>0" link type="primary" @click="selection(scope.row.title, scope.row.id)">选课</el-button>
         <span v-else>禁选</span>
       </template>

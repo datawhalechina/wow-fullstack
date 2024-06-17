@@ -23,6 +23,12 @@ export interface ISelectCourse {
     courseid:number
 }
 
+export interface IQuitCourse {
+    id:number
+    courseid:number
+    reason:string
+}
+
 export interface IReportLearn {
     chapter_id:number
     course_id:number
