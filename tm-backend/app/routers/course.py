@@ -103,10 +103,12 @@ async def fetch_all_courses(db: Session = Depends(get_db)):
 
 @course.get("/get_course/{course_id}")
 async def get_course(course_id:int, db: Session = Depends(get_db)):
+    # 获取课程本身的信息
     course = db.query(Course).filter_by(id=course_id).first()
     course_dict = course.__dict__
     if "_sa_instance_state" in course_dict:
         del course_dict["_sa_instance_state"]
+    # 获取课程包含的所有章节信息
     chapters = db.query(Chapter).filter_by(course_id=course_id).order_by(Chapter.serial).all()
     chapters_list = []
     for chapter in chapters:
@@ -115,6 +117,7 @@ async def get_course(course_id:int, db: Session = Depends(get_db)):
         #if "_sa_instance_state" in chapter_dict:
         #    del chapter_dict["_sa_instance_state"]
         chapters_list.append(chapter_dict)
+    # 获取当前选这门课的人员信息
     current_selections = db.query(Selection).filter_by(course_id=course_id,finish_time=None).order_by(Selection.current_serial).all()
     current_list = []
     for sele in current_selections:
@@ -129,6 +132,7 @@ async def get_course(course_id:int, db: Session = Depends(get_db)):
             sele_dict['shushi_id'] = sele.shushi_id
             sele_dict['shushi_name'] = db.query(Users).filter_by(id=sele.shushi_id).first().username
         current_list.append(sele_dict)
+    # 获取已学完这门课的人员信息
     finish_selections = db.query(Selection).filter(
         Selection.course_id==course_id,
         Selection.finish_time!=None

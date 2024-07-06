@@ -105,6 +105,18 @@ const routes: Array<RouteRecordRaw> = [
           component: () => import("../views/user/Mentor.vue"),
         },
         {
+          path: "/user/goaltalk",
+          // 命名
+          name: "Goaltalk",
+          component: () => import("../views/user/Goaltalk.vue"),
+        },
+        {
+          path: "/user/mytalk",
+          // 命名
+          name: "Mytalk",
+          component: () => import("../views/user/Mytalk.vue"),
+        },
+        {
           path: "/user/supervise",
           // 命名
           name: "Supervise",

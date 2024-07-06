@@ -58,6 +58,23 @@ class Goals(Base):
     end_time = Column(DateTime)
     review = Column(VARCHAR(500))
 
+class Goaltalk(Base):
+    __tablename__ = 'goaltalk'
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    shusheng_id = Column(Integer)
+    shushi_id = Column(Integer)
+    create_time = Column(DateTime)
+    planed_time = Column(DateTime)
+    presenter = Column(VARCHAR(32))
+    confirmed_time = Column(DateTime)
+    confirmer = Column(VARCHAR(32))
+    planed_duration = Column(Integer)
+    access_info = Column(VARCHAR(500))
+    finish_time = Column(DateTime)
+    actual_duration = Column(Integer)
+    content = Column(VARCHAR(5000))
+
+
 class Shuzhi(Base):
 	__tablename__ = 'shuzhi'
 	id = Column(Integer, primary_key=True, autoincrement=True)

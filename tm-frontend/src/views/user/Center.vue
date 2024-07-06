@@ -23,6 +23,8 @@ const userid = loginstate.id
     <br />
     <el-link type="primary" href="/user/mentor" target="_blank">选塾师</el-link>
     <br />
+    <el-link type="primary" href="/user/goaltalk" target="_blank">目标面谈</el-link>
+    <br />
     <el-link type="primary" href="/user/supervise" target="_blank">学习监督</el-link>
     <br />
     <el-link v-if="loginstate.id==1" type="primary" href="/course/add" target="_blank">新增课程</el-link>

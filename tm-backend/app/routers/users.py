@@ -11,7 +11,7 @@ from typing import Optional
 from app.core.schemas.users import UserBase, TokenModel
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc 
-from app.core.models.users import Base, Users, Register, Mentors, Goals, Shuzhi
+from app.core.models.users import Base, Users, Register, Mentors, Goals, Shuzhi, Goaltalk
 from app.core.models.course import Course, Report
 from app.database import engine
 
@@ -310,6 +310,30 @@ async def fetch_goal(user_id:int, db: Session = Depends(get_db)):
             del goal_dict["_sa_instance_state"]
     return goal_dict
 
+@router.post("/fetch_all_goals")
+async def fetch_goal(presenter: str = Form(...), user: UserBase = Depends(check_jwt_token), db: Session = Depends(get_db)):
+    if presenter == '塾师':
+        mentors = db.query(Mentors).filter_by(shushi_id=user.id, end_time=None).all()
+        shushengs = []
+        if mentors:
+            for mentoritem in mentors:
+                if mentoritem.shusheng_id not in shushengs:
+                    shushengs.append(mentoritem.shusheng_id)
+        rtn = []
+        for shusheng_id in shushengs:
+            goalitem = db.query(Goals).filter_by(user_id=shusheng_id, end_time=None).first()
+            goal_dict = {}
+            if goalitem:
+                goal_dict = goalitem.__dict__
+                if "_sa_instance_state" in goal_dict:
+                    goal_dict["shusheng_name"] = db.query(Users).filter_by(id=shusheng_id).first().username
+                    del goal_dict["_sa_instance_state"]
+            else:
+                goal_dict["shusheng_id"] = shusheng_id
+                goal_dict["shusheng_name"] = db.query(Users).filter_by(id=shusheng_id).first().username
+            rtn.append(goal_dict)
+    return rtn
+
 @router.get("/fetch_reports/{user_id}")
 async def fetch_reports(user_id:int, db: Session = Depends(get_db)):
     reports = db.query(Report).filter_by(user_id=user_id).order_by(desc(Report.id)).all()
@@ -388,6 +412,157 @@ async def fetch_shushengs(user_id:int, db: Session = Depends(get_db)):
                 }
             shushis.append(shushi_dict)
     return shushis
+
+
+@router.post("/fetch_goaltalk")
+async def fetch_goaltalk(presenter: str = Form(...), user: UserBase = Depends(check_jwt_token), db: Session = Depends(get_db)):
+    rtn = []
+    if presenter == '塾师':
+        goal_talks = db.query(Goaltalk).filter_by(shushi_id=user.id, finish_time=None).all()
+        for talk in goal_talks:
+            temp = {}
+            temp['id'] = talk.id
+            temp['shusheng_id'] = talk.shusheng_id
+            temp['shushi_id'] = talk.shushi_id
+            temp['planed_time'] = talk.planed_time
+            temp['planed_duration'] = talk.planed_duration
+            temp['presenter'] = talk.presenter
+            temp['confirmed_time'] = talk.confirmed_time
+            temp['confirmer'] = talk.confirmer
+            temp['access_info'] = talk.access_info
+            if talk.shusheng_id:
+                temp['shusheng_name'] = db.query(Users).filter_by(id=talk.shusheng_id).first().username
+            rtn.append(temp)
+    elif presenter == '塾生':
+        goal_talks = db.query(Goaltalk).filter_by(shusheng_id=user.id, finish_time=None).all()
+        for talk in goal_talks:
+            temp = {}
+            temp['id'] = talk.id
+            temp['shusheng_id'] = talk.shusheng_id
+            temp['shushi_id'] = talk.shushi_id
+            temp['planed_time'] = talk.planed_time
+            temp['planed_duration'] = talk.planed_duration
+            temp['presenter'] = talk.presenter
+            temp['confirmed_time'] = talk.confirmed_time
+            temp['access_info'] = talk.access_info
+            if talk.shusheng_id:
+                temp['shushi_name'] = db.query(Users).filter_by(id=talk.shushi_id).first().username
+            rtn.append(temp)
+    return rtn
+
+@router.post("/fetch_finished_goaltalk")
+async def fetch_finished_goaltalk(presenter: str = Form(...), user: UserBase = Depends(check_jwt_token), db: Session = Depends(get_db)):
+    rtn = []
+    if presenter == '塾师':
+        goal_talks = db.query(Goaltalk).filter(Goaltalk.shushi_id==user.id, Goaltalk.finish_time!=None).all()
+        for talk in goal_talks:
+            temp = {}
+            temp['id'] = talk.id
+            temp['shusheng_id'] = talk.shusheng_id
+            temp['shushi_id'] = talk.shushi_id
+            temp['finish_time'] = talk.finish_time
+            temp['actual_duration'] = talk.actual_duration
+            temp['content'] = talk.content
+            if talk.shusheng_id:
+                temp['shusheng_name'] = db.query(Users).filter_by(id=talk.shusheng_id).first().username
+            rtn.append(temp)
+    elif presenter == '塾生':
+        goal_talks = db.query(Goaltalk).filter(Goaltalk.shusheng_id==user.id, Goaltalk.finish_time!=None).all()
+        for talk in goal_talks:
+            temp = {}
+            temp['id'] = talk.id
+            temp['shusheng_id'] = talk.shusheng_id
+            temp['shushi_id'] = talk.shushi_id
+            temp['finish_time'] = talk.finish_time
+            temp['actual_duration'] = talk.actual_duration
+            temp['content'] = talk.content
+            if talk.shushi_id:
+                temp['shushi_name'] = db.query(Users).filter_by(id=talk.shushi_id).first().username
+            rtn.append(temp)
+    return rtn
+
+@router.post("/edit_goaltalk")
+async def edit_goaltalk(request: Request,
+                      user: UserBase = Depends(check_jwt_token), 
+                      db: Session = Depends(get_db)):
+    form_data = await request.form()
+    goaltalk_id =  form_data.get("id")
+    presenter =  form_data.get("presenter")
+    access_info =  form_data.get("access_info")
+    counter_part_id =  form_data.get("counter_part_id")
+    planed_time =  form_data.get("planed_time")
+    planed_duration =  form_data.get("planed_duration")
+    if goaltalk_id=='0':
+        goal_talk = Goaltalk(
+            planed_time=planed_time,
+            create_time = datetime.now(),
+            planed_duration=planed_duration,
+            presenter=presenter
+        )
+        db.add(goal_talk)
+        db.flush()
+    else:
+        goal_talk = db.query(Goaltalk).filter_by(id=goaltalk_id).first()
+        goal_talk.planed_time = planed_time
+        goal_talk.planed_duration = planed_duration
+        goal_talk.access_info = access_info
+    if presenter=="塾师":
+        goal_talk.shushi_id = user.id
+        goal_talk.shusheng_id = counter_part_id
+    elif presenter=="塾生":
+        goal_talk.shushi_id = counter_part_id
+        goal_talk.shusheng_id = user.id
+    db.commit()
+    return {"code": 200, "goaltalk_id":goal_talk.id}
+
+@router.post("/confirm_talk")
+async def confirm_talk(id: int = Form(...),
+                       confirmer: str = Form(...),
+                      user: UserBase = Depends(check_jwt_token), 
+                      db: Session = Depends(get_db)):
+    goal_talk = db.query(Goaltalk).filter_by(id=id).first()
+    goal_talk.confirmed_time = datetime.now()
+    if confirmer=="塾生":
+        goal_talk.shusheng_id = user.id
+    goal_talk.confirmer = confirmer
+    db.commit()
+    return {"code": 200}
+
+@router.post("/confirm_reserve")
+async def confirm_reserve(request: Request,
+                      user: UserBase = Depends(check_jwt_token), 
+                      db: Session = Depends(get_db)):
+    form_data = await request.form()
+    shushi_id =  int(form_data.get("shushi_id"))
+    planed_time =  form_data.get("planed_time")
+    planed_duration =  int(form_data.get("planed_duration"))
+    print(form_data)
+    goal_talk = Goaltalk(
+        shushi_id = shushi_id,
+        shusheng_id = user.id,
+        planed_time=planed_time,
+        create_time = datetime.now(),
+        planed_duration=planed_duration,
+        presenter='塾生'
+    )
+    db.add(goal_talk)
+    db.flush()
+    db.commit()
+    return {"code": 200, "talk_id":goal_talk.id}
+
+@router.post("/finish_talk")
+async def finish_talk(id: int = Form(...),
+                      actual_duration: int = Form(...),
+                      content: str = Form(...),
+                      user: UserBase = Depends(check_jwt_token), 
+                      db: Session = Depends(get_db)):
+    goal_talk = db.query(Goaltalk).filter_by(id=id).first()
+    if goal_talk.shushi_id == user.id:
+        goal_talk.finish_time = datetime.now()
+        goal_talk.actual_duration = actual_duration
+        goal_talk.content = content 
+        db.commit()
+    return {"code": 200}
 
 @router.get("/fetch_shuzhi/{user_id}")
 async def fetch_shuzhi(user_id:int, db: Session = Depends(get_db)):

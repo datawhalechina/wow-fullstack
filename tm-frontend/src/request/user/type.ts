@@ -74,3 +74,29 @@ export interface ISaveGoal {
     review:string
     action?:string
 }
+
+export interface IEditGoaltalk {
+    id:number
+    counter_part_id:number
+    planed_time:string
+    planed_duration:number
+    presenter:string
+    access_info:string
+}
+
+export interface IConfirmTalk {
+    id:number
+    confirmer:string
+}
+
+export interface IConfirmReserve {
+    shushi_id:number
+    planed_time:string
+    planed_duration:number
+}
+
+export interface IFinishTalk {
+    id:number
+    actual_duration:number
+    content:string
+}
