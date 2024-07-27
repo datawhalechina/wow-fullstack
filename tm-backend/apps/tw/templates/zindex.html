@@ -1,0 +1,65 @@
+{% extends 'biwennewbase.html' %}
+{% block header_part %}
+<title>专栏</title>
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+.outer {
+    border:solid #a0f 1px;border-radius:10px;margin:20px 0px;
+}  
+</style> 
+{% endblock %}
+
+{% block body_part %}
+
+<div class="row text-center"><h2 class="col-md-12 text-center">专栏</h2></div>
+{% for zz in zdata %}
+<div class="outer">
+    <h4 class="col-md-12">
+        <a style="color:#a0f" href="{{ url_for('tw.zhuanlan',zhuanlanid= zz['zhuanlanid']) }}" target="_blank">{{zz['zhuanlan_title']}}</a>
+    </h4>
+    <div class="col-md-12">
+        塾主: {{zz['zhuanlan_author']}}&nbsp;&nbsp;&nbsp;&nbsp;
+        {% if current_user.id == zz['authorid'] or current_user.role=='admin' %}
+        <a href="{{ url_for('tw.editzhuanlan',zhuanlanid=zz['zhuanlanid']) }}" target="_blank"><i class="fa fa-pencil" style="font-size:20px;line-height: 30px;"></i></a>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <i class="fa fa-trash-o" id="{{zz['zhuanlanid']}}" onclick="deletezhuanlan(this)" style="font-size:20px;line-height: 30px;"></i>
+        {% endif %}
+    </div>
+</div>
+{% endfor %}
+
+<br>
+<br>
+<br>
+
+		
+	
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+    
+	function deletezhuanlan(obj){
+        if (confirm("确定删除此专栏？")) {
+            var zhuanlanid = obj.id;
+            $.ajax({
+                url:"{{ url_for('tw.deletezhuanlan') }}",
+                type:"POST",
+                data:{
+                    zhuanlanid:zhuanlanid
+                },
+                dataType: "json",
+                success: function(response) {
+                    location.reload();
+                }
+            })
+        }
+} 
+
+    
+</script>
+{% endblock %}

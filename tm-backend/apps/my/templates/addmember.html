@@ -1,0 +1,133 @@
+{% extends 'userbase.html' %}
+{% block header_part %}
+<title>添加新人</title>
+<script>
+	$(function(){
+		function footerPosition(){
+			var contentHeight = document.body.scrollHeight,//网页正文全文高度
+				winHeight = window.innerHeight;//可视窗口高度，不包括浏览器顶部工具栏
+			if(!(contentHeight > winHeight)){
+				//当网页正文高度小于可视窗口高度时，为footer添加类fixed-bottom
+				$("footer").addClass("fixed-bottom");
+			}
+		}
+		footerPosition();
+		$(window).resize(footerPosition);
+	});
+</script>
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+img[src=""],img:not([src]){
+     opacity:0;
+}
+.row {
+	margin-left:15px !important;
+	margin-right:15px !important;
+}
+</style> 
+{% endblock %}
+	
+{% block body_part %}
+	
+			<div class="row">
+			<div style="display:inline-block;margin:0 auto; width:400px;padding:10px">
+			<div id="form_frame">
+ 
+				<div style="text-align:center;"><h4>新人添加</h4></div>
+				<br>
+				<label>姓名：</label>
+				<input type="text" id="name"/><br>
+				<label id="checknm" style="display:none;font-size:20px;"></label><br>
+				<label>性别：</label>
+				<input type="text" id="gender"/><br><br>
+				<label>身份：</label>
+				<input type="text" id="shenfen"/><br><br>
+				<label>手机：</label>
+				<input type="text" id="phone"/><br><br>
+				<label>部门：</label>
+				<input type="text" id="bumen"/><br><br>
+				<br>
+				<div style="display:block;text-align:center"><button class="btn rightbtn" id="export">提交</button></div>
+				<div style="text-align:center;"><label id="thank" style="display:none;font-size:20px"></label></div>
+			</div>
+			</div>
+			</div>
+				
+				
+{% endblock %}
+
+
+{% block script_part %}
+<script>
+var exportBtn = document.getElementById("export");
+
+exportBtn.onclick = function() {
+	var name = $('#name').val();
+	var gender = $('#gender').val();
+	var shenfen = $('#shenfen').val();
+	var phone = $('#phone').val();
+	var bumen = $('#bumen').val();
+	console.log(name);
+	console.log(gender);
+	console.log(shenfen);
+	console.log(bumen);
+	var fd = new FormData();
+	fd.append("action", "submit");
+	fd.append("name", name);
+	fd.append("gender", gender);
+	fd.append("shenfen", shenfen);
+	fd.append("phone", phone);
+	fd.append("bumen", bumen);
+	
+	$.ajax({
+		url: "/v1/my/saveadd/",
+		type: "POST",
+		processData: false,
+		contentType: false,
+		data: fd,
+		success: function (response) {
+			//console.log(response);
+			document.getElementById("thank").innerHTML = response;
+			var showex=document.getElementById("export");
+			var showst=document.getElementById("thank");
+			showex.style.display='none';
+			showst.style.display='block';
+		},
+		error : function(data) {  
+			alert("上传失败~~");
+		}
+	})
+	
+}
+
+
+var nameBtn = document.getElementById("name");
+nameBtn.onblur = function(){
+	var name = $('#name').val();
+	var fd = new FormData();
+	fd.append("action", "checkname");
+	fd.append("name", name);
+	$.ajax({
+		url: "/v1/my/saveadd/",
+		type: "POST",
+		processData: false,
+		contentType: false,
+		data: fd,
+		success: function (response) {
+			var showck=document.getElementById("checknm");
+			if (response){
+				showck.innerHTML = response;
+				showck.style.display='block';
+				showck.style.color='red';
+			} else {
+				showck.style.display='none';
+			}
+			
+		}
+	})
+}
+
+</script>
+{% endblock %}

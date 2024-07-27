@@ -1,0 +1,85 @@
+{% extends 'userbase.html' %}
+{% block header_part %}
+    <title>个人信息展示</title>
+	<script>
+		$(function(){
+			function footerPosition(){
+				var contentHeight = document.body.scrollHeight,//网页正文全文高度
+					winHeight = window.innerHeight;//可视窗口高度，不包括浏览器顶部工具栏
+				if(!(contentHeight > winHeight)){
+					//当网页正文高度小于可视窗口高度时，为footer添加类fixed-bottom
+					$("footer").addClass("fixed-bottom");
+				}
+			}
+			footerPosition();
+			$(window).resize(footerPosition);
+		});
+		</script>
+{% endblock %}
+
+
+{% block style_part %}
+<style type="text/css"> 
+img[src=""],img:not([src]){
+     opacity:0;
+}
+.row {
+	margin-left:15px !important;
+	margin-right:15px !important;
+}
+
+
+</style> 
+{% endblock %}	
+
+
+{% block body_part %}
+			<div class="row" style="margin-bottom:70px;">
+			<div style="margin:0 auto; height:20px;" class="col-md-12"></div>
+				<div class="col-md-4">
+				{% if datar.picpath %}
+				<p style="text-align:center;"><img src='{{"/v1/sp/spstatic/images/coworker/"+datar.picpath}}' width="100%"></p>
+				{% endif %}
+				</div>
+				<div class="col-md-8">
+				<div class="row">
+					<label class="col-md-6">姓名：{{datar.name or ''}}</label>
+					<label class="col-md-6">性别：{{datar.gender or ''}}</label>
+				</div>
+
+				<div class="row">
+					<label class="col-md-6">部门：{{datar.bumen or ''}}</label>
+					<label class="col-md-6">工号：{{datar.gonghao or ''}}</label>
+				</div>
+
+				<div class="row">
+					<label class="col-md-6">籍贯：{{datar.jiguan or ''}}</label>
+					<label class="col-md-6">星座：{{datar.xingzuo or ''}}</label>
+				</div>
+
+				<div class="row">
+					<label class="col-md-6">学历：{{datar.xueli or ''}}</label>
+					<label class="col-md-6">专业：{{datar.zhuanye or ''}}</label>
+				</div>
+
+				<hr>
+
+				<div class="row">
+					<label class="col-md-12">最后毕业学校：{{datar.xuexiao or ''}}</label>
+				</div>
+
+				<div class="row">
+					<label class="col-md-12">爱好：{{datar.aihao or ''}}</label>
+				</div>
+
+				<div class="row">
+					<label class="col-md-12">自我描述：{{datar.ziwo or ''}}</label>
+				</div>
+				</div>
+			</div>
+				
+{% endblock %}
+
+
+{% block script_part %}
+{% endblock %}

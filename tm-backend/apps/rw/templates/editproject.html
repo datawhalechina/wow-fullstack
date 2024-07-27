@@ -1,0 +1,331 @@
+{% extends 'taskbase.html' %}
+{% block header_part %}
+<script src="/v1/auth/mystatic/js/vue.js"></script>
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    img[src=""],img:not([src]){
+         opacity:0;
+    }
+    .table-css{
+        vertical-align:middle;
+        text-align:center;
+    }
+    table th {
+        border: 1px solid black;
+    }
+
+    table td {
+        border: 1px solid black;
+    }
+    .lie1{width:5%;}
+    .lie2{width:10%;}
+    .lie3{width:40%;}
+    .lie4{width:10%;}
+    .lie5{width:20%;}
+    .lie6{width:5%;}
+
+    .kaoyou {
+        text-align: right;
+    }
+    .kaozuo {
+        text-align: left;
+    }
+    .editable {
+        border-width:0;
+        width:100%;
+        height:100%;
+        font-size:1em;
+    }
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+<div class="row">
+    <div style="display:inline-block;margin:0 auto;"><h2>编辑项目</h2></div>
+    <div style="margin:0 auto; height:20px;" class="col-md-12"></div>
+    
+    </div>
+    <div id='app'>
+        <div style="margin-left: 20px;text-align: center;">
+            <br/>
+            <div class="row" style="margin-top:10px">
+                <div class="col-md-2 kaoyou">标题：</div>
+                <input class="col-md-8 form-control" v-model="project_title"></input>
+            </div>
+            <div class="row" style="margin-top:10px">
+                <div class="col-md-2 kaoyou">说明：</div>
+                <textarea rows="4" class="col-md-8 form-control" v-model="project_desc"></textarea>
+            </div>
+            <div class="row" style="margin-top:10px">
+                <div class="col-md-2"></div>
+                <label class="col-md-4 form-check-label kaozuo">
+                    <input type="checkbox" v-model="descposter_has" style="margin-right: 10px;" onclick="this.value=(this.value==0)?1:0" value="0">说明配图
+                </label>
+            </div>
+
+            <div v-show="descposter_has==1" class="row" style="margin-top:10px">
+            <div class="col-md-2">上传图片：<br/>(尺寸16:9)</div>
+            <div class="col-md-8">
+                <input style="width:100%;border:1px dashed black;" class="btn btn-default" id="descposter" type="file" name="descpo"></input>
+            </div>
+            </div>
+            
+            <div class="row" v-show="descposter_show && descposter_has==1">
+            <div class="col-md-2"></div>
+            <div class="col-md-8" style="text-align: center;"> 
+                <canvas id="descposter-canvas" style="width: 480px"></canvas>
+            </div>
+            </div>
+            <div style="display:inline-block;margin:auto;">
+                <!-- <div v-for="(item,index) in tasklist">
+                    <input class="editable" v-model="index"></input>
+                    <input class="editable" v-model="item.A"></input>
+                    <input class="editable" v-model="item.B"></input>
+                    <span v-if="index>0"><button class="editable" class="btn btn-default" @click="deletewords(index)">删除</button></span>
+                </div> -->
+            
+            <table class="table-css">
+                <thead>
+                    <tr>
+                        <th class="lie1">当前</th>
+                        <th class="lie2">上游</th>
+                        <th class="lie2">下游</th>
+                        <th class="lie3">任务内容</th>
+                        <th class="lie4">执行人</th>
+                        <th class="lie5">期限</th>
+                        <th class="lie2">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(item,index) in tasklist">
+                        <td class="lie1"><label class="editable">{[index+1]}</label></td>
+                        <td class="lie2"><input class="editable" v-model="item[1]"></input></td>
+                        <td class="lie2"><input class="editable" v-model="item[2]"></input></td>
+                        <td class="lie3"><input class="editable" v-model="item[3]"></input></td>
+                        <td class="lie4"><input class="editable" v-model="item[4]"></input></td>
+                        <td class="lie5"><input class="editable" v-model="item[5]"></input></td>
+                        <td class="lie2"><button v-if="index>0" class="editable" class="btn btn-default" @click="deletewords(index)">删除</button></td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+            </div>
+
+
+
+            <!-- <div v-for="(item,index) in querylist" class="row" style="margin-top:10px">
+                <div class="col-md-2 kaoyou">{[index+1]}:</div>
+                <input v-model="item[0]" class="col-md-8 form-control" type="text">
+                <span v-if="index>0"><button class="btn btn-default" @click="deletewords(index)">删除</button></span>
+            </div> -->
+            <div class="row" style="margin-top:10px">
+            <div class="col-md-2"></div>
+            <button class="btn btn-primary"  @click="addwords()">+增加任务</button>
+            </div>
+            <div v-show="completed>0">
+                <div class="row" style="margin-top:10px">
+                    <div class="col-md-2 kaoyou">成果：</div>
+                    <input class="col-md-8 form-control" v-model="outcome"></input>
+                </div>
+                <div class="row" style="margin-top:10px">
+                    <div class="col-md-2"></div>
+                    <label class="col-md-4 form-check-label kaozuo">
+                        <input type="checkbox" v-model="slnposter_has" style="margin-right: 10px;" onclick="this.value=(this.value==0)?1:0" value="0">成果配图
+                    </label>
+                </div>
+
+                <div v-show="slnposter_has==1" class="row" style="margin-top:10px">
+                <div class="col-md-2">上传图片：<br/>(尺寸16:9)</div>
+                <div class="col-md-8">
+                    <input style="width:100%;border:1px dashed black;" class="btn btn-default" id="slnposter" type="file" name="slnpo"></input>
+                </div>
+                </div>
+                
+                <div class="row" v-show="slnposter_show && slnposter_has==1">
+                <div class="col-md-2"></div>
+                <div class="col-md-8" style="text-align: center;"> 
+                    <canvas id="slnposter-canvas" style="width: 480px"></canvas>
+                </div>
+                </div>
+                <div class="row" style="margin-top:10px">
+                    <div class="col-md-2 kaoyou">成果说明：</div>
+                    <textarea rows="4" class="col-md-8 form-control" v-model="outcome_desc"></textarea>
+                </div>
+            </div>
+            <br/>
+            <input class="btn btn-primary" @click="tijiao()" type="submit" value="提交">
+        </div>
+        <span id="showres"></span>
+    </div>
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+    var authoid = {{current_user.id}};
+    projectvue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: '#app',
+        data: {
+            descposter_has:false,
+            descposter_show:false,
+            slnposter_has:false,
+            slnposter_show:false,
+            completed:0,
+            outcome:'',
+            outcome_desc:'',
+            pro_id:{{pr.projectid|tojson}},
+            project_title:{{pr.project_title|tojson}},
+            project_desc:{{pr.project_desc|tojson}},
+            tasklist:[[0,'','','','','']],
+            deleteditem:[],
+            addeditem:[],
+        },
+        mounted: function(){
+            var tasktmp = {{pr.sln_desc|tojson}};
+            console.log(tasktmp);
+            if (tasktmp && tasktmp.length>0){
+                this.tasklist = JSON.parse(tasktmp);
+            }
+            //如果第一个元素不是数字，就在开头补一个零。
+            this.tasklist.forEach(ee => {
+                //var regPos = /^[0-9]+.?[0-9]*/; //判断是否是数字。
+                if (ee.length==5){
+                    ee.unshift(0);
+                }
+            });
+        },
+        methods: {
+            addwords (){
+                this.tasklist.push([0,'','','','','']);
+            },
+            deletewords (i){
+                var deletetemp = this.tasklist.splice(i,1);
+                if (deletetmp[0]>0){
+                    //如果删除的是数据库中的任务，就放入真删除列表中
+                    this.deleteditem.push(deletetemp);
+                }
+            },
+            
+            tijiao () {
+                
+
+                if(this.tasklist.length>0){
+                    
+                    var fd = new FormData();
+
+                    if (this.descposter_has && this.descposter_show){
+                        var descurl = descposterCanvas.toDataURL('image/jpg', 0.92);
+                        var descarr = descurl.split(',');
+                        var descmime = descarr[0].match(/:(.*?);/)[1];
+                        var descbstr = atob(descarr[1]);
+                        var descn = descbstr.length;
+                        var descu8arr = new Uint8Array(descn);
+                        while(descn--){
+                            descu8arr[descn] = descbstr.charCodeAt(descn);
+                        }
+                        var descobj = new Blob([descu8arr], {type:descmime});
+                        fd.append("descposter", descobj,"image.jpg");
+                    }
+                    if (this.slnposter_has && this.slnposter_show){
+
+                        var slnurl = slnposterCanvas.toDataURL('image/jpg', 0.92);
+                        var slnarr = slnurl.split(',');
+                        var slnmime = slnarr[0].match(/:(.*?);/)[1];
+                        var slnbstr = atob(slnarr[1]);
+                        var slnn = slnbstr.length;
+                        var slnu8arr = new Uint8Array(slnn);
+                        while(slnn--){
+                            slnu8arr[slnn] = slnbstr.charCodeAt(slnn);
+                        }
+                        var slnobj = new Blob([slnu8arr], {type:slnmime});
+                        fd.append("slnposter", slnobj,"image.jpg");
+                    }
+                    fd.append("project_title",this.project_title);
+                    fd.append("project_desc",this.project_desc);
+                    fd.append("taskinfo",JSON.stringify(this.tasklist));
+                
+                    fd.append("deleteditem",JSON.stringify(this.deleteditem));
+                    fd.append("sln",this.outcome);
+                    fd.append("pro_id",this.pro_id);
+                    fd.append("ques_authorid",authoid);
+
+                    fd.append("descposter_has",this.descposter_has);
+                    fd.append("slnposter_has",this.slnposter_has);
+
+                    $.ajax({
+                        url:"{{ url_for('rw.saveproject') }}",
+                        type:"POST",
+                        processData: false,
+                        contentType: false,
+                        data:fd,
+                        dataType: "json",
+                        success: function(response) {
+                            $("#showres").html("成功保存项目-->"+response.result);
+                            //projectvue.$data.optionsArr=response.result;
+
+                        }
+                    })
+
+
+                    // this.timuxin='';
+                    // this.timudesc='';
+                    // this.daan='';
+                    // this.jieshi='';
+                    // this.querylist=[['']];
+                    // this.descposter_has=false;
+                    // this.descposter_show=false;
+                    // this.slnposter_has=false;
+                    // this.slnposter_show=false;
+                }
+            }
+        }
+    })
+    
+    
+
+
+    var descposterInput = document.getElementById("descposter");
+    var descposterCanvas = document.getElementById("descposter-canvas");
+    //var ori = document.getElementById("poster-canvas").width;
+    var descposterCxt = descposterCanvas.getContext("2d");
+    
+    
+
+    var slnposterInput = document.getElementById("slnposter");
+    var slnposterCanvas = document.getElementById("slnposter-canvas");
+    //var ori = document.getElementById("poster-canvas").width;
+    var slnposterCxt = slnposterCanvas.getContext("2d");
+    
+
+    descposterInput.onchange = function() {
+        var descposterimg = new Image();
+        descposterimg.src =  URL.createObjectURL(descposterInput.files[0]);
+        console.log("展示图片1");
+        descposterimg.onload = function() {
+            descposterCanvas.setAttribute('width', 480);
+            descposterCanvas.setAttribute('height', 270);
+            projectvue.$data.descposter_show=true;
+            descposterCxt.drawImage(descposterimg,0,0,480,270);
+        }
+    }
+
+    slnposterInput.onchange = function() {
+        var slnposterimg = new Image();
+        slnposterimg.src =  URL.createObjectURL(slnposterInput.files[0]);
+        slnposterimg.onload = function() {
+            slnposterCanvas.setAttribute('width', 480);
+            slnposterCanvas.setAttribute('height', 270);
+            projectvue.$data.slnposter_show=true;
+            slnposterCxt.drawImage(slnposterimg,0,0,480,270);
+        }
+    }
+
+
+    
+</script>
+{% endblock %}

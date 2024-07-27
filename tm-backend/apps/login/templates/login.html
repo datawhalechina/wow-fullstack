@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<link rel="shortcut icon" href="/v1/auth/mystatic/img/favicon.ico">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+	<script src="/v1/auth/mystatic/js/jquery-3.2.1.min.js"></script>
+	<script src="/v1/auth/mystatic/js/vue.js"></script>
+    <link rel="stylesheet" href="/v1/auth/mystatic/css/bootstrap.css">
+	<link rel="stylesheet" href="/v1/auth/mystatic/css/font-awesome.min.css">
+	<script src="/v1/auth/mystatic/js/bootstrap.min.js"></script>
+	<script src="/v1/auth/mystatic/js/feather.min.js"></script>
+	<script src="https://cdn.staticfile.org/popper.js/1.15.0/umd/popper.min.js"></script>
+	<link rel="stylesheet" href="/v1/auth/mystatic/css/style.css">
+    {% block header_part %}
+    {% endblock %}
+    <title>自塾</title>
+	<script>
+		$(function(){
+			function footerPosition(){
+				var contentHeight = document.body.scrollHeight,//网页正文全文高度
+					winHeight = window.innerHeight;//可视窗口高度，不包括浏览器顶部工具栏
+				if(!(contentHeight > winHeight)){
+					//当网页正文高度小于可视窗口高度时，为footer添加类fixed-bottom
+					$("footer").addClass("fixed-bottom");
+				}
+			}
+			footerPosition();
+			$(window).resize(footerPosition);
+		});
+	</script>
+	
+<style>
+
+.table-css tr th img:hover{
+   transform: scale(1.2);
+}
+
+.table-css tr th{
+   padding-left: 20px;
+   padding-right: 20px;
+}
+</style>	
+</head>
+<body>
+
+
+<style type="text/css"> 
+img[src=""],img:not([src]){
+     opacity:0;
+}
+</style> 
+	
+<!--navigation-->
+<section class="smart-scroll">
+	<div class="container-fluid">
+		<nav class="navbar navbar-expand-md navbar-light">
+			<a class="navbar-brand heading-black" href="{{ url_for('start') }}">
+				<img src="/v1/auth/mystatic/img/logo.png" />
+			</a>
+			
+			<button class="navbar-toggler navbar-toggler-right border-0" type="button" data-toggle="collapse"
+					data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false"
+					aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+			</button>
+			<div class="collapse navbar-collapse" id="navbarCollapse">
+				<ul class="navbar-nav ml-auto">
+					<!-- Dropdown -->
+					<li class="nav-item dropdown">
+						<a class="nav-link dropdown-toggle" href="" id="navbardrop" data-toggle="dropdown">
+							载体
+						</a>
+						<div class="dropdown-menu">
+						<a class="dropdown-item" href="{{ url_for('sp.spstart') }}">视频</a>
+						<a class="dropdown-item" href="">图文</a>
+						<a class="dropdown-item" href="">脑图</a>
+						<a class="dropdown-item" href="">题目</a>
+						</div>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link page-scroll" href="#jc">教程</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link page-scroll" href="#rz">认证</a>
+					</li>
+					<li class="nav-item">
+						<a class="nav-link page-scroll" href="#rw">任务</a>
+					</li>
+				</ul>
+				<form class="mx-md-4">
+					<div class="input-group input-group-md">
+						<input type="text" class="form-control" style="padding:1px 5px;">
+						<div class="input-group-append">
+							<button class="btn rightbtn" style="padding:3px 5px;"><i class="fa fa-search" style="font-size:24px"></i></button>
+						</div>
+					</div>
+				</form>
+				<form class="form-inline" style="min-width:60px;white-space: nowrap;">
+					{% if current_user.is_authenticated %}
+					<a style="padding:3px 5px;color:#aa00ff;font-size:24px;" href="{{ url_for('my.usercenter') }}">{{current_user.name}}</a>
+					<a style="padding:3px 5px;color:#aa00ff;font-size:24px;" href="{{ url_for('auth.logout') }}"><i class="fa fa-power-off"></i></a>
+					{% else %}
+					<a class="rightbtn btn" style="font-size:18px;padding:3px 5px;" href="{{ url_for('auth.login') }}">登录</a>
+					{% endif %}
+				</form>
+			</div>
+		</nav>
+	</div>
+</section>
+
+
+
+
+<div class="container">
+	
+	
+	
+	<div class="row">
+	<div style="margin:0 auto; height:200px;" class="col-md-12"></div>
+	<div style="margin:0 auto; width:90%;text-align:center">
+		<div id="login_frame">
+
+			<h3>自塾欢迎你！</h3>
+			<br>
+			
+			<form method="post" action="{{url_for('auth.login',next=request.args.next)}}">
+			
+				<p><label class="label_input">手机</label><input type="text" name="username" id="username" placeholder="你的手机号" class="text_field" required/></p>
+				<p><label class="label_input">密码</label><input type="password" name="password" id="password" placeholder="密码默认六个1"  class="text_field" required/></p>
+			
+				<div id="login_control">
+					<input type="submit" class="btn rightbtn"  style="font-size:18px;padding:3px 5px;" value="登录">
+				</div>
+			</form>
+		</div>
+	</div>
+		
+	</div>
+
+</div>
+
+<style>
+#login_frame {
+    max-width: 400px;
+    height: 260px;
+    padding: 13px;
+	margin:0 auto;
+    border-radius: 10px;
+    text-align: center;
+}
+ 
+form p > * {
+    display: inline-block;
+    vertical-align: middle;
+}
+ 
+#image_logo {
+    margin-top: 4px;
+}
+ 
+.label_input {
+    font-size: 16px;
+    width: 65px;
+    height: 28px;
+    line-height: 28px;
+    text-align: center;
+	vertical-align: middle;
+ 
+    color: white;
+    background-color: #aa00ff;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+ 
+.text_field {
+    width: 200px;
+    height: 28px;
+	font-size: 18px;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border: 0;
+	vertical-align: middle;
+	margin-bottom:8px;
+	padding-left:5px;
+	padding-top:0px;
+	padding-bottom:0px;
+}
+ 
+
+#login_control {
+    padding: 0 28px;
+}
+</style>
+
+
+</body>
+</html>

@@ -1,0 +1,515 @@
+{% extends 'taskbase.html' %}
+{% block header_part %}
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    img[src=""],img:not([src]){
+         opacity:0;
+    }
+    .table-css{
+        margin-top: 10px;
+        vertical-align:middle;
+        text-align:center;
+        width:1000px;
+    }
+    table th {
+        border: 1px solid black;
+    }
+
+    table td {
+        border: 1px solid black;
+    }
+    .lie1{width:4%;}
+    .lie2{width:6%;}
+    .lie3{width:10%;}
+    .lie4{width:10%;}
+    .lie5{width:10%;}
+    .lie6{width:5%;}
+
+    .kaoyou {
+        text-align: right;
+    }
+    .kaozuo {
+        text-align: left;
+    }
+    .editable {
+        border-width:0;
+        width:100%;
+        height:100%;
+        font-size:1em;
+    }
+    .opbtn {
+        border-width:0;
+        height:100%;
+        font-size:1em;
+    }
+    .readonly {
+        width:100%;
+        font-size:1em;
+        vertical-align: middle;
+    }
+    input {
+        padding-left:2px;
+        padding-right:2px;
+    }
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+    
+    <div id='app'>
+        <div style="text-align: center;">
+            
+            <div style="display:inline-block;margin:auto;">
+                <div class="text-center"><h2 class="text-center">项目管理</h2></div>
+                <div>
+                    <button class="btn btn-primary" @click="add_motm">新建</button>
+                    <button class="btn btn-primary" @click="delete_motm" :disabled="cur_motm == -1">删除</button>
+                    <button class="btn btn-primary" @click="view_motm" :disabled="cur_motm == -1">查看</button>
+                </div>
+            
+            <table class="table-css">
+                <thead>
+                    <tr @click="quliang_motm">
+                        <th class="lie1">序号</th>
+                        <th class="lie1">案号</th>
+                        <th class="lie1">主题</th>
+                        <th class="lie3">成员</th>
+                    </tr>
+                </thead>
+                <tbody :key="mkey">
+                    <tr v-for="(item,index) in motm_list" @click="gaoliang_motm(index)">
+                        <td class="lie1" :id="'motm'+index">{[index+1]}</td>
+                        <td class="lie1"><input class="editable" v-model="item[0]" @change="save_motm"></input></td>
+                        <td class="lie1"><input class="editable" v-model="item[1]" @change="save_motm"></input></td>
+                        <td class="lie3"><input class="editable" v-model="item[2]" @change="save_motm"></input></td>
+                    </tr>
+                    
+                </tbody>
+                
+            </table>
+            
+
+            <hr>
+
+            <div style="display:inline-block;margin:auto;">
+                <div>
+                    <button class="btn btn-primary" @click="add_task">新增</button>
+                    <button class="btn btn-primary" @click="delete_task" :disabled="cur == -1">删除</button>
+                    <button class="btn btn-primary" @click="send_task">分配</button>
+                </div>
+            
+            <table class="table-css">
+                <thead>
+                    <tr @click="quliang">
+                        <th class="lie1">序号</th>
+                        <th class="lie2">案号</th>
+                        <th class="lie3">主题</th>
+                        <th class="lie6">姓名</th>
+                        <th class="lie6">统筹配时</th>
+                    </tr>
+                </thead>
+                <tbody :key="key">
+                    <tr v-for="(item,index) in tasklist" @click="gaoliang(index)">
+                        <td class="lie1" :name="index">{[index+1]}</td>
+                        <td class="lie2"><input class="editable" v-model="item[0]"></input></td>
+                        <td class="lie3"><input class="editable" v-model="item[1]"></input></td>
+                        <td class="lie6"><input class="editable" v-model="item[2]"></input></td>
+                        <td class="lie6"><input class="editable" v-model="item[3]" type="number" step="0.01"></input></td>
+                    </tr>
+                    
+                </tbody>
+                
+            </table>
+
+            </div>
+
+            <hr>
+
+            <div v-if="cur_archive != -1">{[cur_riqi]}有效工作时间：{[validtime_archive]}小时。</div>
+            <div v-if="cur_archive != -1">{[cur_anhao]}-{[cur_zhuti]}：统筹配时{[tongchou]}小时，分拆配时{[yi_peishi || tongchou]}小时，实际用时{[yi_yongshi]}小时。</div>
+            <table class="table-css">
+                <thead>
+                    <tr @click="quliang_archive">
+                        <th class="lie1">序号</th>
+                        <th class="lie2">案号</th>
+                        <th class="lie3">主题</th>
+                        <th class="lie6">姓名</th>
+                        <th class="lie6">统筹配时</th>
+                        <th class="lie5">分拆事项</th>
+                        <th class="lie6">分拆配时</th>
+                        <th class="lie6">开始时间</th>
+                        <th class="lie6">结束时间</th>
+                        <th class="lie6">实际用时</th>
+                        <th class="lie6">日期</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th class="lie1"></th>
+                        <th class="lie2"><input class="editable" placeholder="筛选" @input="filterfn" v-model="searchitems[0]"></input></th>
+                        <th class="lie3"><input class="editable" placeholder="筛选" @input="filterfn" v-model="searchitems[1]"></input></th>
+                        <th class="lie6"><input class="editable" placeholder="筛选" @input="filterfn" v-model="searchitems[2]"></input></th>
+                        <th class="lie6"></th>
+                        <th class="lie5"></th>
+                        <th class="lie6"></th>
+                        <th class="lie6"></th>
+                        <th class="lie6"></th>
+                        <th class="lie6"></th>
+                        <th class="lie6"><input class="editable" placeholder="筛选" @input="filterfn" v-model="searchitems[3]"></input></th>
+                    </tr>
+                    <tr v-for="(item,index) in finishlist" @click="gaoliang_archive(index)">
+                        <td class="lie1">{[index+1]}</td>
+                        <td class="lie2" :id="'anhao'+index"><span>{[item[0]]}</span></td>
+                        <td class="lie3" :id="'zhuti'+index"><span>{[item[1]]}</span></td>
+                        <td class="lie6">{[item[9]]}</td>
+                        <td class="lie6">{[item[2]]}</td>
+                        <td class="lie3">{[item[3]]}</td>
+                        <td class="lie6">{[item[4]]}</td>
+                        <td class="lie6">{[item[5]]}</td>
+                        <td class="lie6">{[item[6]]}</td>
+                        <td class="lie6">{[item[7]]}</td>
+                        <td class="lie6" :id="'riqi'+index">{[item[8]]}</td>
+                    </tr>
+                    
+                </tbody>
+            </table>
+            <div v-if="finishlist.length > 0">当前列表总实际时间：{[total_time]}小时。</div>
+            <button v-if="finishlist.length > 0" class="btn btn-primary" @click="export_list">导出</button>
+            </div>
+        </div>
+        <br>
+        <br>
+        <br>
+    </div>
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+    var usrname = {{current_user.name|tojson}};
+    var motms = {{m_items|tojson}};
+    const now = new Date();
+
+    // 获取年、月和日
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0'); // 如果月份小于10，前面添加'0'
+    const day = now.getDate().toString().padStart(2, '0'); // 如果日期小于10，前面添加'0'
+
+    // 格式化日期
+    const formattedDate = `${year}-${month}-${day}`;
+    otmvue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: '#app',
+        data: {
+            tasklist:[['','','','']],
+            finishlist:[],
+            searchlist:[],
+            searchitems:['','','',''],
+            motm_list:[['','','']],
+            cur:-1,
+            cur_archive:-1,
+            cur_motm:-1,
+            cur_anhao:"",
+            cur_zhuti:"",
+            cur_riqi:"",
+            validtime_archive:0,
+            yi_yongshi:0,
+            yi_peishi:0,
+            tongchou:0,
+            key:0,
+            skey:0,
+            mkey:0,
+            total_time:0,
+            username:usrname
+        },
+        computed: {
+            validtime: function(){
+                var sum_time=0;
+                //如果你想强制计算属性更新并重新计算它的值，
+                //你可以简单地使用数据属性并在计算函数中提及该属性
+                //（你不必使用它，只要存在就足够了）
+                //然后更改该数据属性；这将强制更新计算属性。
+                this.skey;
+                for(var i=0;i<this.tasklist.length;i++){
+                    
+                    if (this.tasklist[i][7]>0){
+                        sum_time += this.tasklist[i][7];
+                    }
+                }
+                return sum_time.toFixed(2);
+            },
+        },
+        mounted: function(){
+            if (motms && motms.length>0){
+                this.motm_list = motms;
+            }
+        },
+        methods: {
+            add_motm (){
+                console.log("增加管理")
+                this.motm_list.push(['','','']);
+            },
+            delete_motm (){
+                console.log("删除管理")
+                if (confirm("确定删除此项目记录？")) {
+                    var deletetemp = this.motm_list.splice(this.cur_motm,1);
+                    this.quliang_motm();
+                    this.mkey += 1
+                    
+                }
+            },
+            gaoliang_motm (ind){
+                var cur_row_motm = document.getElementById('motm'+ind);
+                if (ind != this.cur_motm){
+                    if (this.cur_motm != -1){
+                        var old_row_motm = document.getElementById('motm'+this.cur_motm);
+                        old_row_motm.style.backgroundColor = "";
+                    }
+                    this.cur_motm = ind;
+                }
+                cur_row_motm.style.backgroundColor = "#a0f";
+                //console.log(cur_row_motm)
+                //this.mkey += 1;
+            },
+            quliang_motm (){
+                if (this.cur_motm != -1){
+                    var old_row_motm = document.getElementById('motm'+this.cur_motm);
+                    old_row_motm.style.backgroundColor = "";
+                    this.cur_motm = -1;
+                }
+            },
+            save_motm () {
+                if(this.motm_list.length>0){
+                    var fd = new FormData();
+                    fd.append("motm_info",JSON.stringify(this.motm_list));
+                    $.ajax({
+                        url:"{{ url_for('rw.save_motm') }}",
+                        type:"POST",
+                        processData: false,
+                        contentType: false,
+                        data:fd,
+                        dataType: "json",
+                        success: function(response) {
+                            console.log(response);
+                        }
+                    })
+
+                }
+            },
+            view_motm () {
+                if(this.motm_list.length>0){
+                    this.quliang_archive();
+                    var fd = new FormData();
+                    fd.append("view_info",JSON.stringify(this.motm_list[this.cur_motm]));
+                    $.ajax({
+                        url:"{{ url_for('rw.view_motm') }}",
+                        type:"POST",
+                        processData: false,
+                        contentType: false,
+                        data:fd,
+                        dataType: "json",
+                        success: function(response) {
+                            otmvue.finishlist = response;
+                            otmvue.searchlist = response;
+                            otmvue.total_time = otmvue.cal_total_time(response);
+                        }
+                    })
+
+                }
+            },
+            add_task (){
+                if (this.cur > -1){
+                    var cur_list = this.tasklist[this.cur];
+                    var new_list = [cur_list[0],cur_list[1],'',''];
+                    this.tasklist.splice(this.cur+1,0,new_list);
+                    
+                } else if (this.cur_archive > -1){
+                    var cur_list = this.finishlist[this.cur_archive];
+                    var new_list = [cur_list[0],cur_list[1],'',''];
+                    this.tasklist.push(new_list);
+                } else {
+                    this.tasklist.push(['','','','']);
+                }
+                
+            },
+            delete_task (){
+                console.log("删除改任务")
+                if (confirm("确定删除此任务？")) {
+                    var deletetemp = this.tasklist.splice(this.cur,1);
+                    this.quliang();
+                    this.key += 1
+                    
+                }
+            },
+            
+            send_task () {
+                var alertinfo;
+                if (this.cur ==-1){
+                    alertinfo = "确定批量分配这些任务？";
+                } else{
+                    alertinfo = "确定分配此任务？";
+                }
+                if(confirm(alertinfo)){
+                    var temp = [];
+                    if (this.cur == -1){
+                        temp = this.tasklist;
+                        this.tasklist = [];
+                    } else {
+                        temp = this.tasklist.splice(this.cur,1);
+                    }
+                    var fd = new FormData();
+                    fd.append("motm_info",JSON.stringify(temp));
+                    console.log(temp);
+                    $.ajax({
+                        url:"{{ url_for('rw.send_motm') }}",
+                        type:"POST",
+                        processData: false,
+                        contentType: false,
+                        data:fd,
+                        dataType: "json",
+                        success: function(response) {
+                            console.log(response);
+                        }
+                    })
+
+                }
+                this.cur = -1;
+            },
+            gaoliang (ind){
+                var cur_row = document.getElementsByName(ind.toString())[0];
+                if (ind != this.cur){
+                    if (this.cur != -1){
+                        console.log(this.cur);
+                        var old_row = document.getElementsByName(this.cur.toString())[0];
+                        old_row.style.backgroundColor = "";
+                    }
+                    this.cur = ind;
+                }
+                cur_row.style.backgroundColor = "#a0f";
+                this.skey += 1;
+                
+            },
+            quliang (){
+                if (this.cur != -1){
+                var old_row = document.getElementsByName(this.cur.toString())[0];
+                old_row.style.backgroundColor = "";
+                this.cur = -1;
+                }
+
+            },
+            cal_total_time(tmplist){
+                var tmp_time = 0.0;
+                for(i=0;i<tmplist.length;i++){
+                    tmp_time += parseFloat(tmplist[i][7] || 0);
+                }
+                tmp_time = tmp_time.toFixed(2);
+                return tmp_time;
+            },
+            gaoliang_archive (ind){
+                this.cur_anhao = this.finishlist[ind][0];//当前的anhao
+                this.cur_zhuti = this.finishlist[ind][1];
+                this.cur_riqi = this.finishlist[ind][8];
+                this.validtime_archive = 0;
+                this.tongchou = this.finishlist[ind][2];
+                this.yi_peishi = 0;
+                this.yi_yongshi = 0;
+                
+                if (ind != this.cur_archive){
+                    
+                    this.cur_archive = ind;
+                }
+                
+                for(i=0;i<this.finishlist.length;i++){
+                    var cur_row_anhao = document.getElementById('anhao'+i);
+                    var cur_row_zhuti = document.getElementById('zhuti'+i);
+                    var cur_row_riqi = document.getElementById('riqi'+i);
+                    cur_row_anhao.style.backgroundColor = "";
+                    cur_row_zhuti.style.backgroundColor = "";
+                    cur_row_riqi.style.backgroundColor = "";
+                    if (this.finishlist[i][0] == this.cur_anhao && this.finishlist[i][1] == this.cur_zhuti){
+                        cur_row_anhao.style.backgroundColor = "#a9f";
+                        cur_row_zhuti.style.backgroundColor = "#a9f";
+                        this.yi_peishi += parseFloat(this.finishlist[i][4] || 0);
+                        this.yi_yongshi += parseFloat(this.finishlist[i][7] || 0);
+                    }
+                    if (this.finishlist[i][8] == this.cur_riqi){
+                        cur_row_riqi.style.backgroundColor = "#d7f";
+                        this.validtime_archive += parseFloat(this.finishlist[i][7] || 0);
+                    }
+                    
+                }
+                this.validtime_archive = this.validtime_archive.toFixed(2);
+                this.yi_peishi = this.yi_peishi.toFixed(2);
+                this.yi_yongshi = this.yi_yongshi.toFixed(2);
+                
+                
+            },
+            quliang_archive (){
+                for(i=0;i<this.finishlist.length;i++){
+                    var cur_row_anhao = document.getElementById('anhao'+i);
+                    var cur_row_zhuti = document.getElementById('zhuti'+i);
+                    var cur_row_riqi = document.getElementById('riqi'+i);
+                    cur_row_anhao.style.backgroundColor = "";
+                    cur_row_zhuti.style.backgroundColor = "";
+                    cur_row_riqi.style.backgroundColor = "";
+                }
+                this.cur_archive = -1;
+            },
+            compare_data(data,filter){
+                ind = true;
+                if(filter[0].length>0 & ind){
+                    if(data[0].includes(filter[0])==false){
+                        ind = false;
+                    }
+                }
+                if(filter[1].length>0 & ind){
+                    if(data[1].includes(filter[1])==false){
+                        ind = false;
+                    }
+                }
+                if(filter[2].length>0 & ind){
+                    if(data[9].includes(filter[2])==false){
+                        ind = false;
+                    }
+                }
+                if(filter[3].length>0 & ind){
+                    if(data[8].includes(filter[3])==false){
+                        ind = false;
+                    }
+                }
+                return ind;
+            },
+            filterfn() {
+                var temp = [];
+                for(i=0;i<this.searchlist.length;i++){
+                    if(this.compare_data(this.searchlist[i],this.searchitems)){
+                        temp.push(this.searchlist[i]);
+                    }
+                }
+                this.finishlist = temp;
+                this.total_time = this.cal_total_time(this.finishlist);
+            },
+            export_list(){
+                var title = ['编号','主题','统筹配时','分拆事项','分拆配时','开始时间','结束时间','实际用时','日期','姓名']
+                var str = [];
+                str.push(title.join(",")+"\n");
+                for(var i=0;i<this.finishlist.length;i++){
+                    str.push(this.finishlist[i].join(",")+"\n");
+                }
+                var blob = new Blob(['\uFEFF' + str.join('')], {
+                    type: 'text/plain;charset=utf-8',
+                });
+                var downloadLink = document.createElement("a");
+                downloadLink.href = URL.createObjectURL(blob);
+                downloadLink.download = "记录导出"+formattedDate+".csv"; 
+                downloadLink.click();
+            }
+        }
+    })
+    
+</script>
+{% endblock %}

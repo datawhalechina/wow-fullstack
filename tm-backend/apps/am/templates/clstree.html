@@ -1,0 +1,721 @@
+{% extends 'adminbase.html' %}
+{% block header_part %}
+<script src="/v1/auth/mystatic/js/popper.min.js"></script>
+<title>分类树编辑</title>
+
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    #app{
+        font-size:18px;
+    }
+    img[src=""],img:not([src]){
+         opacity:0;
+    }
+    .editicon {
+        margin-right: 0.5em;
+        font-size:18px;
+        cursor:pointer;
+    }
+    .noteditable {
+        cursor:not-allowed !important;
+    }
+    .wraptree {
+        /* min-height:400px; */
+        height:500px;
+        width:100%;
+        overflow-y: scroll;
+        scrollbar-width:none;
+        background-color:#fbfbfb;
+        border:0px solid #999;
+        -webkit-border-radius:4px;
+        -moz-border-radius:4px;
+        border-radius:4px;
+        -webkit-box-shadow:inset 0 1px 1px rgba(0, 0, 0, 0.05);
+        -moz-box-shadow:inset 0 1px 1px rgba(0, 0, 0, 0.05);
+        box-shadow:inset 0 1px 1px rgba(0, 0, 0, 0.05)
+    }
+
+.wraptree::-webkit-scrollbar {
+    width:10px;
+}
+
+.wraptree::-webkit-scrollbar-thumb {
+    background: #ccc; 
+    border-radius: 5px; 
+}
+
+
+.tree {
+  min-height:20px;
+  padding:19px;
+  width:100%;
+  margin-bottom:20px;
+  
+}
+.tree li {
+  list-style-type:none;
+  margin:0;
+  padding:0px 5px 0 5px;
+  position:relative
+}
+.tree li::before, .tree li::after {
+  content:'';
+  left:-25px;
+  position:absolute;
+  right:auto
+}
+.tree li::before {
+  border-left:1px solid #999;
+  bottom:10px;
+  height:100%;
+  top:-7px;
+  width:1px
+}
+.tree li::after {
+  border-top:1px solid #999;
+  height:20px;
+  top:13px;
+  width:30px
+}
+.tree li span {
+  -moz-border-radius:5px;
+  -webkit-border-radius:5px;
+  border:0px solid #999;
+  border-radius:5px;
+  display:inline-block;
+  padding:1px 8px;
+  text-decoration:none
+}
+
+.tree li label {
+  -moz-border-radius:5px;
+  -webkit-border-radius:5px;
+  border-radius:5px;
+  padding-left:5px;
+  padding-right:5px;
+}
+.tree li.parent_li>span {
+  cursor:pointer
+}
+.tree>ul>li::before, .tree>ul>li::after {
+  border:0
+}
+.tree li:last-child::before {
+  height:20px
+}
+.tree li.parent_li>span:hover, .tree li.parent_li>span:hover+ul li span {
+  background:#eee;
+  border:0px solid #94a0b4;
+  color:#000
+}
+
+.xuanzhong {
+    background:rgb(233, 172, 172);
+}
+
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+<div id="app">
+    <div class="row" style="padding-left:15px;">
+    <span v-show="activeid>0">
+        <i class="editicon fa fa-plus-square" title="增加" data-toggle="modal" data-target="#ZengModal"></i>
+        <i v-show="activechildnum==0" class="editicon fa fa-times-rectangle" title="删除" data-toggle="modal" data-target="#ShanModal"></i>
+        <i class="editicon fa fa-pencil-square" title="修改" data-toggle="modal" data-target="#GaiModal"></i>
+        <i v-show="activerank>0" class="editicon fa fa-caret-square-o-up" title="上挪" data-toggle="modal" data-target="#NuoModal"></i>
+    </span>
+    <span id="shownode">&nbsp;</span>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="wraptree">
+                <div id="ftree" class="tree">
+                    <ul></ul>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div>{[activekeywords]}</div>
+        </div>
+    </div>
+    <!-- <div style="height:50px;" class="col-md-12"></div>
+    <input class="btn btn-primary" @click="inittree()" type="submit" value="初始化"></input> -->
+    <div class="row" style="margin-top:10px">
+        <span id="showres" style="display:inline-block;margin:0 auto;"></span>
+    </div>
+    <!-- 增加模态框 -->
+    <div class="modal fade" id="ZengModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+        <!-- 模态框头部 -->
+        <div class="modal-header">
+            <h4 class="modal-title">增加节点</h4>
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- 模态框主体 -->
+        <div class="modal-body">
+            <div>{[classpath]}</div>
+            <label class="form-check-label">
+            <input type="radio" value="同级" v-model="addtype" v-bind:disabled=addjinyong> 同级
+            </label>
+            <span>&nbsp;&nbsp;</span>
+            <label class="form-check-label">
+            <input type="radio" value="下级" v-model="addtype" v-bind:disabled=addjinyong> 下级
+            </label>
+            <br>
+            <input type="text" class="form-control" style="width:200px;" placeholder="新的分类名" v-model="newclassname">
+        </div>
+
+        <!-- 模态框底部 -->
+        <div class="modal-footer">
+            <button @click="zeng()" type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+        </div>
+
+        </div>
+    </div>
+    </div>
+
+    <!-- 删除模态框 -->
+    <div class="modal fade" id="ShanModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+    
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title">删除节点</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+    
+            <!-- 模态框主体 -->
+            <div class="modal-body">
+                <h5>{[classpath]}</h5>
+                <h5>真的要删除我吗？</h5>
+            </div>
+    
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button @click="shan()" type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+    
+            </div>
+        </div>
+    </div>
+
+    <!-- 修改模态框 -->
+    <div class="modal fade" id="GaiModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+    
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title">修改节点</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+    
+            <!-- 模态框主体 -->
+            <div class="modal-body">
+                <div>{[classpath]}</div>
+                <br>
+                <input type="text" class="form-control" style="width:100%;" v-model="classtext">
+                <br>
+                <br>
+                <textarea rows="6" type="text" class="form-control" style="width:100%;" v-model="activekeywords"></textarea>
+            </div>
+    
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button @click="gai()" type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+    
+            </div>
+        </div>
+    </div>
+
+    <!-- 挪动模态框 -->
+    <div class="modal fade" id="NuoModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+    
+            <!-- 模态框头部 -->
+            <div class="modal-header">
+                <h4 class="modal-title">向上挪动节点</h4>
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+    
+            <!-- 模态框主体 -->
+            <div class="modal-body">
+                <h5>{[classpath]}</h5>
+                <h5>真的要挪动我吗？</h5>
+            </div>
+    
+            <!-- 模态框底部 -->
+            <div class="modal-footer">
+                <button @click="nuo()" type="button" class="btn btn-primary" data-dismiss="modal">确定</button>
+            </div>
+    
+            </div>
+        </div>
+    </div>
+</div>
+		
+	
+	
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+const app = Vue.createApp({
+    data() {
+        return {
+        tdata: [],
+        activeid:0,
+        fatherid:0,
+        activedegree:3,
+        activechildnum:0,
+        activerank:0,
+        newclassname:"",
+        activekeywords:"",
+        addtype:"同级",
+        classpath:"",
+        classtext:"",
+        addjinyong:false,
+        notadd:true,
+    }
+    },
+    delimiters: ['{[', ']}'],
+    mounted: function(){
+        this.fetchtree();
+        //this.gentree('ftree');
+        //this.loadtree();
+    },
+    methods: {
+        loadtree: function(){
+            $('.tree li:has(ul)').addClass('parent_li').find(' > span').attr('title', '展开');
+            $('.tree li:has(ul)').find(' > ul > li').hide();
+            $('.tree li.parent_li > span').on('click', function (e) {
+                var children = $(this).parent('li.parent_li').find(' > ul > li');
+                if (children.is(":visible")) {
+                children.hide('fast');
+                $(this).attr('title', '展开').find(' > i').addClass('fa-chevron-circle-right').removeClass('fa-chevron-circle-down');
+                } else {
+                children.show('fast');
+                $(this).attr('title', '折叠').find(' > i').addClass('fa-chevron-circle-down').removeClass('fa-chevron-circle-right');
+                }
+                e.stopPropagation();
+            });
+            $('.tree li > label').on('click', function (e) {
+                if (treevue.activeid>0){
+                    $('#' + treevue.activeid + ' > label').removeClass('xuanzhong');
+                }
+                treevue.activeid = $(this).attr("tabindex");
+                $(this).addClass('xuanzhong');
+                
+                var pathtext = $(this).text();
+                var fathernode;
+                var currentdegree;
+                treevue.addjinyong=false;
+                treevue.tdata.forEach((tt)=>{
+                    if (tt[0]==treevue.activeid){
+                        treevue.activedegree=tt[4];
+                        currentdegree=tt[4];
+                        treevue.activechildnum=tt[3];
+                        treevue.activerank=tt[5];
+                        treevue.activekeywords=tt[6];
+                        treevue.classtext = tt[1];
+                        treevue.fatherid = tt[2];
+                        fathernode=tt[2];
+                    }
+                });
+                if (treevue.activedegree==3){
+                    treevue.addjinyong=true;
+                    treevue.addtype="同级";
+                }
+                if (currentdegree>0){
+                    treevue.tdata.forEach((tt)=>{
+                        if (tt[0]==fathernode){
+                            currentdegree=tt[4];
+                            fathernode=tt[2];
+                            pathtext = tt[1] + '-->' + pathtext;
+                        }
+                    });
+                }
+                if (currentdegree>0){
+                    treevue.tdata.forEach((tt)=>{
+                        if (tt[0]==fathernode){
+                            currentdegree=tt[4];
+                            fathernode=tt[2];
+                            pathtext = tt[1] + '-->' + pathtext;
+                        }
+                    });
+                }
+                $("#showres").html(treevue.activeid+pathtext);
+                $("#shownode").html(pathtext);
+                console.log(treevue.activedegree);
+                treevue.classpath = pathtext;
+            });
+        },
+        gentree: function(treeid){
+            var block = $('#'+treeid+' ul');
+            //console.log(item[1]);
+            this.tdata.forEach((item)=>{
+                if (item[2]==0){
+                    var liitem = $('<li></li>');
+                    liitem.attr('id',item[0])
+                    var spanitem = $('<span></span>');
+                    var labelitem = $('<label></label>');
+                    labelitem.attr('tabindex',item[0])
+                    var iitemr = $('<i class="fa fa-chevron-circle-right"></i>');
+                    var iitemsq = $('<i class="fa fa-square"></i>');
+                    if (item[3]>0){
+                        spanitem.append(iitemr);
+                    } else {
+                        spanitem.append(iitemsq);
+                    }
+                    
+                    labelitem.append(' '+item[1]);
+                    liitem.append(spanitem);
+                    liitem.append(labelitem);
+                    block.append(liitem);
+                    console.log(item[1]);
+                } else {
+                    var parli = $('#'+item[2]);
+                    //console.log(parli.find(' > ul').length);
+                    if (parli.find(' > ul').length==0){
+                        var newul = $('<ul></ul>')
+                        parli.append(newul);
+                    }
+                    var ulblock = $('#'+item[2]+' ul');
+                    var liitem = $('<li></li>');
+                    liitem.attr('id',item[0])
+                    var spanitem = $('<span></span>');
+                    var labelitem = $('<label></label>');
+                    labelitem.attr('tabindex',item[0])
+                    var iitemr = $('<i class="fa fa-chevron-circle-right"></i>');
+                    var iitemsq = $('<i class="fa fa-square"></i>');
+                    if (item[3]>0){
+                        spanitem.append(iitemr);
+                    } else {
+                        spanitem.append(iitemsq);
+                    }
+                    
+                    labelitem.append(' '+item[1]);
+                    liitem.append(spanitem);
+                    liitem.append(labelitem);
+                    ulblock.append(liitem);
+                    //console.log(item[1]);
+                }
+            });
+        },
+        inittree: function(){
+            var fd = new FormData();
+            fd.append("action","init");
+            fd.append("initlist",JSON.stringify(this.tdata));
+            $.ajax({ 
+                url:"{{ url_for('am.classtree') }}",
+                type:"POST",
+                processData: false,
+                contentType: false,
+                data:fd,
+                dataType: "json",
+                success: function(response) {
+                    console.log(response);
+                    $("#showres").html(response);
+
+                }
+            })
+        },
+        fetchtree: function(){
+            var fd = new FormData();
+            fd.append("action","fetchall");
+            $.ajax({ 
+                url:"{{ url_for('am.classtree') }}",
+                type:"POST",
+                processData: false,
+                contentType: false,
+                data:fd,
+                dataType: "json",
+                success: function(response) {
+                    console.log(response);
+                    treevue.tdata = response;
+                    $("#showres").html("已获取数据");
+                    treevue.gentree('ftree');
+                    treevue.loadtree();
+                }
+            });
+        },
+        getid:function(){
+            var tmpid=0;
+            this.tdata.forEach((tt)=>{
+                if (tt[0]>tmpid){
+                    tmpid=tt[0];
+                }
+            });
+            return tmpid+1;
+        },
+        zeng: function(){
+            //var oldtext = $("#showres").html();
+            //$("#shownode").html('增加'+ oldtext);
+            // 先构造一个虚拟的id
+            var newid = this.getid();
+            console.log(newid);
+            //构造一个li标签以备使用
+            var currentnode = $('#' + this.activeid);
+            var liitem = $('<li></li>');
+            liitem.attr('id',newid)
+            var spanitem = $('<span></span>');
+            var labelitem = $('<label></label>');
+            labelitem.attr('tabindex',newid)
+            var iitemsq = $('<i class="fa fa-square"></i>');
+            spanitem.append(iitemsq);
+            labelitem.append(' '+this.newclassname);
+            liitem.append(spanitem);
+            liitem.append(labelitem);
+            console.log(liitem);
+            // 同级和下级要分别处理
+            if (this.addtype=='同级'){
+                // 把备用节点插入到当前节点后面
+                currentnode.after(liitem);
+                // 把路径的最后面一个替换成当前分类名
+                this.classpath = this.classpath.replace(this.classtext,this.newclassname);
+                // 把当前节点之后的节点的排名都加一，留出空位让新节点插入
+                this.tdata.forEach((tt)=>{
+                    if (tt[2]==this.fatherid && tt[5]>this.activerank){
+                        tt[5]=tt[5]+1;
+                    }
+                });
+                // 在数据中插入新节点
+                dlist = [newid,this.newclassname,this.fatherid,0,this.activedegree,this.activerank+1]
+                this.tdata.push(dlist);
+                this.backajax('additem',dlist);
+                // 把当前节点排名加一
+                this.activerank = this.activerank + 1;
+
+            } else if (this.addtype=='下级'){
+                // 直接在当前路径后面拼接新分类名
+                this.classpath = this.classpath + '-->' + this.newclassname;
+                // 如果当前节点没有孩子，要为当前节点添加父节点样式
+                if (this.activechildnum==0){
+                    // 先加ul标签
+                    $('#'+this.activeid).append('<ul></ul>');
+                    // 在ul标签中添加备用节点
+                    $('#'+this.activeid+' ul').append(liitem);
+                    // 把叶子图标更改为父节点展开的下箭头图标
+                    $('#'+this.activeid+' > span').find(' > i').addClass('fa-chevron-circle-down').removeClass('fa-square');
+                    // 添加父节点class和title
+                    $('#'+this.activeid).addClass('parent_li').find(' > span').attr('title', '展开');
+                    // 添加父节点点击事件
+                    $('#'+this.activeid+' > span').on('click', function (e) {
+                        var children = $(this).parent('li.parent_li').find(' > ul > li');
+                        if (children.is(":visible")) {
+                        children.hide('fast');
+                        $(this).attr('title', '展开').find(' > i').addClass('fa-chevron-circle-right').removeClass('fa-chevron-circle-down');
+                        } else {
+                        children.show('fast');
+                        $(this).attr('title', '折叠').find(' > i').addClass('fa-chevron-circle-down').removeClass('fa-chevron-circle-right');
+                        }
+                        e.stopPropagation();
+                    });
+                } else {
+                    // 如果当前节点有孩子，那么就展开孩子，把备用节点插入到最后
+                    $('#'+this.activeid).find(' > ul > li').show('fast');
+                    $('#'+this.activeid+' > ul').append(liitem);
+                }
+                // 把下级节点插入到数据中
+                dlist = [newid,this.newclassname,this.activeid,0,this.activedegree+1,this.activechildnum]
+                this.tdata.push(dlist);
+                this.backajax('additem',dlist);
+                // 当前节点的等级加1
+                this.activedegree = this.activedegree+1;
+                // 当前排名就是原来的当前节点的孩子数量
+                this.activerank = this.activechildnum;
+                // 原来的活动节点id变成现在的父节点id
+                this.fatherid = this.activeid;
+            }
+            // 原活动节点去除选中样式
+            $('#' + this.activeid + ' > label').removeClass('xuanzhong');
+            // 新增的节点添加选中样式
+            $('#' + newid + ' > label').addClass('xuanzhong');
+            // 新节点id成为活动节点id
+            this.activeid = newid;
+            // 新分类名成为当前分类名
+            this.classtext = this.newclassname;
+            this.newclassname = "";
+            // 新增的节点一定是没有孩子的，所以孩子数量归零
+            this.activechildnum = 0;
+            // 新增的节点添加点击事件
+            $('#' + newid + ' > label').on('click', function (e) {
+                if (treevue.activeid>0){
+                    // 把原来的选中的节点去除选中样式
+                    $('#' + treevue.activeid + ' > label').removeClass('xuanzhong');
+                }
+                // 点击的节点的id成为活动id
+                treevue.activeid = $(this).attr("tabindex");
+                // 点击的节点获得选中样式
+                $(this).addClass('xuanzhong');
+                
+                var pathtext = $(this).text();
+                var fathernode;
+                var currentdegree;
+                // 先解除下级添加的禁用
+                treevue.addjinyong=false;
+                treevue.tdata.forEach((tt)=>{
+                    if (tt[0]==treevue.activeid){
+                        // 更新当前节点的各项活动数据
+                        treevue.activedegree=tt[4];
+                        currentdegree=tt[4];
+                        treevue.activechildnum=tt[3];
+                        treevue.activerank=tt[5];
+                        treevue.activekeywords=tt[6];
+                        treevue.classtext = tt[1];
+                        treevue.fatherid = tt[2];
+                        fathernode=tt[2];
+                    }
+                });
+                // 向上找路径，直到顶级节点
+                if (currentdegree>0){
+                    treevue.tdata.forEach((tt)=>{
+                        if (tt[0]==fathernode){
+                            currentdegree=tt[4];
+                            fathernode=tt[2];
+                            pathtext = tt[1] + '-->' + pathtext;
+                        }
+                    });
+                }
+                if (currentdegree>0){
+                    treevue.tdata.forEach((tt)=>{
+                        if (tt[0]==fathernode){
+                            currentdegree=tt[4];
+                            fathernode=tt[2];
+                            pathtext = tt[1] + '-->' + pathtext;
+                        }
+                    });
+                }
+                $("#showres").html(treevue.activeid+pathtext);
+                $("#shownode").html(pathtext);
+                treevue.classpath = pathtext;
+            });
+            // 如果是第3级节点，就禁用增加下级节点
+            if (treevue.activedegree==3){
+                treevue.addjinyong=true;
+                treevue.addtype="同级";
+            }
+            $("#shownode").html('增加'+ this.classpath);
+        },
+        shan: function(){
+            // 在dom中移除这个节点
+            $('#' + this.activeid).remove();
+            this.tdata.forEach((tt)=>{
+                // 删除后调整比它靠后的节点的排名
+                if (tt[2]==this.fatherid && tt[5]>this.activerank){
+                    tt[5]=tt[5]-1;
+                }
+                // 同时将父节点的孩子个数减1
+                if (tt[0]==this.fatherid){
+                    tt[3]=tt[3]-1;
+                    // 如果这个节点没有兄弟，那么就将父节点变为叶子节点
+                    if (tt[3]==0){
+                        // 去除父节点样式
+                        $('#'+this.fatherid).removeClass('parent_li')
+                        // 图标变回叶子节点
+                        $('#'+this.fatherid+' > span').find(' > i').addClass('fa-square').removeClass('fa-chevron-circle-down');
+                        // 去除点击事件
+                        $('#'+this.fatherid+' > span').unbind();
+                    }
+                }
+            });
+            // 在数组中把这个节点删除
+            for(i=0;i<this.tdata.length;i++){
+                if (this.tdata[i][0]==this.activeid){
+                    var delist = this.tdata.splice(i,1);
+                    // 把要删除的节点数据切出来传回后台
+                    this.backajax('delete',delist[0]);
+                    break;
+                }
+            }
+            
+            // 将activeid归零，隐藏编辑按钮
+            this.activeid = 0;
+            $("#shownode").html('已删除'+ this.classpath);
+        },
+        gai: function(){
+            var oldname = $('#' + this.activeid + ' > label').html();
+            this.classpath = this.classpath.replace(oldname,this.classtext);
+            $('#' + this.activeid + ' > label').html(this.classtext);
+            if (this.activekeywords){
+                this.activekeywords = this.activekeywords.replaceAll(',','，');
+            }
+            
+            this.tdata.forEach((tt)=>{
+                if (tt[0]==this.activeid){
+                    tt[1]=this.classtext;
+                    tt[6]=this.activekeywords;
+                }
+            });
+            dlist = [this.activeid,this.classtext,this.activekeywords]
+            this.backajax('update',dlist);
+            $("#shownode").html('编辑'+ this.classpath);
+        },
+        nuo: function(){
+            // 把该节点和前面的节点交换位置
+            var prenode = $('#' + this.activeid).prev();
+            prenode.before($('#' + this.activeid));
+            this.tdata.forEach((tt)=>{
+                if (tt[2]==this.fatherid && tt[5]==this.activerank-1){
+                    // 把前一个节点的排名改成当前的排名
+                    tt[5]=this.activerank;
+                }
+                if (tt[0]==this.activeid){
+                    // 把现在节点的排名减1，数据传回后台
+                    tt[5]=this.activerank-1;
+                    this.backajax('upmove',tt);
+                }
+            });
+            
+            this.activerank = this.activerank-1;
+            $("#shownode").html('上挪'+ this.classpath);
+        },
+        backajax: function(action,dlist){
+            var fd = new FormData();
+            console.log(dlist);
+            fd.append("action",action);
+            fd.append("datalist",JSON.stringify(dlist));
+            $.ajax({ 
+                url:"{{ url_for('am.classtree') }}",
+                type:"POST",
+                processData: false,
+                contentType: false,
+                data:fd,
+                dataType: "json",
+                success: function(response) {
+                    console.log(response);
+                    // 如果是增加节点，需要用数据库id更新原来的虚拟id
+                    if (action=='additem'){
+                        // 更新数据数组中的当前节点id
+                        treevue.tdata.forEach((tt)=>{
+                            if (tt[0]==treevue.activeid){
+                                tt[0]=response;
+                            }
+                        });
+                        // 更新activeid
+                        treevue.activeid = response;
+                    }
+                    $("#showres").html("已更新数据");
+                }
+            })
+        }
+    }
+})
+
+const treevue = app.mount('#app')
+
+
+</script>
+{% endblock %}

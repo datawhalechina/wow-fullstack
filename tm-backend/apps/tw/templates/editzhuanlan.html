@@ -1,0 +1,333 @@
+{% extends 'tuwenwide.html' %}
+{% block header_part %}
+<title>编辑专栏</title>
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css">
+    .flip-list-move {
+        transition: transform 0.3s ease-in;
+    }
+    .kaoyou {
+        text-align: right;
+    }
+    .kaozuo {
+        text-align: left;
+    }
+    #options {
+        width:50%;
+        height: 700px;
+        float: left;
+        overflow-y: scroll;
+    }
+    #box {
+        width:50%;
+        height: 700px;
+        float: left;
+        /* text-align: center; */
+        overflow-y: scroll;
+
+    }
+    .items {
+        width: 95%;
+        margin: 10px auto;
+        padding:5px;
+        background-color: #DDD;
+        border-radius:5px;
+
+    }
+    #line{
+        width: 2px;
+        height: 400px; 
+        position: absolute; 
+        left: 50%;
+        z-index: 666;
+        cursor: w-resize;
+    }
+    #contes { /* 弹框的页面*/
+        width: 300px; /*宽度*/
+        background: #eee; /*背景色*/
+        z-index: 3; /*覆盖*/
+        border-radius:5px;
+        box-shadow: darkgrey 10px 10px 30px 10px;
+        position: absolute;
+        top: 100px;
+        left: 400px; /* 定位*/
+    }
+    #bar {
+        background: blue;
+        height:30px;
+        border-radius:5px 5px 0px 0px;
+    }
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+    
+<div class="row" id='app'>
+    
+    <div class="col-md-6" id="options">
+        <div style="width:100%;text-align: center;">
+            <div class="row" v-for="(item,index) in querylist" style="margin:0 auto;text-align: center;">
+                <select id="fclass" class="col-md-3 form-control" v-model="item[0]">
+                    <option value="author_name">作者</option>
+                    <option value="title">标题</option>
+                    <option value="fulltext">全文</option>
+                    <option value="title/fulltext">标题/全文</option>
+                </select>
+                <span>&nbsp;&nbsp;</span>
+                <input v-model="item[1]" class="col-md-5 form-control" @input="changewords()" placeholder="可以用and和or，不要用括号" type="text">
+                <span v-if="index<querylist.length-1">&nbsp;&nbsp;<label class="btn btn-default">AND</label></span>
+                <span v-if="index>0">&nbsp;&nbsp;<button class="btn btn-default" @click="deletewords(index)">删除</button></span>
+            </div>
+            <hr>
+            <button class="btn btn-primary" style="margin-top:10px;" @click="addwords()">+增加字段</button>
+            <span>&nbsp;&nbsp;</span>
+            <button class="btn btn-primary" style="margin-top:10px;" @click="query()" :disabled="disabled">开始检索</button>
+            <br/><br/>
+        </div>
+        
+
+        <div class="items" draggable="true" v-for="(item,index) in optionsArr" :key="index" @dragstart="dragStart1($event,item)">
+            <h5>{[item.title]}</h5>
+            <span>{[item.author_name]}</span><br/>
+        </div>
+    </div>
+
+    <div class="col-md-6" id="box">
+        <div style="display:inline-block;margin:0 auto; width:100%;text-align: center;">
+            <input id="zhuanlan_title" class="form-control col-md-4 offset-md-4" placeholder="专栏名称" value="{{zhuanlanname}}" type="text"><br/>
+            <label>文章数量：{[subjectArr|Amount]}</label>
+        </div>
+        <div class="items" style="text-align: center;" draggable="true" @dragover.prevent @dragstart="dragStart2($event,index)" @dragenter="dragenter($event)" @dragleave="dragleave($event)" @drop="add($event,index,item)" v-for="(item,index) in tempArr" :key="item.biwenid" v-if="kong">
+            将文章拖拽到此处
+        </div>
+        <transition-group name="flip-list">
+            <div class="items row" style="padding-left:0px;padding-right:0px;" draggable="true" @dragover.prevent @dragstart="dragStart2($event,index)" @dragenter="dragenter($event)" @dragleave="dragleave($event)" @drop="add($event,index,item)" v-for="(item,index) in subjectArr" :key="item.biwenid">
+                <div class="col-md-6" style="margin-left:0px;margin-right:0px;padding-left:5px;padding-right:5px;">
+                组别：
+                <input style="height: 20px;width:60%;font-size: 14px;padding:0px 2px;" type="text" v-model="item.zhuanlan_part"></input>
+                </div>
+                <div class="col-md-6" style="margin-left:0px;margin-right:0px;padding-left:5px;padding-right:5px;">
+                <a :href="'/tw/editarticle/'+item.biwenid" target="_blank"><i class="fa fa-pencil" style="font-size:20px;line-height: 30px;"></i></a>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <i class="fa fa-trash-o" @click="deletebiwen($event,index)" style="font-size:20px;line-height: 30px;"></i>
+                </div>
+                <div class="col-md-12" style="margin-left:0px;margin-right:0px;padding-left:5px;padding-right:5px;">
+                    <span>第{[index+1]}篇：   {[item.title]}</span>
+                </div>
+            </div>
+        </transition-group>
+
+        <div style="width:100%;text-align: center;">
+            <button class="btn btn-primary" onclick="savezhuanlan()">保存专栏</button>
+        </div>
+    </div>
+
+
+
+
+</div>
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+    var authoid = {{current_user.id}};
+    var zhuanlandata = {{zdata|tojson}};
+    editvue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: '#app',
+        data: {
+            querylist:[['','']],
+            disabled:true,
+            kong:true,
+            itemlist:[['']],
+            //optionsArr: ['机械', '电学', '化学', '生物'],
+            tempArr:[{'quesid':1000, 'ques_part':'', 'isshow':false, 'ques_title':'','item_a':'','item_b':'','item_c':'','item_d':''}],
+            // {'quesid':33, 'ques_group':'处理任务', 'isshow':false, 'ques_title':'哪些方式可以打开任务？','item_a':'双击任务','item_b':'右键选择处理任务','item_c':'点击上方工具栏中的处理任务按钮','item_d':'点击上方工具栏中的打开案件','answer':'abc'}
+
+            optionsArr: [],
+            subjectArr: zhuanlandata,
+            deleteditem:[],
+            addeditem:[]
+        },
+        filters:{
+                    Amount:function(subjectArr){
+                        return subjectArr.length;
+                    },
+                    
+                },
+        methods: {
+            created (){
+                if(subjectArr.length > 0){
+                    kong=false;
+                }
+            },
+            
+            addwords (){
+                this.querylist.push(['','']);
+                this.disabled = true;
+            },
+            query (){
+                console.log(this.querylist);
+                let queryli = this.querylist;
+                $.ajax({
+                    url:"{{ url_for('tw.searchbiwen') }}",
+                    type:"POST",
+                    data:{
+                        querywords:JSON.stringify(queryli)
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        //$("#showgym").html(response);
+                        editvue.$data.optionsArr=response;
+
+                    }
+                })
+            },
+            deletewords (i){
+                this.querylist.splice(i,1);
+                this.disabled = false;
+                this.querylist.forEach(el => {
+                    str1 = el[0];
+                    str2 = el[1].replace(/\s*/g,"");
+                    if(str1.length==0 | str2.length==0){
+                        this.disabled = true;
+                    }
+                });
+            },
+            changewords (){
+                this.disabled = false;
+                this.querylist.forEach(el => {
+                    str1 = el[0];
+                    str2 = el[1].replace(/\s*/g,"");
+                    if(str1.length==0 | str2.length==0){
+                        this.disabled = true;
+                    }
+                });
+            },
+            dragStart1 (e,item) {
+                e.dataTransfer.setData('text', JSON.stringify(item))
+                
+            },
+            dragStart2 (e,index) {
+                e.dataTransfer.setData('text', index)
+                
+            },
+            dragenter(e) {
+                let tar = e.target;
+                tar.style.backgroundColor = "silver";
+            },
+            dragleave (e) {
+                let tar = e.target;
+                tar.style.backgroundColor = "";
+            },
+            deletebiwen (e,index) {
+                //获取被删的元素
+                var tmpitem = this.subjectArr.splice(index, 1);
+                var realdelete = true;
+                if(this.addeditem.length>0){
+                    this.addeditem.forEach((deletecheck)=>{
+                        //如果被删的元素在新增列表中有了，就是假删除
+                        if(deletecheck.biwenid == tmpitem[0].biwenid){
+                            realdelete = false;
+                            this.addeditem.remove(deletecheck);
+                        }
+                    })
+                }
+                if(realdelete){
+                    //如果是真删除，就把id增加到删除列表中
+                    this.deleteditem.push(tmpitem[0].biwenid);
+                }
+            },
+            add (e,index,item) {
+                let getitem = e.dataTransfer.getData('text')
+                let tar = e.target;
+                tar.style.backgroundColor = "";
+                if(/^\d+$/.test(getitem)){
+                    //console.log("是数字"+getitem);
+                    let arr = this.subjectArr.concat([]);
+                    temp = arr.splice(getitem, 1);
+                    arr.splice(index, 0, temp[0]);
+                    this.subjectArr = arr;
+                }
+                else{
+                    let getjson = JSON.parse(getitem);
+                    
+                    var flag = true;
+                    this.subjectArr.forEach((dragcheck)=>{
+                        console.log(dragcheck.biwenid);
+                        console.log(getjson.biwenid);
+                        if(dragcheck.biwenid==getjson.biwenid){
+                            flag = false;
+                            alert("题目已存在，不可重复添加！");
+                        }
+                    })
+                    if(flag){
+                        let arr = this.subjectArr.concat([]);
+                        let convobj = {
+                            'biwenid':getjson.biwenid,
+                            'show_title':"",
+                            'zhuanlan_part':item.zhuanlan_part?item.zhuanlan_part:"",
+                            'title':getjson.title,
+                            'author_id':getjson.author_id,
+                            'author_name':getjson.author_name
+                        }
+                        arr.splice(index+1, 0, convobj);
+                        this.subjectArr = arr;
+                        this.addeditem.push(convobj);
+                    }
+                    
+                }
+                
+                console.log(this.subjectArr);
+            },
+        }
+    })
+
+    document.body.ondrop = function(event) {
+    event.preventDefault();
+    event.stopPropagation();
+    };
+
+    
+    function savezhuanlan() {
+        var zhuanlan_title = $("#zhuanlan_title").val();
+        if (zhuanlan_title.length<2){
+            alert("专栏名称须不少于两个字");
+            return;
+        }
+        var reg = new RegExp("[0-9]+$");
+        var txt = window.location.href.match(reg);
+        console.log(editvue.$data.deleteditem);
+        console.log(editvue.$data.addeditem);
+        console.log(txt[0]);
+        console.log(editvue.$data.subjectArr);
+        console.log(zhuanlan_title);
+        $.ajax({
+            url:"{{ url_for('tw.savezhuanlan') }}",
+            type:"POST",
+            data:{
+                zhuanlan_title:zhuanlan_title,
+                zhuanlan_id:txt[0],
+                biwen_amount:editvue.$data.subjectArr.length,
+                author_id:authoid,
+                deleted_data:JSON.stringify(editvue.$data.deleteditem),
+                zhuanlan_data:JSON.stringify(editvue.$data.subjectArr),
+            },
+            dataType: "json",
+            success: function(response) {
+                console.log(response.result);
+                editvue.$data.deleteditem=[];
+                editvue.$data.addeditem=[];
+                window.location.href = "{{ url_for('tw.showzhuanlan') }}";
+
+            }
+        })
+    }
+
+
+</script>
+{% endblock %}

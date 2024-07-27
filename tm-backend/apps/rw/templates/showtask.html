@@ -1,0 +1,86 @@
+{% extends 'taskbase.html' %}
+{% block header_part %}
+<script src="/v1/auth/mystatic/js/vue.js"></script>
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    .kaoyou {
+        text-align: right;
+    }
+    .kaozuo {
+        text-align: left;
+    }
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+    <div class="row">
+    <div style="display:inline-block;margin:0 auto;"><h2>全部任务</h2></div>
+    <div style="margin:0 auto; height:20px;" class="col-md-12"></div>
+    
+    </div>
+    {% if current_user.role=='admin' %}
+    <a href="/v1/rw/newtask/" target="_blank"><button class="btn btn-primary">新建任务</button></a><br/><br/>
+    {% endif %}
+    <div id="app">
+    <div v-for="item in tasklist">
+    <h4 style="margin-bottom: 10px;">{[item.task_title]}</h4>
+
+    <span>执行人: {[item.task_taker]}</span>
+    &nbsp;&nbsp;&nbsp;
+    <span>任务阶段: {[item.task_phase]}</span>
+    <br/>
+    <a :href="'/v1/rw/viewtask/'+item.taskid" target="_blank">查看任务</a> 
+    <a :href="'/v1/rw/edittask/'+item.taskid" target="_blank">编辑任务</a>
+    <button :id="item.taskid" @click="deletepro(item.taskid)">删除任务</button><br/><br/>
+        
+    <br/><br/>
+    </div>
+    </div>
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+    taskvue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: '#app',
+        data: {
+            tasklist:[]
+        },
+        mounted: function(){
+            this.tasklist = {{tdata|tojson}};
+            console.log(this.tasklist);
+        },
+        methods: {
+            deletepro(objid){
+                $.ajax({
+                    url:"{{ url_for('rw.deleteta') }}",
+                    type:"POST",
+                    data:{
+                        ta_id:objid
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        window.location.href = "{{ url_for('rw.showtask') }}";
+
+                    }
+                })
+            },
+            
+            
+        }
+    })
+    
+    
+
+
+   
+
+
+    
+</script>
+{% endblock %}

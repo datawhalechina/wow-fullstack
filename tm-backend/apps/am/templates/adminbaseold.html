@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+	<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+	<script src="/task/mystatic/js/vue.global.js"></script>
+	<script src="/task/mystatic/js/jquery-3.4.1.min.js"></script>
+    <link rel="stylesheet" href="/task/mystatic/css/bootstrap.min.css">
+	<link href="/task/mystatic/css/moni.css" rel = "stylesheet"/>
+    {% block header_part %}
+    {% endblock %}
+    <title>控制台</title>
+</head>
+<body>
+
+{% block style_part %}
+{% endblock %}
+
+
+
+
+	
+	<aside id="fh5co-aside" role="complementary" class="border js-fullheight">
+	
+		<h1 id="fh5co-logo"><a href="{{ url_for('start') }}">弼兴科技</a></h1>
+		<nav id="fh5co-main-menu" role="navigation">
+			<ul>
+				<li><a href="/verwaltung/">控制台</a></li>
+				<li><a href="/verwaltung/chongzai/">重载模块</a></li>
+				<li><a href="/verwaltung/researcherview/">研究者</a></li>
+				<li><a href="{{ url_for('guanguan.reviews') }}">审核中心</a></li>
+			</ul>
+		</nav>
+	
+		<div class="fh5co-footer">
+			<p>弼兴 &copy; 2022</p>
+			
+		</div>
+	
+	</aside>
+	
+	<div id="fh5co-main">
+		<aside id="fh5co-hero" class="js-fullheight">
+			<div class="flexslider js-fullheight">
+				
+		  	</div>
+		</aside>
+		<div class="fh5co-narrow-content">
+		<div class="row" style="right: 0px;top: 0px;position:absolute;">
+			<div class="span8">
+			<ul class="nav nav-pills">
+				{% if current_user.role=='admin' %}
+				<li class="m-3"><a href="{{ url_for('researcher.research_index') }}">Researcher</a></li>
+				<li class="m-3"><a href="{{ url_for('developer.develop_index') }}">Developer</a></li>
+				{% endif %}
+
+				{% if current_user.role=='researcher' %}
+				<li class="m-3"><a href="{{ url_for('researcher.research_index') }}">Researcher</a></li>
+				{% endif %}
+
+				{% if current_user.role=='developer' %}
+				<li class="m-3"><a href="{{ url_for('developer.develop_index') }}">Developer</a></li>
+				{% endif %}
+
+				{% if current_user.is_authenticated %}
+				<li class="m-3">欢迎你，<a href="{{ url_for('user.usercenter') }}">{{current_user.name}}</a></li>
+				<li class="m-3"><a href="{{ url_for('auth.logout') }}">登出</a></li>
+				{% else %}
+				<li class="m-3"><a href="{{ url_for('auth.login') }}">登录</a></li>
+				{% endif %}
+			</ul>
+			</div>
+		</div>
+
+
+        {% block body_part %}
+
+        {% endblock %}
+		</div>
+
+
+{% block script_part %}
+{% endblock %}
+
+
+
+</body>
+</html>

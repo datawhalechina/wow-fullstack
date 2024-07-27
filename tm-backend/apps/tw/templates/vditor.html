@@ -1,0 +1,434 @@
+{% extends 'biwennewbase.html' %}
+{% block header_part %}
+<meta charset="UTF-8">
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+<title>{{vdata['title']}}</title>
+<link rel="stylesheet" href="https://unpkg.com/vditor@3.9.4/dist//index.css" />
+<script src="https://unpkg.com/vditor@3.9.4/dist/index.min.js"></script>
+
+{% endblock %}
+
+{% block style_part %} 
+		<style>
+
+		.vditor{
+		   margin: 0 auto;
+           border:0px;
+           margin-bottom:100px;
+		}
+		.titleline{
+		   width: 800px;
+		   margin: 0 auto;
+		}
+        .toolline{
+		   margin: 0 auto;
+           padding-top:20px;
+		}
+        /*鼠标右键菜单*/
+
+        #right_menu {
+            width: 160px;
+            position: absolute;
+            display: none;
+            list-style: none;
+            border: 1px solid #b3b3b3;
+            font-size: 16px;
+            background-color: #ebebeb;
+            -webkit-box-shadow: 4px 4px 4px rgba(6, 0, 1, 0.1);
+            box-shadow: 4px 4px 4px rgba(6, 0, 1, 0.1);
+            z-index: 999;
+        }
+
+        #right_menu li {
+            cursor: pointer;
+            border: 1px solid transparent;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+
+        #right_menu li:hover {
+            border-color: #0279f6;
+        }
+
+        #right_menu em,
+        #right_menu span {
+            display: inline-block;
+            float: left;
+            height: 28px;
+            line-height: 28px;
+        }
+
+        #right_menu em {
+            width: 35px;
+            color: #0278F4;
+            border-right: 1px solid #d9d9d9;
+            text-align: center;
+        }
+
+        #right_menu span {
+            width: 110px;
+            padding-left: 10px;
+            border-left: 1px solid #fff;
+        }
+		</style>
+{% endblock %}
+
+{% block body_part %}
+        <br/>
+		<div class="row">
+        <div class="col-md-8 offset-md-1" style="margin-top:10px;">
+            <input id="title" class="form-control" value="{{vdata['title']}}" type="text"></input>
+        </div>
+        <div class="col-md-2 text-center" style="margin-top:10px;">
+            <button id="savebtn"  class="btn btn-primary" onclick="shuchu()">保存</button>
+        </div>
+		
+		</div>
+        <!--右键菜单-->
+        <ul id="right_menu">
+            <li onclick="accept();"><span>接受</span></li>
+            <li onclick="reject();"><span>拒绝</span></li>
+        </ul>
+        {% if current_user.id!=vdata["author_id"] %}
+        <div>
+            <div class="row">
+            <div class="col-md-8 offset-md-1" style="margin-top:10px;">
+                <input id="addtext" class="form-control" type="text"></input>
+            </div>
+            <div class="col-md-2 text-center" style="margin-top:10px;">
+                <button id="addbtn" class="btn btn-primary" onclick="charu()">插入</button>
+                &nbsp;&nbsp;&nbsp;&nbsp;
+                <button id="delbtn" class="btn btn-primary" onclick="shanchu()">删除</button>
+            </div>
+            </div>
+            <div class="row">
+                <div class="col-md-10 offset-md-1">要添加内容，把鼠标点在插入处，在文本框中输入内容，点击插入。</div>
+                <div class="col-md-10 offset-md-1">要删除内容，用鼠标选中想要删除的内容，点击加删除线。</div>
+                <div class="col-md-10 offset-md-1">要换行，键盘输入回车。按Ctrl+V撤销，按Ctrl+Y重做。</div>
+            </div>
+            
+        </div>
+        {% else %}
+        <div class="row" style="margin-top:10px">
+            <div class="col-md-2"></div>
+            <label class="col-md-4 form-check-label kaozuo">
+                <input type="checkbox" id="private" style="margin-right: 10px;" onclick="this.value=(this.value==0)?1:0" value="{{vdata['private']}}"></input>仅自己可见
+            </label>
+        </div>
+        {% endif %}
+        <br/>
+        <div class="row">
+        <div id="vditor" onchange="unsaved()" class="vditor col-md-10 offset-md-1"></div>
+        </div>
+{% endblock %}
+
+{% block script_part %}
+<script>
+    let that = this;
+    console.log('开始渲染');
+    var vd = {{vdata|tojson}};
+    var usrid = {{current_user.id|tojson}};
+    var usrname = {{current_user.name|tojson}};
+    var ar = vd.fulltext;
+    if (document.getElementById('private')){
+        document.getElementById('private').checked = vd["private"]=="1"?true:false;
+    }
+    
+    var amendflag = 0;
+    var op = "";
+    var cont = "";
+    var coedit = true;
+    var toollist = [];
+    if (vd.author_id == usrid){
+        coedit = false;
+        toollist = ['headings', 'bold', 'italic', 'quote', 'strike', 'link','|', 'list', 'ordered-list', 'check', 'line', 'indent', '|', 'code', 'inline-code', 'table', 'insert-after', 'insert-before', '|', 'undo', 'redo', 'edit-mode', 'upload', 'export'];
+    } else {
+        toollist = [];
+    }
+    var keycode = 0;
+    document.onkeydown=function(event){
+        var e = event || window.event || arguments.callee.caller.arguments[0];
+        if(e && e.keyCode==13){ // enter 键
+            keycode = 13;
+        } else if (e.ctrlKey && e.keyCode==89) {
+            keycode = 1089;
+        } else if (e.ctrlKey && e.keyCode==90) {
+            keycode = 1090;
+        } else {
+            keycode = e.keyCode; 
+        }
+    };
+
+
+    var originpic = [];
+    var deletedpics = [];
+    //var reg = new RegExp("[0-9]+\.jpg");
+    var picreg = /[0-9]{14}\.[a-z]+/g;
+    var searchout = ar.match(picreg);
+    if (searchout!=null){
+        originpic=searchout;
+    }
+    console.log(originpic);
+    const imageUrl = "{{ url_for('tw.upload') }}";
+    const vditor = new Vditor('vditor', {
+        "height": 640,
+        "width":800,
+        "theme": "light", //主题
+        "placeholder": "我们的编辑器",
+        outline: { //大纲
+            enable: false
+        },
+        toolbarConfig: {
+            hide: false,
+        },
+        toolbar: toollist,
+        "preview": {
+
+            "theme": {
+                "current": "light"
+            },
+            "hljs": {
+				enable: true,
+                lineNumber: true
+            },
+
+        },
+        counter: {
+            enable: true,
+            type: 'text',
+        },
+        resize: {
+            enable: true
+        },
+        after() {
+            vditor.setValue(ar);
+        },
+        input() {
+            $("#savebtn").html("保存");
+            if (amendflag==0 && coedit==true){
+                if (![13,1089,1090].includes(keycode)){
+                    vditor.setValue(ar);
+                }
+                
+            }
+        },
+        //上传图片
+        upload: {
+        	//允许的图片后缀
+            //尝试pdf
+            accept: 'image/*,.wav,.jpg,.png,.gif,.jpeg,.svg,.pdf,.PDF,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.rar,.zip,.txt,.TXT',
+			
+            max: 10 * 1024 * 1024,
+
+            multiple: false,
+			// 上传图片要用的url
+            url: imageUrl,
+
+            filename(name) {
+                return name.replace(/[^(a-zA-Z0-9\u4e00-\u9fa5\.)]/g, '').replace(
+                    /[\?\\/:|<>\*\[\]\(\)\$%\{\}@~]/g, '').replace('/\\s/g', '')
+            },
+			
+			//上传成功时执行
+            success(editor, msg) {
+                let responseData = JSON.parse(msg)
+                console.log(responseData)
+                let imageUrl = responseData.url;
+                let succFileText = "";
+                if (vditor && vditor.vditor.currentMode === "wysiwyg") {
+                    succFileText += `\n <img alt=${imageUrl} src="${imageUrl}">`;
+                } else {
+                    if (responseData.ex==".pdf" || responseData.ex==".PDF") {
+                        let title = 'PDF_'+responseData.oriname + responseData.ex;
+                        succFileText += `\n [${title}](${imageUrl})`;
+                    } else if ([".doc",".docx",".xls",".xlsx",".ppt",".pptx",".rar",".zip",".txt",".TXT"].includes(responseData.ex)) {
+                        let title = 'FILE_'+responseData.oriname + responseData.ex;
+                        succFileText += `\n [${title}](${imageUrl})`;
+                    } else {
+                        succFileText += `\n![${imageUrl}](${imageUrl})`;
+                    }
+                }
+                //将图片路径写入文本
+                originpic.push(responseData.url.replace('/image/',''));
+                document.execCommand("insertHTML", false, succFileText);
+                shuchu();
+                //alert('成功');
+            },
+            error() {
+                alert('失败');
+            }
+
+        },
+
+    });
+    // 
+    function shanchu(){
+        amendflag = 1;
+        var sel = vditor.getSelection();
+        vditor.updateValue('$\\color{red}\\sout{\\text{'+sel+'（'+usrname+'）'+'}}$');
+        ar = vditor.getValue();
+        amendflag = 0;
+    }
+    function charu(){
+        amendflag = 1;
+        var addd = document.getElementById('addtext').value;
+        if (addd.length>0){
+            vditor.insertValue('$\\color{blue}\\underline{\\text{'+addd+'（'+usrname+'）'+'}}$');
+        }
+        ar = vditor.getValue();
+        document.getElementById('addtext').value = "";
+        amendflag = 0;
+    }
+    // console.log(ar);
+    // vditor.setValue(ar);
+
+    rightMenuFn(); //鼠标右键事件
+    function rightMenuFn() {
+        // 右键鼠标
+        var rightMenu = document.getElementById('right_menu');
+        var rightScope = document.getElementById('vditor');
+        //var rightScope = document.getElementsByTagName('html')[0];
+
+        rightScope.oncontextmenu = function(e) {
+            var e = event || window.event;
+            console.log("右键点击了");
+            var position = window.getSelection().getRangeAt(0);
+            console.log(position.endOffset);
+            console.log(position.startContainer.parentNode.className);
+            console.log(position.startContainer.parentNode.innerText);
+            console.log(position.startContainer.parentNode.style.color);
+            var tmpop = position.startContainer.parentNode.style.color;
+            cont = position.startContainer.parentNode.innerText;
+            if (['blue','red'].includes(tmpop) && !coedit){
+                op = tmpop;
+                rightMenu.style.position = 'fixed';
+                rightMenu.style.display = "block";
+                rightMenu.style.left = e.clientX + 'px';
+                rightMenu.style.top = e.clientY + 'px';
+                return false; //取消右键点击的默认事件
+            }
+            // var vv = vditor.getValue();
+            // console.log(vv);
+            
+        }
+
+        document.onclick = function() {
+            rightMenu.style.display = "none";
+        }
+    }
+
+    function accept() {
+        amendflag = 1;
+        var alltext = vditor.getValue();
+        if(op=="blue"){
+            var starttext = '$\\color{blue}\\underline{\\text{'+cont+'}}$';
+            var outStr = cont.replace(/（.*?）/g, '');
+            var newtext = alltext.replace(starttext,outStr); 
+        } else if (op=="red"){
+            var starttext = '$\\color{red}\\sout{\\text{'+cont+'}}$';
+            var newtext = alltext.replace(starttext,'');
+        }
+        vditor.setValue(newtext);
+        ar = newtext;
+        amendflag = 0;
+    }
+
+    function reject() {
+        amendflag = 1;
+        var alltext = vditor.getValue();
+        if(op=="blue"){
+            var starttext = '$\\color{blue}\\underline{\\text{'+cont+'}}$';
+            var newtext = alltext.replace(starttext,'');
+        } else if (op=="red"){
+            var starttext = '$\\color{red}\\sout{\\text{'+cont+'}}$';
+            var outStr = cont.replace(/（.*?）/g, '');
+            var newtext = alltext.replace(starttext,outStr); 
+        }
+        vditor.setValue(newtext);
+        ar = newtext;
+        amendflag = 0;
+    }
+
+    var reg = new RegExp("[0-9]+$");
+    var txt = window.location.href.match(reg);
+
+    function shuchu(){
+        var shuchuzhi = vditor.getValue();
+        var editreg = new RegExp("\\\\color");
+        var isedit = 0;
+        var searchedit = shuchuzhi.match(editreg);
+        if (searchedit){
+            isedit = 1;
+            console.log('有修订标记');
+        }
+        
+        var currentpic = [];
+        var searchoutc = shuchuzhi.match(picreg);
+        console.log('当前找到');
+        console.log(searchoutc);
+        if (searchoutc!=null){
+            currentpic=searchoutc;
+        }
+        console.log('初始图片');
+        console.log(originpic);
+        console.log('当前图片');
+        console.log(currentpic);
+        for (i=0;i<originpic.length;i++){
+            if (!currentpic.includes(originpic[i])){
+                if(!deletedpics.includes(originpic[i])){
+                    deletedpics.push(originpic[i]);
+                }
+                
+            }
+        }
+        console.log('删除图片');
+        console.log(deletedpics);
+        var titlev = document.getElementById('title').value;
+        var private = document.getElementById('private').value;
+        console.log('当前隐私');
+        console.log(private);
+        if (titlev.length==0){
+            return false;
+        }
+        // console.log(txt);
+        $.ajax({
+            url:"{{ url_for('tw.save') }}",
+            type:"POST",
+            data:{
+                articleid:txt[0],
+                title:titlev,
+                private:private,
+                edited:isedit,
+                article:shuchuzhi,
+                deleted:JSON.stringify(deletedpics)
+            },
+            dataType: "json",
+            success: function(data) {
+                $("#savebtn").html("已保存");
+				var retid = data.result;
+				if (retid>0){
+					window.location.href = "/v1/tw/editarticle/"+retid;
+				}
+            }
+        })
+    }
+	
+	setInterval(function () { //每5秒刷新一次图表
+         //需要执行的代码写在这里
+		 var buttonValue= document.getElementById('savebtn').innerHTML;
+         var titlesave = document.getElementById('title').value;
+		 if (buttonValue=="保存" && titlesave.length>1){
+			shuchu();
+		 }
+
+    }, 15000);
+
+
+    window.onbeforeunload = function(){
+        if (txt[0]>0){
+            shuchu(); 
+        }
+    };
+
+</script>
+{% endblock %}

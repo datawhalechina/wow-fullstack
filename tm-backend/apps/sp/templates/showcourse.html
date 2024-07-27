@@ -1,0 +1,61 @@
+{% extends 'videobase.html' %}
+{% block header_part %}
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    img[src=""],img:not([src]){
+         opacity:0;
+    }
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+    <div class="row">
+    <div style="display:inline-block;margin:0 auto;"><h2>全部合集</h2></div>
+    <div style="margin:0 auto; height:20px;" class="col-md-12"></div>
+    
+    </div>
+    {% if current_user.role=='admin' or current_user.role=='researcher' %}
+    <a href="{{ url_for('sp.editcourse',courseid= 0) }}" target="_blank"><button class="btn btn-primary">新建合集</button></a><br/><br/>
+    {% endif %}
+
+    {% for dd in cdata %}
+    
+    <h4 style="margin-bottom: 10px;">{{dd.course_title}}</h4>
+
+    <span class="{{dd.courseid}}">作者: {{dd.course_author}}</span>
+    <br/>
+    <a href="{{ url_for('sp.beginlearn',courseid= dd.courseid) }}" target="_blank">开始学习</a>
+        {% if current_user.role=='admin' or current_user.role=='researcher' %}
+        <a href="{{ url_for('sp.editcourse',courseid= dd.courseid) }}" target="_blank">编辑课程</a>
+        <button class="{{dd.courseid}}" onclick="deletecourse(this)">删除课程</button><br/><br/>
+        {% endif %}
+    <br/><br/>
+    {% endfor %}
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+    
+function deletecourse(obj){
+    var courseid = obj.className;
+    $.ajax({
+        url:"{{ url_for('sp.deletecourse') }}",
+        type:"POST",
+        data:{
+            course_id:courseid
+        },
+        dataType: "json",
+        success: function(response) {
+            window.location.href = "{{ url_for('sp.showcourse') }}";
+
+        }
+    })
+}   
+    
+</script>
+{% endblock %}

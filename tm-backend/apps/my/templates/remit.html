@@ -1,0 +1,215 @@
+{% extends 'userbase.html' %}
+{% block header_part %}
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    img[src=""],img:not([src]){
+         opacity:0;
+    }
+    .select-content {
+        width: 200px;
+        position: relative;
+    }
+    .select-content .select-input {
+        width: 100%;
+    }
+    .select-content .sanjiao {
+        position: absolute;
+        left: 190px;
+        top: -2px;
+        cursor: pointer;
+    }
+    .select-content .sanjiao .dot-bottom {
+        font-size: 0;
+        line-height: 0;
+        border-width: 5px;
+        border-color: #6a6a6a;
+        border-bottom-width: 0;
+        border-style: dashed;
+        border-top-style: solid;
+        border-left-color: transparent;
+        border-right-color: transparent;
+    }
+    .search-select {
+        display: none;
+        position: absolute;
+        left: 0;
+        top: 40px;
+        z-index: 999;
+        min-width: 200px;
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #799bd2;
+        background-color: #f0f0f0;
+    }
+    .select-content .search-select .select-ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    .select-content .search-select .select-ul .li-select {
+        color: #555;
+        padding: 2px 10px;
+        cursor: pointer;
+    }
+    .select-content .search-select .select-ul .li-hover {
+        color: #fff;
+        background-color: #1e90ff;
+    }
+    
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+	<div id="app">
+		<div style="margin:0 auto; height:50px;" class="col-md-12"></div>
+    <div class="row" style="margin-top:10px">
+      <div class="col-md-2 kaoyou">收款人：</div>
+      <div class="select-content">
+          <input type="text" name="select_input" id="select_input" class="select_input  form-control" value="" autocomplete="new-password" placeholder="人员姓名"  v-bind:disabled=jinyong></input>
+          <div id="search_select" class="search-select">
+              <ul id="select_ul" class="select-ul">
+                  
+              </ul>
+          </div>
+      </div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <div class="col-md-2 kaoyou">金额：</div>
+      <input class="col-md-8 form-control" type="number" v-model="amount" placeholder="请填写整数数字" v-bind:disabled=jinyong></input>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+      <div class="col-md-2 kaoyou">备注：</div>
+      <input id="input" class="col-md-8 form-control" v-model="notice" v-bind:disabled=jinyong></input>
+    </div>
+
+    <div style="height:50px;" class="col-md-12"></div>
+    <input class="btn btn-primary" @click="tijiao()" type="submit" value="提交转账"></input>
+
+    <div class="row" style="margin-top:10px">
+        <span id="showres" style="display:inline-block;margin:0 auto;"></span>
+    </div>
+  </div>
+		
+	
+	
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+usrid = {{current_user.id|tojson}};
+usrname = {{current_user.name|tojson}};
+usrrole = {{current_user.role|tojson}};
+const app = Vue.createApp({
+  data() {
+    return {
+      reveiver_name:'',
+      reveiver_id:0,
+      notice:"",
+      jinyong:false,
+      amount:0,
+    }
+  },
+  delimiters: ['{[', ']}'],
+  mounted: function(){
+    
+  },
+  methods: {
+    tijiao(){
+      var fd = new FormData();
+      fd.append("reveiver_id",this.reveiver_id);
+      fd.append("reveiver_name",this.reveiver_name);
+      fd.append("amount",this.amount);
+      fd.append("notice",this.notice);
+      $.ajax({ 
+          url:"{{ url_for('my.trasact') }}",
+          type:"POST",
+          processData: false,
+          contentType: false,
+          data:fd,
+          dataType: "json",
+          success: function(response) {
+              remitvue.jinyong = true;
+              $("#showres").html("转账成功！");
+              //taskvue.$data.optionsArr=response.result;
+
+          }
+      })
+    }
+  }
+})
+
+const remitvue = app.mount('#app')
+
+var tempArr = {{usrsl|tojson}}
+searchInput(tempArr);
+
+function newOptions(tempArr){
+    var listArr = [];
+    for(var i=0;i<tempArr.length;i++){
+        if(tempArr[i].Username.indexOf($('#select_input').val()) > -1){
+            listArr.push(tempArr[i]);
+        }
+    }
+    var options = '';
+    for(var i = 0; i < listArr.length; i++) {
+        opt = '<li class="li-select" data-newUserid="' + listArr[i].Userid + '">' + listArr[i].Username + '</li>';
+        options += opt;
+    }
+    if(options == ''){
+        $('#search_select').hide();
+    }else{
+        $('#search_select').show();
+        $('#select_ul').html('').append(options);
+    }
+}
+function searchInput(tempArr){
+    $('select-content').on('click',function(){
+        $('#select_input').focus();
+    });
+    $('#select_input').on('keyup',function(){
+        newOptions(tempArr);
+    });
+    $('#select_input').on('focus',function(){
+        $('#search_select').show();
+        newOptions(tempArr);
+    });
+    $('#select_ul .li-disabled').on('click',function(){
+        $('#search_select').show();
+    });
+    $('#search_select').on('mouseover',function(){
+        $(this).addClass('ul-hover');
+    });
+    $('#search_select').on('mouseout',function(){
+        $(this).removeClass('ul-hover');
+    });
+    $('#select_input').on('blur',function(){
+        if($('#search_select').hasClass('ul-hover')){
+            $('#search_select').show();
+        }else{
+            $('#search_select').hide();
+        }
+    });
+    $('#select_ul').delegate('.li-select', 'click',function(){
+        $('#select_ul .li-select').removeClass('li-hover');
+        var selectText = $(this).html();
+        var newUseridVal = $($(this)[0]).attr("data-newUserid");
+        remitvue.reveiver_id=newUseridVal;
+        remitvue.reveiver_name=selectText;
+        $('#select_input').val(selectText);
+        $('#search_select').hide();
+        $("input[name='newUserid']").val(newUseridVal);
+    });
+    $('#select_ul').delegate('.li-select', 'mouseover',function(){
+        $('#select_ul .li-select').removeClass('li-hover');
+        $(this).addClass('li-hover');
+    });
+}
+    
+</script>
+{% endblock %}

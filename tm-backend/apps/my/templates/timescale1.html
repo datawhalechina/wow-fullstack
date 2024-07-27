@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+	<title>时间刻度</title>
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.js"></script>
+	<style>
+        canvas {
+        background: black;
+        
+      }
+
+    </style>
+</head>
+<body>
+<div id="app">
+    <div style="width:1200px;overflow-x: scroll;">
+    <canvas id="time_line" width="1200" height="27"></canvas>
+    </div>
+</div>
+<script type="text/javascript">
+new Vue({
+  el: '#app',
+  delimiters: ['{[', ']}'],
+  data: {
+    screenWidth: document.body.clientWidth
+  },
+  mounted() {
+    let that = this
+    that.carveTimeScale(1200, 2, 5, 0, 30)
+    let canvasColor = '#999999'
+    // let initTime = 12000
+    // setInterval(() => {
+    //   initTime += 1000
+    //   that.carveTimeScale(1200, 1, 10, initTime, 10)
+    // }, 1000);
+  },
+  methods: {
+    /**
+     * 分割像素刻度
+     * width: 宽度 ms：一个小刻度的毫秒数 pxMs：10像素一个小刻度 pageShowStartTime：初始时间（毫秒） 一大段间隔时长(秒）
+     */
+    carveTimeScale(width, ms, pxMs, pageShowStartTime, intervalTime) {
+      let canvasId = document.getElementById('time_line')
+      let ctx = canvasId.getContext('2d')
+      ctx.clearRect(0, 0, 1200, 60)
+      ctx.fillStyle = '#999999'
+      // 为防止苹果屏幕2X显示不正常
+      // 为防止苹果屏幕2X显示不正常
+      var getPixelRatio = function (context) {
+        var backingStore = context.backingStorePixelRatio ||
+          context.webkitBackingStorePixelRatio ||
+          context.mozBackingStorePixelRatio ||
+          context.msBackingStorePixelRatio ||
+          context.oBackingStorePixelRatio ||
+          context.backingStorePixelRatio || 1
+        return (window.devicePixelRatio || 1) / backingStore
+      }
+      let ratio = getPixelRatio(ctx)
+      let msOffset = this.startOffsetTime(pageShowStartTime, ms) // 开始的偏移时间 ms
+      let pxOffset = msOffset / 1000 * pxMs // 开始的偏移距离 px
+      let leftDistance = 0 // 到左侧的距离
+      let leftDistanceTime = 0 // 到左侧的时间
+      let beginX = 0
+      let beginY = 0
+      for (let i = 0; i < width / (ms * pxMs); i++) {
+        leftDistance = pxOffset + i * (ms * pxMs) // 距离 = 开始的偏移距离 + 格数 * px/格
+        leftDistanceTime = pageShowStartTime + msOffset + i * ms // 时间 = 左侧开始时间 + 偏移时间 + 格数 * ms
+        beginX = pxOffset + i * (ms * pxMs)
+        let canvasColor
+        let showTime = pageShowStartTime + beginX / pxMs * 1000
+        if (showTime % (intervalTime * 1000) === 0) {
+          beginY = 0
+          ctx.font = '12px Arial'
+          ctx.fillText(this.changeTime(showTime, 1), beginX + 5, 22)
+          canvasColor = '#999999'
+          ctx.fillStyle = '#B1B1B1'
+          this.drawLine(leftDistance, beginY, leftDistance, 20, canvasColor, 1)
+        } else if (showTime % intervalTime == 0) {
+          beginY = 0
+          canvasColor = '#999999'
+          this.drawLine(leftDistance, beginY, leftDistance, 10, canvasColor, 1)
+        }
+      }
+    },
+    /**
+     * 根据传入参数画线
+     */
+    drawLine(beginX, beginY, endX, endY, color, width) {
+      let canvasId = document.getElementById('time_line');
+      let ctx = canvasId.getContext('2d');
+      ctx.beginPath();
+      ctx.moveTo(beginX, beginY);
+      ctx.lineTo(endX, endY);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = width;
+      ctx.stroke();
+    },
+    /**
+     * 左侧开始时间的偏移，返回单位ms
+     */
+    startOffsetTime(timestamp, step) {
+      let remainder = timestamp % step
+      return remainder ? step - remainder : 0
+    },
+    /**
+     * 返回时间
+     */
+    changeTime(time, num) {
+      let hour = 0
+      let minute = 0
+      let second = 0
+      second = time / 1000
+      if (second >= 3600) {
+        minute = (second - (second % 60)) / 60
+        hour = parseInt((minute / 60).toString())
+        minute = minute % 60
+        /* eslint-disable */
+        hour >= 10 ? hour : hour = '0' + hour
+        minute >= 10 ? minute : minute = '0' + minute
+        second = second % 60
+        second >= 10 ? second : second = '0' + second
+        /* eslint-enable */
+        return hour + ':' + minute + ':' + second
+      }
+      if (second < 3600 && second >= 60) {
+        hour = '00'
+        minute = parseInt((second / 60).toString())
+        /* eslint-disable */
+        minute >= 10 ? minute : minute = '0' + minute
+        second = second % 60
+        second >= 10 ? second : second = '0' + second
+        /* eslint-enable */
+        return hour + ':' + minute + ':' + second
+      }
+      if (second < 60) {
+        hour = '00'
+        minute = '00'
+        second = parseInt(second)
+        /* eslint-disable */
+        second >= 10 ? second : second = '0' + second
+        /* eslint-enable */
+        return hour + ':' + minute + ':' + second
+      }
+    }
+  }
+
+})
+
+
+</script>
+</body>
+</html>

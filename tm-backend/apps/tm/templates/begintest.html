@@ -1,0 +1,214 @@
+{% extends 'tmbase.html' %}
+{% block header_part %}
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+img[src=""],img:not([src]){
+        opacity:0;
+}
+.kaoyou {
+    text-align: right;
+}
+.outer {
+    border:solid #a0f 1px;border-radius:10px;margin:20px 0px;padding:10px;
+}
+
+.slot {
+    margin:5px 10px;
+    padding:5px;
+}
+</style> 
+{% endblock %}
+
+{% block body_part %}
+    <div class="row">
+    <div style="display:inline-block;margin:0 auto;" class="text-center">
+        <h2>{{paper.testpaper_title}}考核</h2>
+        <h6>共{{paper.ques_amount}}题，满分{{paper.full_score}}分</h6>
+    </div>
+    <div style="margin:0 auto; height:20px;" class="col-md-12"></div>
+    
+    </div>
+
+    <div id="testitem">
+    <div v-for="(item,index) in allques" class="outer">
+    <h4 style="margin-bottom: 10px;">{[index+1]}. {[item.ques_title]}</h4>
+    <span>{[item.ques_desc]}</span><br />
+    <span>本题分值为{[item.ques_value]}分</span><br />
+    <p v-if="item.descpic_url"><img style="max-width: 100%;height:auto;" :src="'/v1/sp/spstatic/images/quespic/'+item.descpic_url" /></p>
+    <form v-if="item.ques_type == '选择题'" :id="item.quizitemid">
+        <div>
+          <label class="form-check-label">
+            <input type="checkbox" v-model="reply[index]" v-bind:disabled="jinyong" style="margin-right: 10px;" value="a">A: {[item.item_a]}
+          </label>
+        </div>
+        <div>
+          <label class="form-check-label">
+            <input type="checkbox" v-model="reply[index]" v-bind:disabled="jinyong" style="margin-right: 10px;" value="b">B: {[item.item_b]}
+          </label>
+        </div>
+
+        <div v-if="item.item_c">
+            <label class="form-check-label">
+              <input type="checkbox" v-model="reply[index]" v-bind:disabled="jinyong" style="margin-right: 10px;" value="c">C: {[item.item_c]}
+            </label>
+        </div>
+
+        <div v-if="item.item_d">
+            <label class="form-check-label">
+                <input type="checkbox" v-model="reply[index]" v-bind:disabled="jinyong" style="margin-right: 10px;" value="d">D: {[item.item_d]}
+            </label>
+        </div>
+        <span>你的选择是：{[reply[index]|Answer]}</span>
+        <span v-if="check.length>0">
+            <span style="color:green" v-if="check[index]>0">正确</span>
+            <span style="color:red" v-else>错误</span>
+        </span>
+    </form>
+
+    <form v-if="item.ques_type == '填空题'" :id="item.quizitemid">
+        <div v-if="item.item_a" class="row">
+            <input class="col-md-8 form-control slot" placeholder="A" v-model="reply[index][0]" v-bind:disabled="jinyong">
+        </div>
+
+        <div v-if="item.item_b" class="row">
+            <input class="col-md-8 form-control slot" placeholder="B" v-model="reply[index][1]" v-bind:disabled="jinyong">
+        </div>
+
+        <div v-if="item.item_c" class="row">
+            <input class="col-md-8 form-control slot" placeholder="C" v-model="reply[index][2]" v-bind:disabled="jinyong">
+        </div>
+
+        <div v-if="item.item_d" class="row">
+            <input class="col-md-8 form-control slot" placeholder="D" v-model="reply[index][3]" v-bind:disabled="jinyong">
+        </div>
+        <span>你的答案是：{[reply[index]|Answer2]}</span>
+        <span v-if="check.length>0">
+            <span style="color:green" v-if="check[index]>0">正确</span>
+            <span style="color:red" v-else>错误</span>
+        </span>
+
+    </form>
+
+    <form v-if="item.ques_type == '判断题'" :id="item.quizitemid">
+        <div class="row">
+            <span class="col-md-8" style="text-align: left;">
+                <label class="form-check-label">
+                <input type="radio" value="正确" v-model="reply[index]" v-bind:disabled=jinyong> 正确
+                </label>
+                <span>&nbsp;&nbsp;</span>
+                <label class="form-check-label">
+                <input type="radio" value="错误" v-model="reply[index]" v-bind:disabled=jinyong> 错误
+                </label>
+            </span>
+        </div>
+        <span v-if="check.length>0">
+            <span style="color:green" v-if="check[index]>0">正确</span>
+            <span style="color:red" v-else>错误</span>
+        </span>
+    </form>
+
+    <form v-if="item.ques_type == '简答题'" :id="item.quizitemid">
+        <div class="row">
+            <textarea rows="4" class="col-md-10 form-control" placeholder="请回答" v-model="reply[index]" v-bind:disabled="jinyong"></textarea>
+        </div>
+        <br/>
+        <span v-if="jinyong" style="color:blue">请等待老师阅卷</span>
+    </form>
+    
+    </div>
+    
+    <div class="text-center"><button  v-show="showsend" class="btn btn-primary" id="send">提交</button></div>
+    <br/><br/>
+    <span v-show="!showsend">{{current_user.name}}，</span>
+    <span v-show="!showsend">你目前的得分是：</span>
+    <span v-show="!showsend" id="defen"></span>
+    <br/>
+    <a v-show="!showsend" href="/v1/my/transcript/" target="_blank"><button class="btn btn-primary">查看成绩单</button></a><br/>
+    <br/>
+    <br/>
+    <br/>
+
+    </div>
+
+
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+    // var asel2 = document.querySelectorAll("#sel2");
+    // function op() {
+    //     for (var i = 0; i < asel2.length; i++) {
+    //         if(asel2[i].checked == true){
+    //             console.log(asel2[i].value);
+    //         }
+    //     }
+    // }
+    
+    var allq = {{qdata|tojson}};
+    var user_id = {{current_user.id}};
+    var start_Date = new Date();
+
+
+    var testitem = new Vue({
+        delimiters: ['{[', ']}'],
+				el:'#testitem',
+				data:{
+					reply:[],
+                    check:[],
+                    allques:allq,
+                    showsend:true,
+                    jinyong:false
+				},
+                created: function () {
+                    // `this` 指向 vm 实例;
+                    this.reply=[]
+                    for(var i = 0 ; i < {{qdata|length}} ; i++){
+                        var temp = [];
+                        this.reply.push(temp);
+                    }
+                },
+                filters:{
+                    Answer:function(inin){
+                        return inin.slice().sort().join(',').toUpperCase();
+                    },
+                    Answer2:function(inin){
+                        return inin.slice().join(',');
+                    },
+                }
+			})
+
+    $("#send").click(function () { 
+        testitem.$data.showsend = false;
+        testitem.$data.jinyong = true;
+        var reg = new RegExp("[0-9]+$");
+        var txt = window.location.href.match(reg);
+        var finish_Date = new Date();
+        quesnums = [];
+        testitem.$data.allques.forEach((qq)=>{
+            quesnums.push([qq.quizitemid,qq.quesid,qq.ques_value,qq.ques_type]);
+        })
+        $.ajax({
+            url:"{{ url_for('tm.checkreply') }}",
+            type:"POST",
+            data:{
+                userid:user_id,
+                paper_id:txt[0],
+                start_Date:start_Date.getTime(),
+                finish_Date:finish_Date.getTime(),
+                message:JSON.stringify(testitem.$data.reply),
+                quizitemids:JSON.stringify(quesnums)
+            },
+            dataType: "json",
+            success: function(data) {
+                $("#defen").html(data.result);
+                testitem.$data.check = data.checkout;
+            }
+        })
+    })
+    
+</script>
+{% endblock %}

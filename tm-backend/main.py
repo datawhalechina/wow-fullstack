@@ -1,9 +1,19 @@
-# Author Tom.Yang (https://github.com/7n8fail)
-
 import uvicorn
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.wsgi import WSGIMiddleware
+
+from apps.login.create import create_app
+from apps.login.view import login_manager
+from flask import render_template
+
+flask_app = create_app()
+login_manager.init_app(flask_app)
+
+@flask_app.route('/')
+def start():
+    return render_template("index.html")
 
 from app.routers import users
 from app.routers import course
@@ -37,6 +47,8 @@ app.include_router(inno.inno)
 @app.get("/test")
 def read_root():
     return {"Hello": "World"}
+
+app.mount("/v1", WSGIMiddleware(flask_app))
 
 if __name__ == '__main__':
     uvicorn.run(app, host=settings.HOST, port=settings.PORT)

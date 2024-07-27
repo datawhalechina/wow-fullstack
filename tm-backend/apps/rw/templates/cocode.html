@@ -1,0 +1,106 @@
+<link rel="stylesheet" href="/v1/auth/mystatic/css/codemirror.css">
+<link rel="stylesheet" href="/v1/auth/mystatic/css/show-hint.css">
+<script src="/v1/auth/mystatic/js/codemirror.js"></script>
+<script src="/v1/auth/mystatic/js/show-hint.js"></script>
+<script src="/v1/auth/mystatic/js/xml-hint.js"></script>
+<script src="/v1/auth/mystatic/js/html-hint.js"></script>
+<script src="/v1/auth/mystatic/js/xml.js"></script>
+<script src="/v1/auth/mystatic/js/javascript.js"></script>
+<script src="/v1/auth/mystatic/js/css.js"></script>
+<script src="/v1/auth/mystatic/js/htmlmixed.js"></script>
+<style>
+    .CodeMirror {
+        border-top: 1px solid #888; 
+        border-bottom: 1px solid #888;
+        font-family:Consolas;
+        font-size:20px;
+    }
+</style>
+
+<div v-if="online_coding=1" class="row">
+    <div class="col-md-8" style="min-height:800px;">
+    <label for="send_content">css+html代码：</label>
+    
+    <br/>
+    <br/>
+    <div id="send_content" style="width: 100%;"></div>
+    <br/>
+    <label for="jscode">JS代码：</label>
+    <div id="jscode" style="width: 100%; height:50px;"></div>
+    <br/>
+    </div>
+
+    <div class="col-md-4">
+    <label for="pre"><input id="send" type="button" value="预览"></label><br>
+    <div id="pre"></div>
+    </div>
+</div>
+
+<script>
+    var f = function () {/*
+<style>
+  .side-box{
+      display:flex;
+      margin-top:1rem;
+      margin-bottom:1rem;
+  }
+  .side-title{
+      padding:10px;
+      margin: auto;
+  }
+  .bg-gradient {
+      background-image: linear-gradient(135deg, #aa00ff 0, #00e5ff); }
+</style>
+<div class="col-md-1 side-box">
+  <h3 class="text-dark text-center rounded bg-gradient side-title">
+  新<br />人<br />系<br />列
+  </h3>
+</div>
+<button id="trya">输出</button>
+*/};
+
+var fjs = function () {/*
+bbn = document.getElementById("trya")
+bbn.onclick = function(){
+      alert("hahaha");
+    }
+*/};
+var multiline = function (fn) {
+  var str = fn.toString().split('\n');
+  return str.slice(1, str.length - 1 ).join('\n');
+}
+
+  var textvalue = multiline(f);
+
+    var btn = document.getElementById("send")
+    window.onload = function() {
+      editor = CodeMirror(document.getElementById("send_content"), {
+        mode: "htmlmixed",
+        lineNumbers: true,
+        indentUnit: 4,
+        styleActiveLine: true,
+        matchBrackets: true,
+        extraKeys: {"Ctrl-Space": "autocomplete"},
+        value: textvalue
+      });
+      
+      editorjs = CodeMirror(document.getElementById("jscode"), {
+        mode: "javascript",
+        lineNumbers: true,
+        indentUnit: 4,
+        styleActiveLine: true,
+        matchBrackets: true,
+        extraKeys: {"Ctrl-Space": "autocomplete"},
+        value: multiline(fjs)
+      });
+    };
+    document.getElementById("pre").innerHTML = textvalue;
+    btn.onclick = function(){
+      document.getElementById("pre").innerHTML = editor.getValue();
+      var jstext = editorjs.getValue();
+      eval(jstext);
+    }
+    
+
+</script>
+

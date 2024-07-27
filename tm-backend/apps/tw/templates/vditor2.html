@@ -1,0 +1,80 @@
+{% extends 'biwennewbase.html' %}
+{% block header_part %}
+<meta charset="UTF-8">
+<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+<title>{{vdata['title']}}</title>
+
+
+<link rel="stylesheet" href="https://unpkg.com/vditor@3.9.4/dist//index.css" />
+<script src="https://unpkg.com/vditor@3.9.4/dist/index.min.js"></script>
+<script src="https://cdn.staticfile.org/vue/2.6.14/vue.min.js"></script>
+<script src="/v1/auth/mystatic/com/favorcom.js"></script>
+
+{% endblock %}
+
+{% block style_part %} 
+<style>
+.vditor{
+	margin: 0 auto;
+	margin-bottom:100px;
+	border-width:0px;
+}
+</style>
+{% endblock %}
+
+{% block body_part %}
+	<br/>
+	<div class="row text-center"><h2 class="col-md-12 text-center">{{vdata['title']}}</h2></div>
+	<div id="app" class="row">
+		<div class="col-md-4 offset-md-2 text-center">
+		<span>塾主：{{vdata['author_name']}}</span>
+		<span v-if="islogin">&nbsp;&nbsp;</span>
+		<span v-if="islogin" class="text-left">
+			<favor-btn :target_type="ttype" :targetid="ardata.articleid" :favor_count="ardata.favor_count" :favored="ardata.favored"></favor-btn>
+		</span>
+		<span v-if="islogin">&nbsp;&nbsp;</span>
+		<a v-if="islogin" :href="'/v1/tw/editarticle/'+ardata.articleid" target="_blank" title="编辑文章"><i class="fa fa-edit" style="font-size:14px"></i></a>
+		</div>
+
+		<div class="col-md-4 text-center">
+		<span>发表时间：{{vdata['create_time']}}</span>
+		</div>
+	</div>
+
+	<div class="row" style="margin:0px 5px;">
+		<hr  class="col-md-10 offset-md-1" />
+	</div>
+	
+	<div class="row">
+	<div id="preview" class="vditor col-md-10 offset-md-1"></div>
+	</div>
+{% endblock %}
+
+{% block script_part %}
+<script>
+	var islogin = false;
+	var usrid = 0;
+	var usrname = '';
+    if ({{current_user.is_authenticated|tojson}}==true){
+        islogin = true;
+    }
+    var ar = {{vdata|tojson}};
+    Vditor.preview(document.getElementById('preview'),  ar['varticle']);
+var arvue = new Vue({
+  el: '#app',
+  delimiters: ['{[', ']}'],
+  data: {
+        ttype:'文章',
+		ardata:ar,
+		islogin:islogin,
+  },
+  mounted: function(){
+	usrid = this.ardata.usrid;
+	usrname = this.ardata.usrname;
+  },
+    components: {
+        'favor-btn': favorBtn,
+    }
+})
+</script>
+{% endblock %}

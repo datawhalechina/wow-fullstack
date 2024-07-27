@@ -1,0 +1,516 @@
+{% extends 'taskbase.html' %}
+{% block header_part %}
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    img[src=""],img:not([src]){
+         opacity:0;
+    }
+    .table-css{
+        margin-top: 10px;
+        vertical-align:middle;
+        text-align:center;
+        width:1000px;
+    }
+    table th {
+        border: 1px solid black;
+    }
+
+    table td {
+        border: 1px solid black;
+    }
+    .lie1{width:4%;}
+    .lie2{width:6%;}
+    .lie3{width:10%;}
+    .lie4{width:10%;}
+    .lie5{width:10%;}
+    .lie6{width:5%;}
+
+    .kaoyou {
+        text-align: right;
+    }
+    .kaozuo {
+        text-align: left;
+    }
+    .editable {
+        border-width:0;
+        width:100%;
+        height:100%;
+        font-size:1em;
+    }
+    .opbtn {
+        border-width:0;
+        height:100%;
+        font-size:1em;
+    }
+    .readonly {
+        width:100%;
+        font-size:1em;
+        vertical-align: middle;
+    }
+    input {
+        padding-left:2px;
+        padding-right:2px;
+    }
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+    
+    <div id='app'>
+        <div style="text-align: center;">
+            
+            <div style="display:inline-block;margin:auto;">
+                <div class="text-center"><h2 class="text-center"><a href="" target="_blank">目标时间</a></h2></div>
+                <div>
+                    <button class="btn btn-primary" @click="start" :disabled="cur==-1">开始</button>
+                    <button class="btn btn-primary" @click="end" :disabled="cur==-1">结束</button>
+                    <button class="btn btn-primary" @click="addwords()">新增</button>
+                    <button class="btn btn-primary" @click="deletewords" :disabled="cur==-1">删除</button>
+
+                    <button class="btn btn-primary" @click="finish" :disabled="validtime==0 || no_time">归档</button>
+                </div>
+            
+            <table class="table-css">
+                <thead>
+                    <tr @click="quliang">
+                        <th class="lie1">序号</th>
+                        <th class="lie2">案号</th>
+                        <th class="lie3">主题</th>
+                        <th class="lie6">统筹配时</th>
+                        <th class="lie5">分拆事项</th>
+                        <th class="lie6">分拆配时</th>
+                        <th class="lie6">开始时间</th>
+                        <th class="lie6">结束时间</th>
+                        <th class="lie6">实际用时</th>
+                        <th class="lie6">日期</th>
+                    </tr>
+                </thead>
+                <tbody :key="key">
+                    <tr v-for="(item,index) in tasklist" @click="gaoliang(index)">
+                        <td class="lie1" :name="index">{[index+1]}</td>
+                        <td class="lie2"><input class="editable" v-model="item[0]" @input="tijiao"></input></td>
+                        <td class="lie3"><input class="editable" v-model="item[1]" @input="tijiao"></input></td>
+                        <td class="lie6"><input class="editable" v-model="item[2]" type="number" step="0.01" @input="tijiao"></input></td>
+                        <td class="lie3"><input class="editable" v-model="item[3]" @input="tijiao"></input></td>
+                        <td class="lie6"><input class="editable" v-model="item[4]" type="number" step="0.01" @input="tijiao"></input></td>
+                        <td class="lie6"><input class="editable" v-model="item[5]" @input="tijiao"></input></td>
+                        <td class="lie6"><input class="editable" v-model="item[6]" @input="tijiao"></input></td>
+                        <td class="lie6">{[item[7]]}</td>
+                        <td class="lie6">{[item[8]]}</td>
+                    </tr>
+                    
+                </tbody>
+                
+            </table>
+            <div>今天有效工作时间：{[validtime]}小时。</div>
+            
+            
+
+            
+
+            <div v-if="cur_archive != -1">{[cur_riqi]}有效工作时间：{[validtime_archive]}小时。</div>
+            <div v-if="cur_archive != -1">{[cur_anhao]}-{[cur_zhuti]}：统筹配时{[tongchou]}小时，分拆配时{[yi_peishi || tongchou]}小时，实际用时{[yi_yongshi]}小时。</div>
+            <table class="table-css">
+                <thead>
+                    <tr @click="quliang_archive">
+                        <th class="lie1">序号</th>
+                        <th class="lie2">案号</th>
+                        <th class="lie3">主题</th>
+                        <th class="lie6">统筹配时</th>
+                        <th class="lie5">分拆事项</th>
+                        <th class="lie6">分拆配时</th>
+                        <th class="lie6">开始时间</th>
+                        <th class="lie6">结束时间</th>
+                        <th class="lie6">实际用时</th>
+                        <th class="lie6">日期</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th class="lie1"></th>
+                        <th class="lie2"><input class="editable" placeholder="筛选" @input="filterfn" v-model="searchitems[0]"></input></th>
+                        <th class="lie3"><input class="editable" placeholder="筛选" @input="filterfn" v-model="searchitems[1]"></input></th>
+                        <th class="lie6"></th>
+                        <th class="lie5"></th>
+                        <th class="lie6"></th>
+                        <th class="lie6"></th>
+                        <th class="lie6"></th>
+                        <th class="lie6"></th>
+                        <th class="lie6"><input class="editable" placeholder="筛选" @input="filterfn" v-model="searchitems[2]"></input></th>
+                    </tr>
+                    <tr v-for="(item,index) in finishlist" @click="gaoliang_archive(index)">
+                        <td class="lie1">{[index+1]}</td>
+                        <td class="lie2" :id="'anhao'+index"><span>{[item[0]]}</span></td>
+                        <td class="lie3" :id="'zhuti'+index"><span>{[item[1]]}</span></td>
+                        <td class="lie6">{[item[2]]}</td>
+                        <td class="lie3">{[item[3]]}</td>
+                        <td class="lie6">{[item[4]]}</td>
+                        <td class="lie6">{[item[5]]}</td>
+                        <td class="lie6">{[item[6]]}</td>
+                        <td class="lie6">{[item[7]]}</td>
+                        <td class="lie6" :id="'riqi'+index">{[item[8]]}</td>
+                    </tr>
+                    
+                </tbody>
+                
+            </table>
+            <div v-if="finishlist.length > 0">当前列表总实际时间：{[total_time]}小时。</div>
+            <button v-if="finishlist.length > 0" class="btn btn-primary" @click="export_list">导出</button>
+            </div>
+            <br>
+            <br>
+            <br>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+    var usrname = {{current_user.name|tojson}};
+    var tasks = {{pr|tojson}};
+    var finishs = {{fn|tojson}};
+    const now = new Date();
+
+    // 获取年、月和日
+    const year = now.getFullYear();
+    const month = (now.getMonth() + 1).toString().padStart(2, '0'); // 如果月份小于10，前面添加'0'
+    const day = now.getDate().toString().padStart(2, '0'); // 如果日期小于10，前面添加'0'
+
+    // 格式化日期
+    const formattedDate = `${year}-${month}-${day}`;
+    otmvue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: '#app',
+        data: {
+            tasklist:[['','','','','','','','','']],
+            finishlist:[],
+            searchlist:[],
+            searchitems:['','','',''],
+            cur:-1,
+            cur_archive:-1,
+            cur_anhao:"",
+            cur_zhuti:"",
+            cur_riqi:"",
+            validtime_archive:0,
+            yi_yongshi:0,
+            yi_peishi:0,
+            tongchou:0,
+            key:0,
+            skey:0,
+            no_time:false,
+            total_time:0,
+            username:usrname
+        },
+        computed: {
+            validtime: function(){
+                var sum_time=0;
+                //如果你想强制计算属性更新并重新计算它的值，
+                //你可以简单地使用数据属性并在计算函数中提及该属性
+                //（你不必使用它，只要存在就足够了）
+                //然后更改该数据属性；这将强制更新计算属性。
+                this.skey;
+                for(var i=0;i<this.tasklist.length;i++){
+                    
+                    if (this.tasklist[i][7]>0){
+                        sum_time += this.tasklist[i][7];
+                    }
+                }
+                
+                return sum_time.toFixed(2);
+            },
+        },
+        mounted: function(){
+            if (tasks && tasks.length>0){
+                this.tasklist = tasks;
+            }
+
+            if (finishs && finishs.length>0){
+                this.finishlist = finishs;
+                this.searchlist = finishs;
+            }
+            this.total_time = this.cal_total_time(this.finishlist);
+            this.tijiao();
+        },
+        methods: {
+            addwords (){
+                if (this.cur > -1){
+                    var cur_list = this.tasklist[this.cur];
+                    var new_list = [cur_list[0],cur_list[1],cur_list[2],'','','','','',''];
+                    this.tasklist.splice(this.cur+1,0,new_list);
+                    
+                } else if (this.cur_archive > -1){
+                    var cur_list = this.finishlist[this.cur_archive];
+                    var new_list = [cur_list[0],cur_list[1],cur_list[2],'','','','','',''];
+                    this.tasklist.push(new_list);
+                } else {
+                    this.tasklist.push(['','','','','','','','','']);
+                }
+                this.tijiao();
+                
+            },
+            gaoliang (ind){
+                var cur_row = document.getElementsByName(ind.toString())[0];
+                if (ind != this.cur){
+                    if (this.cur != -1){
+                        var old_row = document.getElementsByName(this.cur.toString())[0];
+                        old_row.style.backgroundColor = "";
+                    }
+                    this.cur = ind;
+                    if (this.tasklist[ind][7]>0){
+                        this.no_time = false;
+                    } else {
+                        this.no_time = true;
+                    }
+                }
+                cur_row.style.backgroundColor = "#a0f";
+                
+                this.skey += 1;
+                this.fetch();
+            },
+            quliang (){
+                if (this.cur != -1){
+                var old_row = document.getElementsByName(this.cur.toString())[0];
+                old_row.style.backgroundColor = "";
+                this.cur = -1;
+                this.no_time = false;}
+                this.fetch();
+            },
+            gaoliang_archive (ind){
+                this.cur_anhao = this.finishlist[ind][0];//当前的anhao
+                this.cur_zhuti = this.finishlist[ind][1];
+                this.cur_riqi = this.finishlist[ind][8];
+                this.validtime_archive = 0;
+                this.tongchou = this.finishlist[ind][2];
+                this.yi_peishi = 0;
+                this.yi_yongshi = 0;
+                if (ind != this.cur_archive){
+                    
+                    this.cur_archive = ind;
+                }
+                
+                for(i=0;i<this.finishlist.length;i++){
+                    var cur_row_anhao = document.getElementById('anhao'+i);
+                    var cur_row_zhuti = document.getElementById('zhuti'+i);
+                    var cur_row_riqi = document.getElementById('riqi'+i);
+                    cur_row_anhao.style.backgroundColor = "";
+                    cur_row_zhuti.style.backgroundColor = "";
+                    cur_row_riqi.style.backgroundColor = "";
+                    if (this.finishlist[i][0] == this.cur_anhao && this.finishlist[i][1] == this.cur_zhuti){
+                        cur_row_anhao.style.backgroundColor = "#a9f";
+                        cur_row_zhuti.style.backgroundColor = "#a9f";
+                        this.yi_peishi += parseFloat(this.finishlist[i][4] || 0);
+                        this.yi_yongshi += this.finishlist[i][7];
+                    }
+                    if (this.finishlist[i][8] == this.cur_riqi){
+                        cur_row_riqi.style.backgroundColor = "#d7f";
+                        this.validtime_archive += this.finishlist[i][7];
+                    }
+                }
+                this.validtime_archive = this.validtime_archive.toFixed(2);
+                this.yi_peishi = this.yi_peishi.toFixed(2);
+                this.yi_yongshi = this.yi_yongshi.toFixed(2);
+                
+            },
+            quliang_archive (){
+                for(i=0;i<this.finishlist.length;i++){
+                    var cur_row_anhao = document.getElementById('anhao'+i);
+                    var cur_row_zhuti = document.getElementById('zhuti'+i);
+                    var cur_row_riqi = document.getElementById('riqi'+i);
+                    cur_row_anhao.style.backgroundColor = "";
+                    cur_row_zhuti.style.backgroundColor = "";
+                    cur_row_riqi.style.backgroundColor = "";
+                }
+                this.cur_archive = -1;
+            },
+            getHour(s1, s2) {
+                var reDate = /\d{4}-\d{1,2}-\d{1,2} /;
+                s1 = new Date((reDate.test(s1) ? s1 : '2018-1-1 ' + s1).replace(/-/g, '/'));
+                s2 = new Date((reDate.test(s2) ? s2 : '2018-1-1 ' + s2).replace(/-/g, '/'));
+                var ms = s2.getTime() - s1.getTime();
+                if (ms < 0) return 0;
+                return Math.floor(ms / 10 / 60 / 60)/100;  //小时
+            },
+            start (){
+                var newDate = new Date();
+                var timesting = newDate.toTimeString();
+                var timesting = timesting.substring(0,8);
+                var datesting = newDate.toLocaleDateString();
+                this.tasklist[this.cur][5]=timesting;
+                this.tasklist[this.cur][8]=datesting;
+                this.key += 1
+                this.tijiao();
+                
+            },
+            end (){
+                var newDate = new Date();
+                var timesting = newDate.toTimeString();
+                var timesting = timesting.substring(0,8);
+                this.tasklist[this.cur][6]=timesting;
+                //计算两个  hh:mm:ss timestring 的时间差，换算成小时
+                var starttime = this.tasklist[this.cur][5];
+                var hour = this.getHour(starttime, timesting)
+                this.tasklist[this.cur][7]=hour;
+                this.no_time = false;
+                this.key += 1
+                this.tijiao();
+            },
+            deletewords (){
+                if (confirm("确定删除此记录？")) {
+                    var deletetemp = this.tasklist.splice(this.cur,1);
+                    console.log("开始删除")
+                    this.tijiao();
+                    this.quliang();
+                    this.key += 1
+                    console.log("结束删除")
+                }
+            },
+            cal_total_time(tmplist){
+                var tmp_time = 0.0;
+                for(i=0;i<tmplist.length;i++){
+                    tmp_time += parseFloat(tmplist[i][7] || 0);
+                }
+                tmp_time = tmp_time.toFixed(2);
+                return tmp_time;
+            },
+            finish (){
+                var alertinfo;
+                if (this.cur ==-1){
+                    alertinfo = "确定批量归档这些记录？";
+                } else{
+                    alertinfo = "确定归档此记录？";
+                }
+                if (confirm(alertinfo)) {
+                    var deletetemp = [];
+                    var remaintemp = [];
+                    if (this.cur == -1){
+                        for (var i = 0; i < this.tasklist.length; i++) {
+                            if (this.tasklist[i][7] > 0){
+                                deletetemp.push(this.tasklist[i]);
+                            } else {
+                                remaintemp.push(this.tasklist[i]);
+                            }
+                        }
+                        this.tasklist = remaintemp;
+                    } else {
+                        deletetemp = this.tasklist.splice(this.cur,1);
+                    }
+                    this.tijiao();
+                    var fd = new FormData();
+                    fd.append("finishitem",JSON.stringify(deletetemp));
+                    $.ajax({
+                        url:"{{ url_for('rw.finishotm') }}",
+                        type:"POST",
+                        processData: false,
+                        contentType: false,
+                        data:fd,
+                        dataType: "json",
+                        success: function(response) {
+                            console.log(response);
+                            
+                            
+                        }
+                    })
+                    var newArr = deletetemp.concat(this.finishlist);
+                    this.finishlist = newArr;
+                    this.searchlist = newArr;
+                    this.total_time = this.cal_total_time(this.finishlist);
+                }
+            },
+
+            fetch () {
+                if(this.tasklist.length>0){
+                    $.ajax({
+                        url:"{{ url_for('rw.get_pr') }}",
+                        type:"GET",
+                        processData: false,
+                        contentType: false,
+                        dataType: "json",
+                        success: function(response) {
+                            if (otmvue.tasklist.toString() !=response.toString() ){
+                                otmvue.tasklist = response
+                                console.log("更新改动")
+                                
+                            }
+
+                        }
+                    })
+
+                }
+            },
+            
+            tijiao () {
+                for(i=0;i<this.tasklist.length;i++){
+                    if (this.tasklist[i][5].length == 8 && this.tasklist[i][6].length ==8){
+                        this.tasklist[i][7] = this.getHour(this.tasklist[i][5],this.tasklist[i][6]);
+                    }
+                }
+                
+                var fd = new FormData();
+                fd.append("taskinfo",JSON.stringify(this.tasklist));
+                $.ajax({
+                    url:"{{ url_for('rw.saveotm') }}",
+                    type:"POST",
+                    processData: false,
+                    contentType: false,
+                    data:fd,
+                    dataType: "json",
+                    success: function(response) {
+                        console.log(response);
+                        
+                    }
+                })
+            },
+            compare_data(data,filter){
+                ind = true;
+                if(filter[0].length>0 & ind){
+                    if(data[0].includes(filter[0])==false){
+                        ind = false;
+                    }
+                }
+                if(filter[1].length>0 & ind){
+                    if(data[1].includes(filter[1])==false){
+                        ind = false;
+                    }
+                }
+                if(filter[2].length>0 & ind){
+                    if(data[8].includes(filter[2])==false){
+                        ind = false;
+                    }
+                }
+                return ind;
+            },
+            filterfn() {
+                var temp = [];
+                for(i=0;i<this.searchlist.length;i++){
+                    if(this.compare_data(this.searchlist[i],this.searchitems)){
+                        temp.push(this.searchlist[i]);
+                    }
+                }
+                this.finishlist = temp;
+                this.total_time = this.cal_total_time(this.finishlist);
+            },
+            export_list(){
+                var title = ['编号','主题','统筹配时','分拆事项','分拆配时','开始时间','结束时间','实际用时','日期']
+                var str = [];
+                str.push(title.join(",")+"\n");
+                for(var i=0;i<this.finishlist.length;i++){
+                    str.push(this.finishlist[i].join(",")+"\n");
+                }
+                var blob = new Blob(['\uFEFF' + str.join('')], {
+                    type: 'text/plain;charset=utf-8',
+                });
+                var downloadLink = document.createElement("a");
+                downloadLink.href = URL.createObjectURL(blob);
+                downloadLink.download = "记录导出"+formattedDate+".csv"; 
+                downloadLink.click();
+            }
+        }
+    })
+    
+</script>
+{% endblock %}

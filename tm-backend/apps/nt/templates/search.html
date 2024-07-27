@@ -1,0 +1,31 @@
+{% extends 'ntbase.html' %}
+{% block header_part %}
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+</style> 
+{% endblock %}
+
+{% block body_part %}
+		
+	<div class="row">
+		<div style="margin:0 auto;width:100%;text-align:left">
+		<form style="margin:10 auto;" action="/v1/nt/search/" method="post">
+			<input style="width:550px; background-color:#FFF;" type="text" name="question" value="{{ cjss }}">
+			<input style="width:100px" type="submit" value="搜索一下">
+		</form>
+		<label style="font-size:11px;">为您查询到{{ total }}条相关结果</label><br/>
+		</div>
+            {% for i in items %}
+            <div style="text-align:left;width:700px;">
+                <span style="font-size:20px;"><a style="color:#a0f" href='/v1/nt/brains/{{ i.graphid }}' target="_blank">{{ i.graphtopic }}</a>---</span><span>{{ i.parenttopic }}</span><br/>
+                <span style="font-size:24px;">{{ i.itemtopic }}</span><br/>
+                <span>{{ i.childrentopic }}</span><br/><br/><br/>
+            </div>
+            {% endfor %}
+	</div>
+{% endblock %}
+
+{% block script_part %}
+{% endblock %}

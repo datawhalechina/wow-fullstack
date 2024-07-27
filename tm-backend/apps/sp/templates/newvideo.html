@@ -1,0 +1,737 @@
+{% extends 'videobase.html' %}
+{% block header_part %}
+<title>新增视频</title>
+<script src="/v1/auth/mystatic/com/selectcom.js"></script>
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    img[src=""],img:not([src]){
+         opacity:0;
+    }
+    
+        .progress {
+       width: 100%;
+        height: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin: auto 0px;
+        overflow: hidden;
+    
+    }
+    /* 初始状态设置进度条宽度为0px */
+    .progress > div {
+        width: 0px;     
+        height: 100%;
+        border-radius: 5px;
+        background-color: yellowgreen;
+        transition: all .3s ease;
+        display: block;
+    }
+    .video {
+    position: relative;
+    padding-bottom: 56.25%;
+    /*height: 0;*/
+    overflow: hidden;
+    }
+    .video iframe,
+    .video object,
+    .video embed {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    }
+    #poster-canvas {
+        border:1px solid #CCCCCC
+    }
+
+    #image-canvas {
+        border:1px solid #CCCCCC
+
+    }
+    .selectInput {
+        padding-left:0px;
+    }
+    .selectInput .title {
+  width: 80%;
+  position: relative;
+}
+.selectInput input[type="text"] {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: 3px;
+  -moz-border-radius: 3px; /* Firefox */
+  -webkit-border-radius: 3px; /* Safari 和 Chrome */
+  border-radius: 3px; /* Opera 10.5+, 以及使用了IE-CSS3的IE浏览器 */
+}
+.selectInput i {
+  position: absolute;
+  width: 30px;
+  height: 40px;
+  margin-top:0px;
+  font-size:18px;
+  font-weight:600;
+  line-height: 38px;
+  right: 3px;
+  top: 1px;
+  text-align: center;
+  cursor: pointer;
+}
+.selectInput ul {
+  border-radius: 3px;
+  -moz-border-radius: 3px; /* Firefox */
+  -webkit-border-radius: 3px; /* Safari 和 Chrome */
+  border-radius: 3px; /* Opera 10.5+, 以及使用了IE-CSS3的IE浏览器 */
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2);
+  -moz-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2); /* Firefox */
+  -webkit-box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2); /* Safari 和 Chrome */
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.2); /* Opera 10.5+, 以及使用了IE-CSS3的IE浏览器 */
+  width: 253px;
+  /* border: 1px solid #ccc; */
+  padding: 10px 30px;
+}
+.selectInput li {
+  line-height: 30px;
+  list-style: none;
+}	
+</style> 
+{% endblock %}
+
+{% block body_part %}
+    
+
+
+<div class="container" id="newvideo">
+    <div class="row" style="margin-top:30px">
+    <div class="col-md-2">
+        <input type="radio" id="local" value="Local" v-model="upstyle">
+        <label for="local">本地视频</label>
+        <br>
+        <input type="radio" id="web" value="Web" v-model="upstyle">
+        <label for="web">B站视频</label>
+    </div>
+    <div class="col-md-8" v-show="upstyle=='Local'">
+    <div class="progress">
+        <div></div>
+    </div>
+    <form id="uploadForm" style="display:block;">
+        <input style="width:100%;border:1px dashed black;margin:10px 0px;" class="btn btn-default" id="img" type="file" name="yu"></input>
+    </form>
+    </div>
+    <input class="col-md-8 form-control" style="margin-top:30px;" v-show="upstyle=='Web'" v-model="video_websrc" @change="pastesrc($event)"></input>
+    </div>
+    <br/>  
+    <div v-show="prate>95 && !video_show" style="text-align: center">
+        <button class="btn btn-primary rightbtn" disabled>
+            <span class="spinner-border spinner-border-sm"></span>
+            视频加载中...
+        </button>
+    </div>  
+    <div class="row" v-show="video_show" style="text-align: center">
+        <div class="col-md-2"></div>
+        <div class="col-md-8">
+            <video id="videoplay" v-show="upstyle=='Local'?true:false" controls="controls" width="100%" preload="auto" src=""></video>
+            <p class="video" v-show="upstyle=='Web'?true:false">
+            <iframe id="iframeplay" src="" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true"> </iframe>
+            </p>
+        </div>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+    <div class="col-md-2">
+        <input type="radio" id="cutp" value="cutposter" v-model="posterstyle">
+        <label for="cutp">截取封面</label>
+        <br>
+        <input type="radio" id="uploadp" value="uploadposter" v-model="posterstyle">
+        <label for="uploadp">上传封面</label>
+    </div>
+    <div class="col-md-8 text-center">
+        <input v-show="posterstyle=='uploadposter'?true:false" style="width:100%;border:1px dashed black;" class="btn btn-default" id="poster" type="file" name="po"></input>
+        <button id="cutposter" class="btn rightbtn" v-show="posterstyle=='cutposter' && video_show">截取</button>
+    </div>
+    </div>
+    <br/> 
+    <div class="row" v-show="poster_show">
+        <div v-show="posterstyle=='uploadposter'?true:false" class="col-md-12" style="text-align: center">
+        <input id="slider" style="width:320px;padding:10px 0px;" type="range"/><br/>
+        <canvas id="image-canvas" height="180" width="320"></canvas><br/>
+        <button id="submit" class="btn btn-primary">预览</button>
+        </div><br/>
+        <div class="col-md-12" style="text-align: center;margin-top: 10px;">
+        <canvas id="poster-canvas" width="480" height="270"></canvas>
+        </div>
+
+    </div>
+
+    <div class="row" style="margin-top:10px">
+        <div class="col-md-2">视频名称：</div>
+        <input class="col-md-8 form-control" v-model="video_title"></input>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+        <div class="col-md-2">视频时长：</div>
+        <input class="col-md-8 form-control" placeholder="填写格式为hh:mm:ss" v-model="video_length"></input>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+        <div class="col-md-2">视频来源：</div> 
+        <select class="col-md-2 form-control" v-model="video_ip">
+            <option value="原创">原创</option>
+            <option value="改编">改编</option>
+            <option value="翻录">翻录</option>
+            <option value="节选">节选</option>
+            <option value="搬运">搬运</option>
+        </select>
+    </div>
+
+
+    <select-cas  @pushclass="reveiveclass"></select-cas>
+
+    <div class="row" style="margin-top:10px">
+        <div class="col-md-2">关键词：</div>
+        <select-input :clsid="nodeid" @pushd="changep"></select-input>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+        <div class="col-md-2">视频描述：</div> 
+        
+        <textarea class="col-md-8 form-control" v-model="video_desc"></textarea>
+    </div>
+    <div class="row" style="margin-top:10px">
+        <div class="col-md-2">视频全文：</div> 
+        
+        <textarea rows="6" class="col-md-8 form-control" v-model="video_fulltext"></textarea>
+    </div>
+    
+    <br/>
+    <div class="text-center">
+        <button v-show="!submitting" class="btn btn-primary rightbtn" onclick="submitvideo()">提交视频</button>
+        <button v-show="submitting" class="btn btn-primary rightbtn" disabled>
+            <span class="spinner-border spinner-border-sm"></span>
+            上传中...
+        </button>
+        <label id="picalert" style="color:red"></label>
+    </div>
+
+</div>
+
+
+
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+
+    var newvideo = new Vue({
+        delimiters: ['{[', ']}'],
+        el:'#newvideo',
+        data:{
+            video_show:false,
+            poster_show:false,
+            submitting:false,
+            upstyle:"Local",
+            posterstyle:"cutposter",
+            prate:0,
+            video_websrc:"",
+            video_title:"",
+            video_tmpname:"",
+            video_length:"",
+            video_desc:"",
+            video_fulltext:"",
+            video_ip:"",
+            video_fclass:"",
+            video_sclass:"",
+            video_tclass:"",
+            nodeid:0,
+            liData: [
+                {
+                Id: 1,
+                Name: "专利实务",
+                Check: false
+                },
+                {
+                Id: 2,
+                Name: "专利流程",
+                Check: false
+                },
+                {
+                Id: 3,
+                Name: "软件操作",
+                Check: false
+                }
+            ],
+            selectName: "",
+        },
+        methods: {
+            pastesrc(e) {
+            var val = e.target.value;
+            var reg = new RegExp('src=[\"\'](.*?)[\"\']');
+            var txt = val.match(reg);
+            console.log(txt[1]);
+            this.video_websrc = txt[1];
+            $('#iframeplay').attr('src', txt[1]);
+            this.video_show=true;
+            this.video_length="";
+            $('#videoplay').attr('src', '');
+            },
+            changep(msg) {
+                this.selectName =msg;
+            },
+            reveiveclass(cls) {
+                console.log(cls);
+                this.nodeid = cls[0];
+                this.video_fclass = cls[2];
+                this.video_sclass = cls[3];
+                this.video_tclass = cls[4];
+            }
+        },
+        components: {
+            'select-cas': selectCas,
+            'select-input': mulSelect,
+            
+        }
+    })
+
+
+    var changefile = document.getElementById('img');
+    changefile.onchange=function(){
+        $('.progress > div').css('width', '0');
+        doUpload();
+        // var file = $("#img").val();
+        // console.log(file);
+        // var pos=file.lastIndexOf("\\");
+        // $("#inputlabel").html(file.substring(pos+1));
+    }
+    
+    
+    
+    //上传文件
+    function doUpload(){
+        var formData = new FormData($("#uploadForm")[0]);
+        
+        //$('.progress > div').css('display', 'block');
+        $.ajax({  
+            url : "/sp/upAjax/",  
+            type: 'POST',  
+            data: formData,   
+            contentType: false,  
+            processData: false, 
+            xhr : function(result) {
+                var xhr = new XMLHttpRequest();
+                //使用XMLHttpRequest.upload监听上传过程，注册progress事件，打印回调函数中的event事件
+                xhr.upload.addEventListener('progress', function (e) {
+                    console.log(e);
+                    //loaded代表上传了多少
+                    //total代表总数为多少
+                    var progressRate = (e.loaded / e.total) * 100 + '%';
+                    newvideo.$data.prate = Math.ceil((e.loaded / e.total) * 100);  //这里的this.prate代表着XHR对象的属性，也可以写成xhr对
+                    //通过设置进度条的宽度达到效果
+                    $('.progress > div').css('width', progressRate);
+                })
+                return xhr;
+            },  
+            success: function(result){
+                if(result==""||result==null){
+                    alert("请至少选择一个文件~~");
+                }else{
+                    console.log("上传成功~~");
+                    var rst = JSON.parse(result);
+                    console.log(rst['result']);
+                    newvideo.$data.video_tmpname = rst['result'];
+                    $('#videoplay').attr('src', '/v1/sp/spstatic/tmp/'+rst['result']);
+                    newvideo.$data.video_show=true;
+                    $('#iframeplay').attr('src', '');
+                    vdio = document.getElementById('videoplay');
+                    vdio.addEventListener("canplay", function () {
+                        var vss = Math.floor(vdio.duration);
+                        newvideo.$data.video_length=sec_to_time(vss);
+                      });
+
+                }
+            },
+            error : function(data) {  
+                alert("上传失败~~");
+            }
+        }); 
+    }
+    
+    var posterInput = document.getElementById("poster");
+    var posterCanvas = document.getElementById("poster-canvas");
+    //var ori = document.getElementById("poster-canvas").width;
+    var posterCxt = posterCanvas.getContext("2d");
+    var posterimg = new Image();
+    posterInput.onchange = function() {
+       posterimg.src =  URL.createObjectURL(posterInput.files[0]);
+       posterimg.onload = function() {
+            posterCanvas.setAttribute('width', 480);
+            posterCanvas.setAttribute('height', 270);
+            newvideo.$data.poster_show=true;
+            posterCxt.drawImage(posterimg,0,0,480,270);
+        }
+    }
+
+    let videocut = document.getElementById("videoplay");
+    var posterCut = document.getElementById("cutposter");
+    let canvasback = document.createElement("canvas");
+    let ctxback = canvasback.getContext("2d");
+    canvasback.width = videocut.videoWidth;
+    canvasback.height = videocut.videoHeight;
+    posterCut.onclick = function() {
+        //ctxback.drawImage(videocut, 0, 0, videocut.width, videocut.height);
+        //img.src=canvasback.toDataURL("image/png");
+        posterCxt.drawImage(videocut,0,0,480,270);
+        //calculateFactor();
+        newvideo.$data.poster_show=true;
+        // img.onload = function() {
+        //     calculateFactor();
+        //     var originPosition = canvasOriginPosition();
+        //     imgCxt.globalCompositeOperation = "destination-over";
+        //     newvideo.$data.poster_show=true;
+        //     imgCxt.clearRect(0,0,imgCanvas.width,imgCanvas.height);
+        //     imgCxt.drawImage(img,originPosition.positionX,originPosition.positionY,img.width*currentFactor,img.height*currentFactor);
+        // }
+    }
+
+
+
+
+
+    //ajax提交表单数据到后台
+    function submitvideo(){
+        console.log("提交了视频！");
+        var url = posterCanvas.toDataURL('image/jpg', 0.92);
+        var arr = url.split(',');
+        var mime = arr[0].match(/:(.*?);/)[1];
+        var bstr = atob(arr[1]);
+        var n = bstr.length;
+        var u8arr = new Uint8Array(n);
+        while(n--){
+            u8arr[n] = bstr.charCodeAt(n);
+        }
+        var obj = new Blob([u8arr], {type:mime});
+        if (newvideo.$data.video_tmpname.length<3) {
+            $("#picalert").text("请上传视频！");
+            return false;
+        } else if (obj.size<3000){
+            $("#picalert").text("请上传封面！");
+            return false;
+        } else if (newvideo.$data.video_title.length<2) {
+            $("#picalert").text("请填写标题！");
+            return false;
+        } else if (newvideo.$data.video_ip.length<2) {
+            $("#picalert").text("请填写视频来源！");
+            return false;
+        } else if (newvideo.$data.video_fclass.length<2) {
+            $("#picalert").text("请填写一级分类！");
+            return false;
+        } else if (newvideo.$data.video_sclass.length<2) {
+            $("#picalert").text("请填写二级分类！");
+            return false;
+        } else if (newvideo.$data.video_desc.length<2) {
+            $("#picalert").text("请填写视频说明！");
+            return false;
+        }
+        var fd = new FormData();
+        fd.append("upposter", obj,"image.jpg");
+        fd.append("video_title",newvideo.$data.video_title);
+        fd.append("video_tmpname",newvideo.$data.video_tmpname);
+        fd.append("video_websrc",newvideo.$data.video_websrc);
+        fd.append("upstyle",newvideo.$data.upstyle);
+        fd.append("video_length",newvideo.$data.video_length);
+        fd.append("video_desc",newvideo.$data.video_desc);
+        fd.append("video_fulltext",newvideo.$data.video_fulltext);
+        fd.append("video_ip",newvideo.$data.video_ip);
+        fd.append("video_fclass",newvideo.$data.video_fclass);
+        fd.append("video_sclass",newvideo.$data.video_sclass);
+        fd.append("video_tclass",newvideo.$data.video_tclass);
+        fd.append("video_tags",newvideo.$data.selectName);
+        fd.append("action","new");
+        fd.append("videochange","yes");
+        console.log(newvideo.$data.video_title);
+        console.log(newvideo.$data.video_tmpname);
+
+        console.log(newvideo.$data.video_desc);
+        console.log(newvideo.$data.video_ip);
+        console.log(newvideo.$data.video_fclass);
+        console.log(newvideo.$data.video_sclass);
+        console.log(newvideo.$data.video_tclass);
+        newvideo.$data.submitting=true;
+        $.ajax({
+            url:"{{ url_for('sp.savevideo') }}",
+            type:"POST",
+            processData: false,
+            contentType: false,
+            data: fd,
+            dataType: "json",
+            success: function(response) {
+                window.location.href = "/v1/sp/watchvideo/"+response.result.videoid;
+
+            }
+        })
+
+
+
+    }
+    
+
+
+    function sec_to_time(s) {
+        var t;
+        if(s > -1){
+            var hour = Math.floor(s/3600);
+            var min = Math.floor(s/60) % 60;
+            var sec = Math.floor(s % 60);
+            if(hour < 10) {
+                t = '0'+ hour + ":";
+            } else {
+                t = hour + ":";
+            }
+
+            if(min < 10){t += "0";}
+            t += min + ":";
+            if(sec < 10){t += "0";}
+            t += sec;
+        }
+        return t;
+    }
+
+    function time_to_sec(time) {
+        var s = '';
+
+        var hour = time.split(':')[0];
+        var min = time.split(':')[1];
+        var sec = time.split(':')[2];
+
+        s = Number(hour*3600) + Number(min*60) + Number(sec);
+
+        return s;
+    };
+
+
+var imgInput = document.getElementById("poster");
+var submitBtn = document.getElementById("submit");
+var mySlider = document.getElementById("slider");
+var resultCanvas = document.getElementById("poster-canvas");
+var resultCxt = resultCanvas.getContext("2d");
+var imgCanvas = document.getElementById("image-canvas");
+var imgCxt = imgCanvas.getContext("2d");
+var currentFactor = 1; //当前的放缩倍数
+var minFactor = 1; //最小放缩倍数
+var maxFactor = 1; //最大放缩倍数
+var ori = document.getElementById("image-canvas").height;
+var oriw = document.getElementById("image-canvas").width;
+var cut = document.getElementById("poster-canvas").height;
+var cutw = document.getElementById("poster-canvas").width;
+var img = new Image();
+var bian = 0;
+img.setAttribute('crossOrigin', 'anonymous');
+
+
+
+imgInput.onchange = function() {
+var imgUrl =  URL.createObjectURL(imgInput.files[0]);
+// imgCanvas.setAttribute('height', ori);
+// resultCanvas.setAttribute('height',cut);
+// drawMask();
+getImage(imgUrl);
+// var fileReader = new FileReader();
+// fileReader.readAsBinaryString(imgInput.files[0]);
+}
+
+//初始滑动条
+initSlider = function() {
+    mySlider.min = minFactor;
+    mySlider.max = maxFactor;
+    mySlider.value = currentFactor;
+    mySlider.step = 0.01;
+}
+
+// 计算初始Factor
+calculateFactor = function() {
+    if(img.width>img.height*16/9) {
+        minFactor = oriw/img.width;//初始状态
+        currentFactor = oriw/img.width;
+        maxFactor = oriw*5/img.width;
+    } else {
+        minFactor = ori/img.height;
+        currentFactor = ori/img.height;
+        maxFactor = ori*5/img.height;
+    }
+    initSlider();
+}
+
+//计算初始画布位置
+canvasOriginPosition = function() {
+    calculateFactor();
+    var positionX;
+    var positionY;
+    if(img.width>img.height*16/9) {
+        positionX = 0;
+        positionY = (ori - img.height*currentFactor) /2;
+    } else {
+        positionX = (oriw - img.width*currentFactor) /2;
+        positionY = 0;
+    }
+    lastImgX = positionX;
+    lastImgY = positionY;
+    return({"positionX":positionX,"positionY":positionY});
+}
+
+//获取图像并画出来
+getImage = function(imgUrl) {
+    // img.src = './changtuxiang.jpg'
+    img.src=imgUrl;
+    img.onload = function() {
+        calculateFactor();
+        var originPosition = canvasOriginPosition();
+        imgCxt.globalCompositeOperation = "destination-over";
+        newvideo.$data.poster_show=true;
+        imgCxt.clearRect(0,0,imgCanvas.width,imgCanvas.height);
+        imgCxt.drawImage(img,originPosition.positionX,originPosition.positionY,img.width*currentFactor,img.height*currentFactor);
+    }
+}
+
+//画蒙版
+// drawMask = function() {
+//     imgCxt.fillStyle = "rgba(0,0,0,0.5)";
+//     imgCxt.fillRect(0,0,ori,ori);
+//     imgCxt.fillStyle = "rgba(0,0,0,1)";
+//     imgCxt.globalCompositeOperation = "destination-out";
+//     imgCxt.fillRect(bian,bian,cut,cut);
+// }
+
+
+//控制canvas拖动
+var moving = false;
+var lastmouseX = null;
+var lastmouseY = null;
+
+//上次移动结束,canvas画图的位置
+var lastImgX = 0;
+var lastImgY = 0;
+
+imgCanvas.onmousedown=function(e) {
+    // console.log("onmousedown",lastImgX,lastImgY);
+    moving = true;
+    lastmouseX = e.clientX;
+    lastmouseY = e.clientY;
+}
+
+window.onmouseup = function(e) {
+    if(moving === true) {
+        moving = false;
+        var newPosition = checkPosition(e.clientX - lastmouseX,e.clientY - lastmouseY)
+        //每次移动完成都要改变一下上次图片绘制位置
+        lastImgX = newPosition.X;
+        lastImgY = newPosition.Y;
+        // console.log("onmouseup",lastImgX,lastImgY);
+    }
+}
+
+imgCanvas.addEventListener("touchstart", function(e) {
+    // console.log("onmousedown",lastImgX,lastImgY);
+    var touches = e.touches[0];
+    moving = true;
+    lastmouseX = touches.clientX;
+    lastmouseY = touches.clientY;
+    document.addEventListener("touchmove",function defaultEvent(e) {
+   e.preventDefault();
+  },false);
+  },false); 
+
+imgCanvas.addEventListener("touchend",function(e) {
+    var touches = e.changedTouches[0];
+    //if(moving === true) {
+        moving = false;
+        var newPosition = checkPosition(touches.clientX - lastmouseX,touches.clientY - lastmouseY)
+        //每次移动完成都要改变一下上次图片绘制位置
+        lastImgX = newPosition.X;
+        lastImgY = newPosition.Y;
+        // console.log("onmouseup",lastImgX,lastImgY);
+    //}
+    document.removeEventListener("touchmove",function defaultEvent(e) {
+    e.preventDefault();
+    },false);
+  },false);
+
+
+redrawImg = function(pX,pY) {
+    //每次绘图前检查position是否没有超出区域
+    var newPosition = checkPosition(pX,pY)
+    imgCanvas.setAttribute('height', ori);
+    // drawMask();
+    imgCxt.globalCompositeOperation = "destination-over";
+    imgCxt.drawImage(img,newPosition.X,newPosition.Y,img.width*currentFactor,img.height*currentFactor);
+
+}
+
+checkPosition = function(pX,pY) {
+    if(pX+lastImgX<=bian&&pX+lastImgX>=oriw+bian-img.width*currentFactor&&pY+lastImgY<=bian&&pY+lastImgY>=ori+bian-img.height*currentFactor) {
+        return ({"X":pX+lastImgX,"Y":pY+lastImgY});
+    } else {
+        var x_ = pX+lastImgX;
+        var y_ = pY+lastImgY;
+        if(pX+lastImgX>bian) {
+            x_ = bian;
+        }
+        if(pX+lastImgX<oriw+bian-img.width*currentFactor) {
+            x_ = oriw+bian-img.width*currentFactor;
+        }
+        if(pY+lastImgY>bian) {
+            y_ = bian;
+        }
+        if(pY+lastImgY<ori+bian-img.height*currentFactor) {
+            y_ = ori+bian-img.height*currentFactor;
+        }
+        return({"X":x_,"Y":y_});
+    }
+}
+
+
+
+
+
+window.onmousemove = function(e) {
+    if(moving) {
+        pX=e.clientX - lastmouseX;
+        pY=e.clientY - lastmouseY;
+        // console.log(checkPosition(pX,pY));
+        
+        redrawImg(pX,pY);
+    }
+}
+
+imgCanvas.addEventListener("touchmove", function(e) {
+    var touches = e.touches[0];
+    if(moving) {
+        pX=touches.clientX - lastmouseX;
+        pY=touches.clientY - lastmouseY;
+        // console.log(checkPosition(pX,pY));
+        
+        redrawImg(pX,pY);
+    }
+},false);
+
+
+
+
+mySlider.oninput = function() {
+    currentFactor = mySlider.value;
+    //每次缩放完也都要修改图片的绘制位置
+    // console.log("oninput",mySlider.value,lastImgX,lastImgY);
+    redrawImg(0,0);
+}
+
+submitBtn.onclick = function() {
+    // console.log("onclick!!",lastImgX,lastImgY);
+    resultCxt.clearRect(0,0,resultCanvas.width,resultCanvas.height);
+    resultCxt.drawImage(img,lastImgX*1.5,lastImgY*1.5,img.width*currentFactor*1.5,img.height*currentFactor*1.5)
+}
+
+    </script>
+{% endblock %}

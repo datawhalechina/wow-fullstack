@@ -1,0 +1,471 @@
+{% extends 'taskbase.html' %}
+{% block header_part %}
+<script src="/v1/auth/mystatic/js/vue.js"></script>
+<link href="/v1/auth/mystatic/css/bootstrap-datetimepicker.min.css" rel="stylesheet" media="screen">
+<script type="text/javascript" src="/v1/auth/mystatic/js/bootstrap-datetimepicker.min.js" charset="UTF-8"></script>
+<script type="text/javascript" src="/v1/auth/mystatic/js/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    .textbox {
+        margin-left:15px;
+        margin-right:15px;
+        padding:5px;
+    }
+    .progress {
+        width: 100%;
+        height: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin: auto 0px;
+        overflow: hidden;
+    
+    }
+    /* 初始状态设置进度条宽度为0px */
+    .progress > div {
+        width: 0px;     
+        height: 100%;
+        border-radius: 5px;
+        background-color: yellowgreen;
+        transition: all .3s ease;
+        display: block;
+    }
+    .select-content {
+        width: 200px;
+        position: relative;
+    }
+    .select-content .select-input {
+        width: 100%;
+    }
+    .select-content .sanjiao {
+        position: absolute;
+        left: 190px;
+        top: -2px;
+        cursor: pointer;
+    }
+    .select-content .sanjiao .dot-bottom {
+        font-size: 0;
+        line-height: 0;
+        border-width: 5px;
+        border-color: #6a6a6a;
+        border-bottom-width: 0;
+        border-style: dashed;
+        border-top-style: solid;
+        border-left-color: transparent;
+        border-right-color: transparent;
+    }
+    .search-select {
+        display: none;
+        position: absolute;
+        left: 15px;
+        top: 40px;
+        z-index: 999;
+        min-width: 200px;
+        max-height: 400px;
+        overflow-y: auto;
+        border: 1px solid #a0f;
+        border-radius: 5px;
+        background-color: #fff;
+    }
+    .select-content .search-select .select-ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+    .select-content .search-select .select-ul .li-select {
+        color: #555;
+        padding: 2px 10px;
+        cursor: pointer;
+    }
+    .select-content .search-select .select-ul .li-hover {
+        color: #fff;
+        background-color: #a0f;
+    }
+</style> 
+{% endblock %}
+
+{% block body_part %}
+<div class="row">
+    <div style="display:inline-block;margin:0 auto;"><h2>编辑任务</h2></div>
+    <div style="margin:0 auto; height:20px;" class="col-md-12"></div>
+    
+    </div>
+    <div id='app'>
+        <div style="margin-bottom: 50px;">
+            <br/>
+            <div class="row" style="margin-top:10px">
+                <h4 class="col-md-2">标题：</h4>
+                <input class="col-md-8 form-control textbox" v-model="tdata.task_title"></input>
+            </div>
+
+            <div class="row" style="margin-top:10px">
+                <h4 class="col-md-2">执行人：</h4>
+                <div class="select-content">
+                    <input type="text" name="select_input" id="select_input" class="select_input form-control textbox" value="" autocomplete="new-password" placeholder="人员姓名" />
+                    <div id="search_select" class="search-select">
+                        <ul id="select_ul" class="select-ul">
+                            
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top:10px">
+                <h4 class="col-md-2">截止时间：</h4>
+                <div>
+                    <div class="controls input-append date form_datetime" data-link-field="dtp_input1">
+                        <input id="starttime" class="form-control textbox" style="width:200px;" size="16" type="text" value="">
+                        <span style="margin-left:30px;" class="add-on"><i class="icon-th"></i></span>
+                    </div>
+                    <input type="hidden" id="dtp_input1" value="" /><br/>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top:10px">
+                <h4 class="col-md-2">赏金：</h4>
+                <input class="col-md-8 form-control textbox" type="number" onblur="this.value=Math.abs(Math.trunc(this.value))" v-model="tdata.bonus" placeholder="请填写整数数字" v-bind:disabled=jinyong></input>
+            </div>
+            
+            <div class="row" style="margin-top:10px">
+                <h4 class="col-md-2">说明：</h4>
+                <textarea rows="4" class="col-md-8 form-control textbox" v-model="tdata.task_desc"></textarea>
+            </div>
+
+            <div class="row" style="margin-top:10px">
+                <div class="col-md-2"></div>
+                <label class="col-md-4 form-check-label">
+                    <input type="checkbox" v-model="descposter_has" style="margin-right: 10px;" onclick="this.value=(this.value==0)?1:0" value="0">说明配图
+                </label>
+            </div>
+
+            <div v-show="descposter_has==1" class="row" style="margin-top:10px">
+            <div class="col-md-2">上传图片：<br/>(尺寸16:9)</div>
+            <div class="col-md-8">
+                <input style="width:100%;border:1px dashed black;" class="btn btn-default" id="descposter" type="file" name="descpo"></input>
+            </div>
+            </div>
+            
+            <div class="row" v-show="descposter_show && descposter_has==1">
+            <div class="col-md-2"></div>
+            <div class="col-md-8" style="text-align: center;"> 
+                <canvas id="descposter-canvas" style="width: 480px"></canvas>
+            </div>
+            </div>
+
+
+            <div class="row" style="margin-top:10px">
+                <div class="col-md-2"></div>
+                <label class="col-md-4 form-check-label kaozuo">
+                    <input type="checkbox" v-model="descfile_has" style="margin-right: 10px;" onclick="this.value=(this.value==false)?true:false" value="0">任务文件
+                </label>
+            </div>
+
+            <div v-show="descfile_has==true" class="row" style="margin-top:10px">
+            <div class="col-md-2">上传文件：</div>
+
+            <div class="col-md-8">
+            <div class="progress">
+                <div></div>
+            </div>
+            <form id="uploadForm" style="display:block;">
+                <input style="width:100%;border:1px dashed black;margin:10px 0px;" class="btn btn-default" id="descfile" type="file" name="descfi"></input>
+            </form>
+            </div>
+            
+            </div>
+            
+            <div class="row" v-show="descfile_show && descfile_has==true">
+            <div class="col-md-2"></div>
+            <div class="col-md-8" style="text-align: center;"> 
+                <label>任务文件：</label>
+                <a id="filedisplay" href="">{[file_oriname]}</a>
+            </div>
+            </div>
+            <br/>
+            <div class="text-center">
+            <input class="btn btn-primary" @click="tijiao()" type="submit" value="保存任务">
+            </div>
+            <div class="row" style="margin-top:10px">
+                <span id="showres" style="display:inline-block;margin:0 auto;"></span>
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+    td = {{dta|tojson}};
+    taskvue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: '#app',
+        data: {
+            descposter_has:false,
+            descposter_show:false,
+            descfile_has:false,
+            descfile_show:false,
+            pic_update:false,
+            file_update:false,
+            file_tmpname:'',
+            file_oriname:'',
+            file_show:false,
+            task_taker:null,
+            tdata:td
+        },
+        mounted: function () {
+            $('#select_input').val(this.tdata.task_taker);
+            this.task_taker=this.tdata.takerid;
+            $('#starttime').val(this.tdata.deadline);
+            //console.log(this.tdata.deadline);
+            if (this.tdata.pubpic_url) {
+                this.descposter_has = true;
+                this.descposter_show=true;
+                var descposterimg = new Image();
+                descposterimg.src = "/v1/sp/spstatic/rw/images/"+this.tdata.pubpic_url;
+                descposterimg.onload = function() {
+                    console.log("渲染任务图片1");
+                    descposterCanvas.setAttribute('width', 480);
+                    descposterCanvas.setAttribute('height', 270);
+                    descposterCxt.drawImage(descposterimg,0,0,480,270);
+                }
+                    
+            }
+
+            if (this.tdata.pubfile_url) {
+                this.descfile_has = true;
+                this.descfile_show=true;
+                $('#filedisplay').attr('href', '/v1/sp/spstatic/rw/files/'+this.tdata.pubfile_url);
+                this.file_oriname = this.tdata.pubfile_name
+                    
+            }
+        },
+        methods: {
+            
+            tijiao () {
+                
+
+                if(this.tdata.task_title.length>0){
+                    
+                    var fd = new FormData();
+
+                    if (this.descposter_has && this.pic_update){
+                        var descurl = descposterCanvas.toDataURL('image/jpg', 0.92);
+                        var descarr = descurl.split(',');
+                        var descmime = descarr[0].match(/:(.*?);/)[1];
+                        var descbstr = atob(descarr[1]);
+                        var descn = descbstr.length;
+                        var descu8arr = new Uint8Array(descn);
+                        while(descn--){
+                            descu8arr[descn] = descbstr.charCodeAt(descn);
+                        }
+                        var descobj = new Blob([descu8arr], {type:descmime});
+                        fd.append("descposter", descobj,"image.jpg");
+                        fd.append("pic_update",this.pic_update);
+                    }
+
+                    if (this.descfile_has && this.file_update){
+                        
+                        //fd.append("descfile", "image.jpg");
+                        fd.append("file_update",this.file_update);
+                        fd.append("file_tmpname",this.file_tmpname);
+                        fd.append("file_oriname",this.file_oriname);
+
+                    }
+                    fd.append("task_title",this.tdata.task_title);
+                    fd.append("task_desc",this.tdata.task_desc);
+                    fd.append("bonus",this.tdata.bonus);
+                    if ($('#select_input').val().length<1){
+                        this.task_taker=null;
+                    }
+                    fd.append("task_taker",this.task_taker);
+                    fd.append("taker_name",$('#select_input').val());
+                    console.log(this.task_taker);
+                    console.log($('#select_input').val());
+                    fd.append("deadline",$('#starttime').val());
+                    fd.append("descposter_has",this.descposter_has);
+                    fd.append("descfile_has",this.descfile_has);
+                    fd.append("ta_id",this.tdata.taskid);
+                    fd.append("task_action","edit");
+
+                    $.ajax({
+                        url:"{{ url_for('rw.savetask') }}",
+                        type:"POST",
+                        processData: false,
+                        contentType: false,
+                        data:fd,
+                        dataType: "json",
+                        success: function(response) {
+                            $("#showres").html("已成功保存任务");
+                            //taskvue.$data.optionsArr=response.result;
+
+                        }
+                    })
+                }
+            }
+        }
+    })
+    
+    var descposterInput = document.getElementById("descposter");
+    var descposterCanvas = document.getElementById("descposter-canvas");
+    //var ori = document.getElementById("poster-canvas").width;
+    var descposterCxt = descposterCanvas.getContext("2d");
+
+    descposterInput.onchange = function() {
+        var descposterimg = new Image();
+        descposterimg.src =  URL.createObjectURL(descposterInput.files[0]);
+        console.log("展示图片1");
+        descposterimg.onload = function() {
+            descposterCanvas.setAttribute('width', 480);
+            descposterCanvas.setAttribute('height', 270);
+            taskvue.$data.descposter_show=true;
+            taskvue.$data.pic_update=true;
+            descposterCxt.drawImage(descposterimg,0,0,480,270);
+        }
+    }
+
+
+    
+    // var descfileInput = document.getElementById("descfile");
+    // descfileInput.onchange = function() {
+    //     taskvue.$data.descfile_show=true;
+
+    // }
+
+
+
+var tempArr = {{usrsl|tojson}}
+searchInput(tempArr);
+
+function newOptions(tempArr){
+    var listArr = [];
+    for(var i=0;i<tempArr.length;i++){
+        if(tempArr[i].Username.indexOf($('#select_input').val()) > -1){
+            listArr.push(tempArr[i]);
+        }
+    }
+    var options = '';
+    for(var i = 0; i < listArr.length; i++) {
+        opt = '<li class="li-select" data-newUserid="' + listArr[i].Userid + '">' + listArr[i].Username + '</li>';
+        options += opt;
+    }
+    if(options == ''){
+        $('#search_select').hide();
+    }else{
+        $('#search_select').show();
+        $('#select_ul').html('').append(options);
+    }
+}
+function searchInput(tempArr){
+    $('select-content').on('click',function(){
+        $('#select_input').focus();
+    });
+    $('#select_input').on('keyup',function(){
+        newOptions(tempArr);
+    });
+    $('#select_input').on('focus',function(){
+        $('#search_select').show();
+        newOptions(tempArr);
+    });
+    $('#select_ul .li-disabled').on('click',function(){
+        $('#search_select').show();
+    });
+    $('#search_select').on('mouseover',function(){
+        $(this).addClass('ul-hover');
+    });
+    $('#search_select').on('mouseout',function(){
+        $(this).removeClass('ul-hover');
+    });
+    $('#select_input').on('blur',function(){
+        if($('#search_select').hasClass('ul-hover')){
+            $('#search_select').show();
+        }else{
+            $('#search_select').hide();
+        }
+    });
+    $('#select_ul').delegate('.li-select', 'click',function(){
+        $('#select_ul .li-select').removeClass('li-hover');
+        var selectText = $(this).html();
+        var newUseridVal = $($(this)[0]).attr("data-newUserid");
+        taskvue.$data.task_taker=newUseridVal;
+        $('#select_input').val(selectText);
+        $('#search_select').hide();
+        $("input[name='newUserid']").val(newUseridVal);
+    });
+    $('#select_ul').delegate('.li-select', 'mouseover',function(){
+        $('#select_ul .li-select').removeClass('li-hover');
+        $(this).addClass('li-hover');
+    });
+}
+
+    $('.form_datetime').datetimepicker({
+        fontAwesome:'font-awesome',//指定
+        language:  'zh-CN',
+        format : 'yyyy-mm-dd hh:ii:ss',
+        weekStart: 1,
+        todayBtn:  1,
+        autoclose: 1,
+        todayHighlight: 1,
+        startView: 2,
+        forceParse: 0,
+        showMeridian: 1
+    });   
+
+
+    var changefile = document.getElementById('descfile');
+    changefile.onchange=function(){
+        $('.progress > div').css('width', '0');
+        doUpload();
+    }
+
+    //上传文件
+    function doUpload(){
+        var formData = new FormData($("#uploadForm")[0]);
+        
+        //$('.progress > div').css('display', 'block');
+        $.ajax({  
+            url : "/v1/rw/uptaskfile/",  
+            type: 'POST',  
+            data: formData,   
+            contentType: false,  
+            processData: false, 
+            xhr : function(result) {
+                var xhr = new XMLHttpRequest();
+                //使用XMLHttpRequest.upload监听上传过程，注册progress事件，打印回调函数中的event事件
+                xhr.upload.addEventListener('progress', function (e) {
+                    console.log(e);
+                    //loaded代表上传了多少
+                    //total代表总数为多少
+                    var progressRate = (e.loaded / e.total) * 100 + '%';
+    
+                    //通过设置进度条的宽度达到效果
+                    $('.progress > div').css('width', progressRate);
+                })
+                return xhr;
+            },  
+            success: function(result){
+                if(result==""||result==null){
+                    alert("请至少选择一个文件~~");
+                }else{
+                    console.log("上传成功~~");
+                    var rst = JSON.parse(result);
+                    console.log(rst['tmp']);
+                    taskvue.$data.file_tmpname = rst['tmp'];
+                    taskvue.$data.file_oriname = rst['ori'];
+                    $('#filedisplay').attr('href', '/v1/sp/spstatic/rw/tmp/'+rst['tmp']);
+                    taskvue.$data.descfile_show=true;
+                    taskvue.$data.file_update=true;
+                    
+
+                }
+            },
+            error : function(data) {  
+                alert("上传失败~~");
+            }
+        }); 
+    }
+
+    
+</script>
+{% endblock %}

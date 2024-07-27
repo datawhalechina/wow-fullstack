@@ -1,0 +1,93 @@
+{% extends 'taskbase.html' %}
+{% block header_part %}
+<script src="/v1/auth/mystatic/js/vue.js"></script>
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    .kaoyou {
+        text-align: right;
+    }
+    .kaozuo {
+        text-align: left;
+    }
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+<div class="row">
+    <div style="display:inline-block;margin:0 auto;"><h2>新建项目</h2></div>
+    <div style="margin:0 auto; height:20px;" class="col-md-12"></div>
+    
+    </div>
+    <div id='app'>
+        <div style="margin-left: 20px;text-align: center;">
+            <br/>
+            <div class="row" style="margin-top:10px">
+                <div class="col-md-2 kaoyou">标题：</div>
+                <input class="col-md-8 form-control" v-model="project_title"></input>
+            </div>
+            <div class="row" style="margin-top:10px">
+                <div class="col-md-2 kaoyou">说明：</div>
+                <textarea rows="4" class="col-md-8 form-control" v-model="project_desc"></textarea>
+            </div>
+            
+            <br/>
+            <input class="btn btn-primary" @click="tijiao()" type="submit" value="进入详细编辑">
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+    projectvue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: '#app',
+        data: {
+            project_title:'',
+            project_desc:'',
+        },
+        methods: {
+            
+            tijiao () {
+                
+
+                if(this.project_title.length>0){
+                    let convobj = {
+                        'project_title':this.project_title,
+                        'project_desc':this.project_desc
+                    }
+                    console.log(convobj);
+                    
+
+                    $.ajax({
+                        url:"{{ url_for('rw.addnewproject') }}",
+                        type:"POST",
+                        data:{
+                            project_title:this.project_title,
+                            project_desc:this.project_desc
+                        },
+                        dataType: "json",
+                        success: function(response) {
+                            
+                            //projectvue.$data.optionsArr=response.result;
+
+                        }
+                    })
+                }
+            }
+        }
+    })
+    
+    
+
+
+   
+
+
+    
+</script>
+{% endblock %}

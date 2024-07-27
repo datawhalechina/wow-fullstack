@@ -1,0 +1,110 @@
+{% extends 'taskbase.html' %}
+{% block header_part %}
+<script src="/v1/auth/mystatic/js/vue.js"></script>
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    .kaoyou {
+        text-align: right;
+    }
+    .kaozuo {
+        text-align: left;
+    }
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+    <div class="row">
+    <div style="display:inline-block;margin:0 auto;"><h2>全部项目</h2></div>
+    <div style="margin:0 auto; height:20px;" class="col-md-12"></div>
+    
+    </div>
+    {% if current_user.role=='admin' %}
+    <a href="/v1/rw/newproject/" target="_blank"><button class="btn btn-primary">新建项目</button></a><br/><br/>
+    {% endif %}
+    <div id="app">
+    <div v-for="item in projectlist">
+    <h4 style="margin-bottom: 10px;">{[item.project_title]}</h4>
+
+    <span>发布人: {[item.project_author]}</span>
+    <br/>
+    <a :href="'/v1/rw/viewproject/'+item.projectid" target="_blank">查看项目</a> 
+    <a :href="'/v1/rw/editproject/'+item.projectid" target="_blank">编辑项目</a>
+    <button :id="item.projectid" @click="deletepro(item.projectid)">删除项目</button><br/><br/>
+        
+    <br/><br/>
+    </div>
+    </div>
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+    projectvue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: '#app',
+        data: {
+            projectlist:[]
+        },
+        mounted: function(){
+            this.projectlist = {{pdata|tojson}};
+            console.log(this.projectlist);
+        },
+        methods: {
+            deletepro(objid){
+                $.ajax({
+                    url:"{{ url_for('rw.deletepro') }}",
+                    type:"POST",
+                    data:{
+                        pro_id:objid
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        window.location.href = "{{ url_for('rw.showproject') }}";
+
+                    }
+                })
+            },
+            
+            tijiao () {
+                
+
+                if(this.project_title.length>0){
+                    let convobj = {
+                        'project_title':this.project_title,
+                        'project_desc':this.project_desc
+                    }
+                    console.log(convobj);
+                    
+
+                    $.ajax({
+                        url:"{{ url_for('rw.addnewproject') }}",
+                        type:"POST",
+                        data:{
+                            project_title:this.project_title,
+                            project_desc:this.project_desc
+                        },
+                        dataType: "json",
+                        success: function(response) {
+                            
+                            //projectvue.$data.optionsArr=response.result;
+
+                        }
+                    })
+                }
+            }
+        }
+    })
+    
+    
+
+
+   
+
+
+    
+</script>
+{% endblock %}

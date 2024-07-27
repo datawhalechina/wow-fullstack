@@ -3,6 +3,7 @@ from datetime import datetime, timedelta
 from app.dependencies import check_jwt_token, get_db, verify_password, get_password_hash
 from app.config import settings
 from jose import jwt
+import requests
 import os
 import json
 import glob
@@ -58,6 +59,16 @@ def check_user(db: Session, phone, password):
         return False
     return user
 
+# import httpx 
+# async def login_flask(id,name,phone,role):
+#     url = 'http://127.0.0.1:8008/v1/auth/login_api'
+#     headers = {"content-type": "application/x-www-form-urlencoded"} 
+#     data = {"id": id, "name": name, "phone":phone, "role":role}
+#     async with httpx.AsyncClient() as client:  
+#         res = await client.post(url, data=data, headers=headers)  
+#     return res.text
+
+
 
 # 使用表单格式参数需要安装模块：python-multipart
 @router.post("/token", response_model=TokenModel)
@@ -81,6 +92,8 @@ async def login_for_access_token(phone: str = Form(...), password: str = Form(..
     )
     user.atoken = access_token
     user.rtoken = refresh_token
+    #rtn = await login_flask(user.id,user.username,user.phone,user.role)
+    #print(rtn)
     return user
 
 @router.get("/refresh", response_model=TokenModel)

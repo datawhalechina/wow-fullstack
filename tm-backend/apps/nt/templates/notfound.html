@@ -1,0 +1,28 @@
+{% extends 'ntbase.html' %}
+{% block header_part %}
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+</style> 
+{% endblock %}
+
+{% block body_part %}
+	
+	<div class="row">
+	<div style="display:inline-block;margin:0 auto;"><h2>脑图启动大脑</h2></div>
+	<div style="margin:0 auto; height:10px;" class="col-md-12"></div>
+	<div style="margin:0 auto; width:90%;text-align:center">
+	<div id="login_frame">
+
+		<p id="image_logo"><img src="{{url_for('nt.static',filename='img/bebrain.png')}}" height="50"></p>
+		
+		<div style="display:inline-block;margin:0 auto;"><h3>没有找到脑图，请核对脑图ID号是否正确。</h3></div>
+	</div>
+	</div>
+	</div>
+				
+{% endblock %}
+
+{% block script_part %}
+{% endblock %}

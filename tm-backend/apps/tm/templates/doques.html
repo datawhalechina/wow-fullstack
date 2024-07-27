@@ -1,0 +1,230 @@
+{% extends 'tmbase.html' %}
+{% block header_part %}
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+img[src=""],img:not([src]){
+        opacity:0;
+}
+.outer {
+    border:solid #a0f 1px;border-radius:10px;margin:20px 0px;padding:10px;
+}
+
+.slot {
+    margin:5px 10px;
+    padding:5px;
+}
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+<div id='app'>
+    <div v-for="(item,index) in querylist">
+        <div class="row" style="margin:10px">
+        <select id="fclass" class="col-md-3 form-control" v-model="item[0]">
+            <option value="题型">题型</option>
+            <option value="作者">作者</option>
+            <option value="审核人">审核人</option>
+            <option value="ques_title">标题</option>
+            <option value="ques_desc">说明</option>
+            <option value="item_a/item_b/item_c/item_d">选项</option>
+            <option value="answer">答案</option>
+            <option value="explain">解析</option>
+            <option value="ques_title/ques_desc">标题/说明</option>
+            <option value="ques_title/ques_desc/item_a/item_b/item_c/item_d">标题/说明/选项</option>
+            <option value="item_a/item_b/item_c/item_d/answer/explain">选项/答案/解析</option>
+            <option value="answer/explain">答案/解析</option>
+            <option value="ques_title/ques_desc/item_a/item_b/item_c/item_d/answer/explain">标题/说明/选项/答案/解析</option>
+        </select>
+        <span>&nbsp;&nbsp;</span>
+        <input v-model="item[1]" class="col-md-5 form-control" @input="changewords()" placeholder="可以用and和or，不要用括号" type="text">
+        <span v-if="index<querylist.length-1">&nbsp;&nbsp;<label style="padding-top:10px;">AND</label></span>
+        <span v-if="index>0"><i class="fa fa-minus-circle" style="font-size:24px;color:#a0f;margin-left:10px;padding-top:10px;" @click="deletewords(index)"></i></span>
+        </div>
+    </div>
+    <div style="margin:10px" class="text-center">
+    <button class="btn btn-primary"  @click="addwords()">+增加字段</button>
+    <span>&nbsp;&nbsp;</span>
+    <button class="btn btn-primary" @click="query()" :disabled="disabled">开始检索</button>
+    </div>
+    
+
+    <div class="outer" v-for="(item,index) in quesdata">
+    <h4 style="margin-bottom: 10px;">{[index+1]}. {[item.ques_title]}</h4>
+    <div><img v-if="item.descpic_url" style="max-width: 100%;height:auto;" :src="'/sp/spstatic/images/quespic/'+item.descpic_url" /></div>
+    <div>{[item.ques_desc]}</div>
+    <div v-if="item.ques_type == '选择题'" :id="item.quesid" @change="checkClick(index)">
+        <div>
+          <label class="form-check-label">
+            <input type="checkbox" v-model="item.reply" value="a"> A: {[item.item_a]}
+          </label>
+        </div>
+        <div>
+          <label class="form-check-label">
+            <input type="checkbox" v-model="item.reply" value="b"> B: {[item.item_b]}
+          </label>
+        </div>
+
+        <div v-if="item.item_c">
+            <label class="form-check-label">
+              <input type="checkbox" v-model="item.reply" value="c"> C: {[item.item_c]}
+            </label>
+        </div>
+
+        <div v-if="item.item_d">
+            <label class="form-check-label">
+                <input type="checkbox" v-model="item.reply" value="d"> D: {[item.item_d]}
+            </label>
+        </div>
+    </div>
+
+    <div v-if="item.ques_type == '判断题'" :id="item.quizitemid" @change="checkClick(index)">
+        <div class="row">
+            <span class="col-md-8" style="text-align: left;">
+                <label class="form-check-label">
+                <input type="radio" value="正确" v-model="item.reply"> 正确
+                </label>
+                <span>&nbsp;&nbsp;</span>
+                <label class="form-check-label">
+                <input type="radio" value="错误" v-model="item.reply"> 错误
+                </label>
+            </span>
+        </div>
+    </div>
+
+    <div v-if="item.ques_type == '填空题'" :id="item.quizitemid" @input="checkClick(index)">
+        <div v-if="item.item_a" class="row">
+            <input class="col-md-8 form-control slot" placeholder="A" v-model="item.reply[0]">
+        </div>
+
+        <div v-if="item.item_b" class="row">
+            <input class="col-md-8 form-control slot" placeholder="B" v-model="item.reply[1]">
+        </div>
+
+        <div v-if="item.item_c" class="row">
+            <input class="col-md-8 form-control slot" placeholder="C" v-model="item.reply[2]">
+        </div>
+
+        <div v-if="item.item_d" class="row">
+            <input class="col-md-8 form-control slot" placeholder="D" v-model="item.reply[3]">
+        </div>
+    </div>
+
+    <div v-if="item.ques_type == '简答题'">
+        <div class="row">
+            <textarea rows="4" class="col-md-10 form-control" :placeholder="item.answer"></textarea>
+        </div>
+    </div>
+    <div v-show="item.check" style="color:#a0f">恭喜你答对啦！</div>
+    <div v-show="item.check">{[item.explain]}</div>
+    </div>
+    <br>
+</div>
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+
+    var quesd= {{qdata|tojson}};
+    quesshow = new Vue({
+        delimiters: ['{[', ']}'],
+        el: '#app',
+        data: {
+            querylist:[['','']],
+            disabled:true,
+            quesdata:quesd,
+            
+        },
+        methods: {
+            created (){
+                if(subjectArr.length > 0){
+                    kong=false;
+                }
+            },
+            addwords (){
+                this.querylist.push(['','']);
+                this.disabled = true;
+            },
+            query (){
+                console.log(this.querylist);
+                let queryli = this.querylist;
+                $.ajax({
+                    url:"{{ url_for('tm.searchques') }}",
+                    type:"POST",
+                    data:{
+                        querywords:JSON.stringify(queryli)
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        //$("#showgym").html(response);
+                        quesshow.$data.quesdata=response;
+
+                    }
+                })
+            },
+            deletewords (i){
+                this.querylist.splice(i,1);
+                this.disabled = false;
+                this.querylist.forEach(el => {
+                    str1 = el[0];
+                    str2 = el[1].replace(/\s*/g,"");
+                    if(str1.length==0 | str2.length==0){
+                        this.disabled = true;
+                    }
+                });
+            },
+            changewords (){
+                this.disabled = false;
+                this.querylist.forEach(el => {
+                    str1 = el[0];
+                    str2 = el[1].replace(/\s*/g,"");
+                    if(str1.length==0 | str2.length==0){
+                        this.disabled = true;
+                    }
+                });
+            },
+            checkClick: function (index) {
+                var shortreply;
+                if (this.quesdata[index].ques_type == "选择题"){
+                    shortreply = this.quesdata[index].reply.slice().sort().join('');
+                } else if (this.quesdata[index].ques_type == "判断题"){
+                    shortreply = this.quesdata[index].reply;
+                } else if (this.quesdata[index].ques_type == "填空题"){
+                    shortreply = this.quesdata[index].reply.slice().join(',');
+                    console.log(shortreply);
+                }
+            
+                if (shortreply==this.quesdata[index].answer){
+                    this.quesdata[index].check=true;
+                } else {
+                    this.quesdata[index].check=false;
+                }
+          },
+        }
+    })
+
+
+function deleteques(obj){
+    var quesid = obj.id;
+    console.log(quesid);
+    $.ajax({
+        url:"{{ url_for('tm.deleteques') }}",
+        type:"POST",
+        data:{
+            ques_id:quesid
+        },
+        dataType: "json",
+        success: function(response) {
+            window.location.href = "{{ url_for('tm.showques') }}";
+
+        }
+    })
+} 
+
+
+    
+</script>
+{% endblock %}

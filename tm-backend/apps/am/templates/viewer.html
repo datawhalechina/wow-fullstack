@@ -1,0 +1,74 @@
+﻿{% extends 'adminbase.html' %}
+{% block header_part %}
+
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    img[src=""],img:not([src]){
+         opacity:0;
+    }
+    .table-css tr td{
+    padding-right:50px;
+    }
+    .table-css tr th{
+    padding-right:50px;
+    }
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+        <br>
+        <h1>工作目录</h1>
+        <br>
+        <br>
+        <div class="row">
+            <div class="col-md-12">
+			<form action="/v1/am/mulu/" method="post" enctype="multipart/form-data">
+			<input style="width:400px; background-color:#FFF;" type="file" name="upfile">
+			<input type="hidden" name="uppath" value="{{fapath}}"/>
+			<input style="width:50px" type ="submit" value="上传">
+			</form>
+            <table class="table-css">
+				<tr>
+					<th>名称</th>
+					<th>修改日期</th>
+					<th>文件大小</th>
+					<th>类型</th>
+					<th>操作</th>
+				</tr>
+				{% for item in disk %}
+				<tr>
+					<td><a href="/v1/am/mulu/?hpath={{item['path']}}&hname={{ item['name'] }}">{{ item['name'] }}</a></td>
+					<td>{{ item['time'] }}</td>
+					<td>{{ item['size'] }}</td>
+					<td>{{ item['type'] }}</td>
+					<td>
+						{% if item['type']=="文件" %}
+							<a href="/v1/am/mulu/?hpath={{item['path']}}&delindex=1" title="{{ item['name'] }}" onclick="javascript:return del(this)">删除</a>
+						{% endif %}
+					</td>
+				</tr>
+				{% endfor %}
+			</table>
+
+			</div>
+
+        </div>
+		{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+function del(obj) { 
+ var fname = obj.title;
+ var msg = "确实要删除<"+fname+">吗?"; 
+ if (confirm(msg)==true){ 
+  return true; 
+ }else{ 
+  return false; 
+ } 
+} 
+</script>
+{% endblock %}
+

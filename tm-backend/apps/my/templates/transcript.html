@@ -1,0 +1,130 @@
+{% extends 'userbase.html' %}
+{% block header_part %}
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    img[src=""],img:not([src]){
+         opacity:0;
+    }
+    .table-css{
+      vertical-align:middle;
+      text-align:center;
+      min-width:1200px;
+    }
+    .table-css tr td{
+    padding-right:50px;
+    }
+    .table-css tr th{
+    padding-right:50px;
+    }
+    .table-top{
+      text-align: center;
+      margin-bottom: 20px;
+      text-align: center;
+      width:100%;
+    }
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+	<div id="app">
+		<div style="margin:0 auto; height:50px;" class="col-md-12"></div>
+    
+		<div style="display:inline-block;margin:auto;">
+    <div v-if="['admin','superviser'].includes(urole)" class="table-top">
+      <input type="text" style="width:200px;" @input="hidenum()" placeholder="考生姓名" v-model="candiname">
+      <span>&nbsp;&nbsp;</span>
+      <button class="btn btn-primary" @click="queryname()">查询</button>
+      <h6 v-if="shownum" style="margin:5px">共查询出{[tdata.length]}条数据</h6>
+    </div>
+		<table class="table-css">
+			<tr>
+				<th>日期</th>
+				<th>科目</th>
+				<th>题数</th>
+				<th>满分</th>
+				<th>成绩</th>
+				<th>百分制</th>
+				<th>用时</th>
+				<th>操作</th>
+			</tr>
+			<tr v-for="dd in tdata">
+				<td>{[dd.test_time]}</td>
+				<td>{[dd.testpaper_title]}</td>
+				<td>{[dd.ques_amount]}</td>
+				<td>{[dd.full_score]}</td>
+				<td>{[dd.test_score]}</td>
+				<td>{[dd.baifen_score]}</td>
+				<td>{[dd.test_during]}分钟</td>
+				<td>
+					<a :href="'../../tm/showcuoti/'+dd.pperformid" target="_blank">复盘</a>
+                    <span>&nbsp;&nbsp;</span>
+					<a :href="'../../tm/begintest/'+dd.testpaperid" target="_blank">重考</a>
+				</td>
+			</tr>
+		</table>
+        </div>  
+    </div>
+		
+	
+	
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+usrid = {{current_user.id|tojson}};
+usrname = {{current_user.name|tojson}};
+usrrole = {{current_user.role|tojson}};
+const app = Vue.createApp({
+  data() {
+    return {
+      tdata: [],
+      candiname:'',
+      shownum:false,
+      urole:usrrole
+    }
+  },
+  delimiters: ['{[', ']}'],
+  mounted: function(){
+    this.fetchdata(usrname);
+  },
+  methods: {
+    fetchdata: function(candi){
+      var fd = new FormData();
+      fd.append("candiname",candi);
+      $.ajax({
+          url:"{{ url_for('my.fetchtrans') }}",
+          type:"POST",
+          processData: false,
+          contentType: false,
+          data:fd,
+          dataType: "json",
+          success: function(response) {
+            transvue.tdata = response;
+            transvue.shownum = true;
+
+          },
+          error : function(data) {  
+          alert("发送失败~~");
+        }
+      })
+    },
+    queryname: function(){
+      this.fetchdata(this.candiname);
+    },
+    hidenum: function(){
+      this.shownum=false;
+    }
+  }
+})
+
+const transvue = app.mount('#app')
+
+
+    
+</script>
+{% endblock %}

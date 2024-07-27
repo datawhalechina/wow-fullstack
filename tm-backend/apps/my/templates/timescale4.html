@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+ 
+<head>
+  <meta charset="utf-8" />
+  <title>拖动选择时间段</title>
+  <link rel="stylesheet" type="text/css" href="../static/css/style.css" />
+</head>
+ 
+<body>
+  <div class="kaoqing" id="demo1"></div>
+  <button id="getdata">获得数据</button>
+  <div id="answer"></div>
+  <script src="../static/js/jquery-3.4.1.min.js"></script>
+  <script src="../static/js/drag.js"></script>
+  <script>
+  $(function() {
+    // 开始时间和结束时间的日期应该是同一天，不支持跨天,
+    // 日期格式要标准，yyyy-MM-dd hh:mm:ss
+    // 已选择的时间段
+    var data3 = [{
+      startime: '2020-10-19 01:30:00',
+      endtime: '2020-10-19 02:00:00'
+    }, {
+      startime: '2020-10-19 16:30:00',
+      endtime: '2020-10-19 20:30:00'
+    }];
+    // data3 = [];
+    var juicy = $("#demo1").initJuicy({
+      height: 650,
+      mondayDate: '2020-10-19',
+      timedata: data3,
+      status: true, //false表示不能编辑，true可以编辑
+    });
+    $("#getdata").click(function() {
+      var backdata = juicy.getdata();
+      $("#answer").html(JSON.stringify(backdata))
+    })
+  })
+  </script>
+</body>
+ 
+</html>

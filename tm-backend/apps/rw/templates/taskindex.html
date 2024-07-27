@@ -1,0 +1,106 @@
+{% extends 'taskbase.html' %}
+{% block header_part %}
+<script src="/v1/auth/mystatic/js/vue3.js"></script>
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+.outer {
+	border:solid #a0f 1px;border-radius:10px;margin:20px 0px;
+}
+</style> 
+{% endblock %}
+
+{% block body_part %}	
+
+<div id="app">
+	<div class="row">
+		<h3 class="col-md-12 text-center">我
+			<select @change="loadrw">
+				<option v-for="item in mylist" :value="item" >{[item]}</option>
+			</select>
+			的任务</h3>
+	</div>
+	<div v-show="curcati=='执行'">
+		<div v-for="dd in tdata" class="row outer">
+			<h4 class="col-md-12">{[dd.taskid]}. <a style="color:#a0f" :href="'/v1/rw/dotask/'+dd.taskid" target="_blank">{[dd.task_title]}</a></h4>
+			<div class="col-md-4">{[dd.task_type]} &nbsp;&nbsp;&nbsp;&nbsp;发布人: {[dd.admin_name]}</div>
+			<div class="col-md-4">赏金: {[dd.bonus]} &nbsp;&nbsp;&nbsp;&nbsp;阶段: {[dd.task_phase]}</div>
+			<div class="col-md-4">期限: {[dd.deadline]}</div>
+		</div>
+	</div>
+
+	<div v-show="curcati=='发布'">
+		<div v-for="pp in pdata" class="row outer">
+			<h4 class="col-md-12">{[pp.taskid]}. <a style="color:#a0f" :href="'/v1/rw/viewtask/'+pp.taskid" target="_blank">{[pp.task_title]}</a></h4>
+			<div class="col-md-4">{[pp.task_type]} &nbsp;&nbsp;&nbsp;&nbsp;执行人: {[pp.taker_name]}</div>
+			<div class="col-md-4">赏金: {[pp.bonus]} &nbsp;&nbsp;&nbsp;&nbsp;阶段: {[pp.task_phase]}</div>
+			<div class="col-md-4">期限: {[pp.deadline]}</div>
+		</div>
+	</div>
+
+	<div v-show="curcati=='完成'">
+		<div v-for="dd in fdata" class="row outer">
+			<h4 class="col-md-12">{[dd.taskid]}. <a style="color:#a0f" :href="'/v1/rw/viewtask/'+dd.taskid" target="_blank">{[dd.task_title]}</a></h4>
+			<div class="col-md-4">{[dd.task_type]} &nbsp;&nbsp;&nbsp;&nbsp;发布人: {[dd.admin_name]}</div>
+			<div class="col-md-4">赏金: {[dd.bonus]} &nbsp;&nbsp;&nbsp;&nbsp;阶段: {[dd.task_phase]}</div>
+			<div class="col-md-4">完成时间: {[dd.finish_time]}</div>
+		</div>
+	</div>
+
+	<div v-show="curcati=='验收'">
+		<div v-for="dd in rdata" class="row outer">
+			<h4 class="col-md-12">{[dd.taskid]}. <a style="color:#a0f" :href="'/v1/rw/viewtask/'+dd.taskid" target="_blank">{[dd.task_title]}</a></h4>
+			<div class="col-md-4">{[dd.task_type]} &nbsp;&nbsp;&nbsp;&nbsp;执行人: {[dd.taker_name]}</div>
+			<div class="col-md-4">赏金: {[dd.bonus]} &nbsp;&nbsp;&nbsp;&nbsp;阶段: {[dd.task_phase]}</div>
+			<div class="col-md-4">完成时间: {[dd.finish_time]}</div>
+		</div>
+	</div>
+	<br>
+	<br>
+	<br>
+
+</div>
+
+
+		
+	
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+    
+td = {{tdata|tojson}};
+pd = {{pdata|tojson}};
+fd = {{fdata|tojson}};
+rd = {{rdata|tojson}};
+usrid = {{current_user.id|tojson}};
+usrname = {{current_user.name|tojson}};
+const taskvue = {
+  data() {
+    return {
+      tdata: td,
+	  pdata: pd,
+	  fdata: fd,
+	  rdata: rd,
+	  mylist: ['执行','发布','完成','验收'],
+	  curcati: '执行',
+    }
+  },
+  delimiters: ['{[', ']}'],
+  methods: {
+	loadrw: function() {
+		this.curcati = $('select  option:selected').val(); 
+		console.log(this.curcati);
+	},
+  }
+}
+
+const app = Vue.createApp(taskvue)
+app.mount('#app')
+
+    
+</script>
+{% endblock %}

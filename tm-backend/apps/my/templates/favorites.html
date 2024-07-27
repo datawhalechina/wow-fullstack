@@ -1,0 +1,382 @@
+{% extends 'userbase.html' %}
+{% block header_part %}
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    img[src=""],img:not([src]){
+         opacity:0;
+    }
+    .folder{
+    height:500px;
+    border-right:solid grey 1px;
+    }
+    .fitem{
+        height:70px;
+        line-height: 70px;
+        padding-left: 30px;
+        padding-right: 20px;
+        font-size:20px;
+        font-weight: normal;
+        border-bottom: solid grey 1px;
+        background-color: white;
+    }
+    .content{
+    height:500px;
+    background-color: white;
+    }
+    .hitem{
+        height:80px;
+        border-bottom: solid grey 1px;    
+    }
+    .sitem{
+        height:60px;
+        line-height: 60px;   
+    }
+    .searchbox{
+        height:40px;
+        line-height: 40px;
+        margin-top:10px;
+        margin-right:5px;
+        border: solid grey 1px; 
+        border-radius: 3px;
+    }
+    .citem{
+        height:50px;
+        margin-top:7px;
+        margin-bottom:7px;
+        margin-left:1px;
+        margin-right:1px;
+        padding-left: 10px;
+        line-height: 50px;
+        font-size:18px;
+        font-weight: normal;
+        background-color: white;
+        border: solid grey 1px; 
+        border-radius: 3px;
+    }
+    .pagenum{
+        width: 33px;
+        height: 30px;
+        margin: 5px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 20px;
+        line-height: 30px;
+        background-color: #eee;
+        border-radius: 3px;
+    }
+    .pb{
+        border: solid red 1px;
+    }
+    .pagenumdis{
+        width: 33px;
+        height: 30px;
+        margin: 5px;
+        text-align: center;
+        font-weight: bold;
+        font-size: 20px;
+        line-height: 30px;
+        background-color: #eee;
+        border-radius: 3px;
+    }
+    .cpagenum{
+        width: 33px;
+        height: 30px;
+        margin: 5px;
+        color:white;
+        text-align: center;
+        font-weight: bold;
+        font-size: 20px;
+        line-height: 30px;
+        background-color: #333;
+        border-radius: 3px;
+    }
+    .pagenum:hover{
+        cursor:pointer;
+        color:black;
+    }
+    .pagenumdis:hover{
+        pointer-events: none;
+    }
+    .cpagenum:hover{
+        cursor:default;
+    }
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+<div class="row" id="app">
+    <div class="col-md-3 folder">
+        <div class="row fitem">
+            <i class="fa fa-folder" style="font-size:24px;line-height: 70px;"></i>
+            <span>&nbsp;</span>
+            新建收藏夹
+        </div>
+        <div @click="enterfolder(item.folderid,ind)" class="row fitem" v-for="(item,index) in fodata">
+            <i class="fa fa-folder-o" style="font-size:24px;line-height: 70px;"></i>
+            <span>&nbsp;</span>
+            {[item.folder_title]}
+            <span>&nbsp;</span>
+            {[item.item_num]}
+        </div>
+    </div>
+    <div class="col-md-9 content">
+        <div class="row hitem">
+            <div class="col-md-12">
+                <span>{[actifoldertitle]}</span>
+                <span>&nbsp;</span>
+                <i class="fa fa-pencil" style="font-size:20px"></i>
+            </div>
+            <div class="col-md-6">
+                <span>专利基础知识的基本要点</span>
+                <span>&nbsp;</span>
+                <i class="fa fa-pencil" style="font-size:20px"></i>
+            </div>
+            <div class="col-md-2">
+                <span>删除收藏夹</span>
+            </div>
+            <div class="col-md-2">
+                <span>批量移动</span>
+            </div>
+            <div class="col-md-2">
+                <span>隐私设置</span>
+            </div>
+        </div>
+        <div class="row sitem">
+            <div class="col-md-1">
+                <span>全部</span>
+            </div>
+            <div class="col-md-1">
+                <span>课程</span>
+            </div>
+            <div class="col-md-1">
+                <span>视频</span>
+            </div>
+            <div class="col-md-1">
+                <span>试卷</span>
+            </div>
+            <div class="col-md-1">
+                <span>题目</span>
+            </div>
+            <div class="col-md-1">
+                <span>项目</span>
+            </div>
+            <div class="col-md-1">
+                <span>任务</span>
+            </div>
+            <div class="col-md-1">
+                <span></span>
+            </div>
+            <div class="col-md-4">
+                <div class="row searchbox">
+                    <span>&nbsp;</span>
+                    <span>{[cpnum]}</span>
+                    <span>&nbsp;</span>
+                    <i class="fa fa-angle-down" style="font-size:18px;margin-top:10px;"></i>
+                    <span>&nbsp;</span>
+                    <input style="width:130px;height:30px;margin-top:5px;border-width:0px;" v-model="allpnum"/>
+                    <span>&nbsp;</span>
+                    <i class="fa fa-search" style="font-size:18px;margin-top:10px;"></i>
+                </div>
+            </div>
+        </div>
+        <hr style="color:grey;margin-top: 0px;"/>
+        <div class="row citem" v-for="(item,index) in faitems">
+            <span v-if="item.target_type=='试卷'">
+                <i class="fa fa-file-text-o" style="font-size:20px;line-height: 50px;"></i>
+                &nbsp;
+                <a :href="'/v1/tm/begintest/'+item.target_id" target="_blank">{[item.target_title]}</a>
+            </span>
+
+            <span v-if="item.target_type=='课程'">
+                <i class="fa fa-file-text" style="font-size:20px;line-height: 50px;"></i>
+                &nbsp;
+                <a :href="'/v1/sp/beginlearn/'+item.target_id" target="_blank">{[item.target_title]}</a>
+            </span>
+
+            <span v-if="item.target_type=='视频'">
+                <i class="fa fa-file-video-o" style="font-size:20px;line-height: 50px;"></i>
+                &nbsp;
+                <a :href="'/v1/sp/watchvideo/'+item.target_id" target="_blank">{[item.target_title]}</a>
+            </span>
+
+            <span v-if="item.target_type=='文章'">
+                <i class="fa fa-file-word-o" style="font-size:20px;line-height: 50px;"></i>
+                &nbsp;
+                <a :href="'/v1/tw/article/'+item.target_id" target="_blank">{[item.target_title]}</a>
+            </span>
+            
+            
+            <span>&nbsp;</span>
+            <i v-show="false"  class="fa fa-info-circle" style="font-size:20px;line-height: 50px;"></i>
+            <span>&nbsp;&nbsp;</span>
+            <i v-show="false"  class="fa fa-pencil" style="font-size:20px;line-height: 50px;"></i>
+            <span>&nbsp;&nbsp;</span>
+            <i @click="deletefavor(item.favorid,index)" class="fa fa-trash-o" style="font-size:20px;line-height: 50px;"></i>
+        </div>
+        <div class="row" style="margin-top:30px;padding-bottom:50px;">
+            <div class="row" v-if="allpnum>1" style="margin:0 auto;">
+            <div :class="cpnum==1?pndis:pn" @click="hit('back')"><i class="fa fa-angle-left" style="font-size:24px" :disabled=true></i></div>
+            <div :class="cpnum==1?cpn:pn" @click="hit(1)">1</div>
+            <div :class="pn" @click="hit('leftlve')" v-if="allpnum>7 && cpnum>5">{[leftlve]}</div>
+            <div :class="cpnum==i+shift?cpn:pn" @click="hit(i+shift)" v-show="allpnum>2" v-for="i in fornum">{[i+shift]}</div>
+            <div :class="pn" @click="hit('rightlve')" v-if="allpnum>7 && allpnum-fornum-shift>1">{[rightlve]}</div>
+            <div :class="cpnum==allpnum?cpn:pn" @click="hit(allpnum)">{[allpnum]}</div>
+            <div :class="cpnum==allpnum?pndis:pn" @click="hit('fort')"><i class="fa fa-angle-right" style="font-size:24px" disabled="cpnum>allpnum-1"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+		
+	
+	
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+usrid = {{current_user.id|tojson}};
+usrname = {{current_user.name|tojson}};
+//'专利在布局中的注意要点','专利的创造性探讨','一个小案例引发的思考','如果让我来作审查员','很实用的小技巧介绍','一个问题可以多方面思考','我们都是一起努力工作的小伙伴','构建自己多方面的知识结构'
+const app = Vue.createApp({
+  data() {
+    return {
+      fodata: [],
+      faitems: [],
+      actifoldernum:0,
+      actifoldertitle:'',
+      allpnum:9,
+      cpnum:1,
+      shift:1,
+      leftlve:'…',
+      rightlve:'…',
+      pn:'pagenum',
+      pndis:'pagenumdis',
+      cpn:'cpagenum'
+    }
+  },
+  mounted() {
+    console.log("加载啦");
+    console.log(this.cpnum);
+    console.log(this.fornum);
+    console.log(this.shift);
+    $.ajax({
+        url:"{{ url_for('my.fetchfolder') }}",
+        type:"POST",
+        data:{
+            userid:usrid,
+            username:usrname
+        },
+        dataType: "json",
+        success: function(response) {
+            favorvue.$data.fodata=response;
+            favorvue.enterfolder(favorvue.$data.fodata[0].folderid,0);
+        }
+    })
+
+    //this.enterfolder(this.fodata[0].folderid);
+    
+  },
+  computed : {
+    fornum:function(){
+        var tmp = 5;
+        if (this.allpnum<7){
+            tmp = this.allpnum-2
+        }
+        return tmp
+    }
+  },
+  methods : {
+    enterfolder: function(fid,ind){
+        this.actifoldernum=ind;
+        this.actifoldertitle=this.fodata[0].folder_title;
+        var fd = new FormData();
+        fd.append("fid",fid);
+        $.ajax({ 
+            url:"{{ url_for('my.fetchfavor') }}",
+            type:"POST",
+            processData: false,
+            contentType: false,
+            data:fd,
+            dataType: "json",
+            success: function(response) {
+                favorvue.$data.faitems = response;
+            }
+        })
+
+    },
+    deletefavor: function(fid,ind){
+        var cind = this.actifoldernum;
+        var fd = new FormData();
+        fd.append("fid",fid);
+        $.ajax({ 
+            url:"{{ url_for('my.deletefavor') }}",
+            type:"POST",
+            processData: false,
+            contentType: false,
+            data:fd,
+            dataType: "json",
+            success: function(response) {
+                console.log("deleted"+fid);
+                favorvue.$data.faitems.splice(ind,1);
+                favorvue.$data.fodata[cind].item_num -= 1;
+            }
+        })
+
+    },
+    hit(id) {
+        
+        if (!isNaN(id)){
+            this.cpnum=id;            
+        }
+        else {
+            if (id=="back"){
+                this.cpnum = this.cpnum-1;
+            }
+            else if (id=="fort"){
+                this.cpnum = this.cpnum+1;
+            }
+            else if (id=="leftlve"){
+                if (this.cpnum>5){
+                    this.cpnum = this.cpnum-5;
+                }
+                else {
+                    this.cpnum = 1;
+                }
+                
+            }
+            else if (id=="rightlve"){
+                if (this.allpnum-this.cpnum>5){
+                    this.cpnum = this.cpnum+5;
+                }
+                else {
+                    this.cpnum = this.allpnum;
+                }
+                
+            }
+        }
+
+        this.shift = this.cpnum-3;
+        if (this.cpnum<this.fornum+1){
+            this.shift = 1;
+        }
+        else if (this.cpnum>this.allpnum-this.fornum-1){
+            this.shift = this.allpnum-this.fornum-1;
+        }
+        console.log('点击了'+id);
+        console.log(this.cpnum);
+        console.log(this.fornum);
+        console.log(this.shift);
+    }
+  },
+  delimiters: ['{[', ']}'],
+})
+var favorvue = app.mount('#app')  
+
+
+    
+</script>
+{% endblock %}

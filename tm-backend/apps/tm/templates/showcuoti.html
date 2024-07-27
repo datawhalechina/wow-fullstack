@@ -1,0 +1,86 @@
+{% extends 'tmbase.html' %}
+{% block header_part %}
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    img[src=""],img:not([src]){
+         opacity:0;
+    }
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+    <div class="row">
+    <div style="display:inline-block;margin:0 auto;"><h2>{{ginfo['tptitle']}}</h2></div>
+    <div style="margin:0 auto; height:20px;" class="col-md-12"></div>
+    
+    </div>
+
+
+    {% for dd in qdata %}
+    <h4 style="margin-bottom: 10px;">{{loop.index}}.{{dd['ques_title']}}</h4>
+    <h6>组别：{{dd['ques_part']}}</h6>
+    {% if dd['descpic_url'] %}
+    <img style="max-width: 100%;height:auto;" src="/v1/sp/spstatic/images/quespic/{{dd['descpic_url']}}" /><br/>
+    {% endif %}
+    {% if dd['item_a'] and dd['ques_type']=='选择题' %}
+    <span>A: {{dd['item_a']}}</span><br/>
+    {% endif %}
+    {% if dd['item_b'] and dd['ques_type']=='选择题' %}
+    <span>B: {{dd['item_b']}}</span><br/>
+    {% endif %}
+    {% if dd['item_c'] and dd['ques_type']=='选择题' %}
+    <span>C: {{dd['item_c']}}</span><br/>
+    {% endif %}
+    {% if dd['item_d'] and dd['ques_type']=='选择题' %}
+    <span>D: {{dd['item_d']}}</span><br/>
+    {% endif %}
+    
+    {% if dd['ques_type']=='选择题' %}
+    <span>你当时的回答是: {{dd['reply']|upper}}</span>
+    {% else %}
+    <span>你当时的回答是: {{dd['reply']}}</span>
+    {% endif %}
+    {% if dd['getscore']>=dd['fullscore'] %}
+    <span style="color:green">恭喜你答对啦！</span>
+    {% elif ginfo['exami_state']==0 and dd['ques_type']=='简答题' %}
+    <span style="color:blue">请耐心等待老师阅卷……</span>
+    {% else %}
+    <span style="color:red">这道题还需要再复习巩固一下哦！</span>
+    {% endif %}
+    <br/>
+    <span>本题满分 {{dd['fullscore']}}分，</span>
+    <span>你得了 {{dd['getscore']}}分。</span><br/>
+    {% if ginfo['exami_state']>0 and dd['ques_type']=='简答题' %}
+        <span>阅卷老师: {{dd['examiner']}}</span><br/>
+        <span>评语: {{dd['comments']}}</span><br/>
+        <span>阅卷日期: {{dd['exami_date']}}</span><br/>
+    {% endif %}
+    <span>{{dd['ques_desc']}}</span><br/>
+    {% if dd['answer'] %}
+        {% if dd['ques_type']=='选择题' %}
+        <span>答案: {{dd['answer']|upper}}</span><br/>
+        {% else %}
+        <span>答案: {{dd['answer']}}</span><br/>
+        {% endif %}
+        {% if dd['explainpic_url'] %}
+        <img style="max-width: 100%;height:auto;" src="/v1/sp/spstatic/images/quespic/{{dd['explainpic_url']}}" /><br/>
+        {% endif %}
+        <span>解析: {{dd['explain']}}</span><br/>
+        
+    {% endif %}
+
+    <br/><br/>
+    {% endfor %}
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+    
+    
+</script>
+{% endblock %}

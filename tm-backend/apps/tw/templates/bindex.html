@@ -1,0 +1,108 @@
+{% extends 'biwennewbase.html' %}
+{% block header_part %}
+<script src="https://cdn.staticfile.org/vue/2.6.14/vue.min.js"></script>
+<script src="/v1/auth/mystatic/com/favorcom.js"></script>
+<script src="/v1/auth/mystatic/com/searchcom.js"></script>
+<title>文章</title>
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+.outer {
+    border:solid #a0f 1px;border-radius:10px;margin:20px 0px;
+}
+</style> 
+{% endblock %}
+
+{% block body_part %}
+
+<div id="app" style="margin:0 auto;">
+<div class="row text-center"><h2 class="col-md-12 text-center">图文</h2></div>
+<search-form @pushquery="receivequery"></search-form>
+<div v-for="dd in vdata" class="row outer">
+    <h4 class="col-md-12">
+        <a style="color:#a0f" :href="'/v1/tw/article/'+dd.biwenid" target="_blank">{[dd.title]}</a>
+        <span v-if="dd.coediting==1" style="margin-left:5px;" class="badge badge-info">有修订</span>
+    </h4>
+    <div class="col-md-12">
+        塾主: {[dd.author_name]}&nbsp;&nbsp;&nbsp;&nbsp;
+        <a :href="'/v1/tw/editarticle/'+dd.biwenid" target="_blank"><i class="fa fa-pencil" style="font-size:20px;line-height: 30px;"></i></a>
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <i v-if="[dd.author_id,35].includes(uid)" class="fa fa-trash-o" :id="dd.biwenid" @click="deletearticle(dd.biwenid)" style="font-size:20px;line-height: 30px;"></i>
+    </div>
+</div>
+<pagination @pushnum="curnum" :allpnum="pageamount"></pagination>
+<br>
+<br>
+</div> 
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+var indexdata = {{vdata|tojson}}
+usrid = 0;
+if ({{current_user.is_authenticated|tojson}}==true){
+    usrid = "{{current_user.id}}"
+    }
+var arvue = new Vue({
+    el: '#app',
+    delimiters: ['{[', ']}'],
+    data:{
+            vdataori:indexdata,
+            vdata:[],
+            uid:usrid,
+            size:20,
+            pageamount:1
+    },
+    mounted: function(){
+        this.pageamount = Math.ceil(this.vdataori.length / this.size);
+        console.log(this.pageamount);
+        this.curnum(1);
+        
+    },
+    methods: {
+        deletearticle:function(obj){
+        var articleid = obj;
+        if (confirm("确定删除此文章？")) {
+            
+            $.ajax({
+                url:"{{ url_for('tw.deletearticle') }}",
+                type:"POST",
+                data:{
+                    articleid:articleid
+                },
+                dataType: "json",
+                success: function(response) {
+                    location.reload();
+                }
+            })
+        }
+        },
+        curnum: function(obj) {
+            console.log(obj);
+            var curpage = obj - 1;
+            if(this.size * curpage >= this.vdataori.length){
+                last = this.vdataori.length;
+            }else{
+                last = this.size * curpage + this.size;
+            }
+            this.vdata = this.vdataori.slice(this.size * curpage,last);
+        },
+        receivequery: function(obj){
+            console.log(obj);
+            this.vdataori = obj;
+            this.pageamount = Math.ceil(this.vdataori.length / this.size);
+            this.curnum(1);
+        }
+    },
+    components: {
+        'pagination': Pagination,
+        'search-form': searchForm,
+    }
+})
+
+
+
+    
+</script>
+{% endblock %}

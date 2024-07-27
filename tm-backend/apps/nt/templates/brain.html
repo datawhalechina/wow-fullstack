@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8">
+		<title>脑图</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+		<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+		<link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
+		<link href="../static/css/moni.css" rel = "stylesheet"/>
+		<link rel="stylesheet" type="text/css" href="../static/css/jsmind.css">
+		<link rel="stylesheet" type="text/css" href="../static/css/index.css">
+	</head>
+
+	<body>
+	
+	<aside id="fh5co-aside" role="complementary" class="border js-fullheight">
+	
+		<h1 id="fh5co-logo"><a href="{{ url_for('start') }}">自塾</a></h1>
+		<nav id="fh5co-main-menu" role="navigation">
+			<ul>
+				<li class="fh5co-active"><a href="{{ url_for('bebrain.brain') }}">搜索脑图</a></li>
+				<li><a href="">全部脑图</a></li>
+				<li><a id="newgraph" href="" onclick="genuuid()" target="_blank">新建脑图</a></li>
+			</ul>
+		</nav>
+	
+		<div class="fh5co-footer">
+			<p>弼兴 &copy; 2021</p>
+			
+		</div>
+	
+	</aside>
+	
+	<div id="fh5co-main">
+	<aside id="fh5co-hero" class="js-fullheight">
+		<div class="flexslider js-fullheight">
+				
+		</div>
+	</aside>
+	
+	<div class="fh5co-narrow-content">
+		
+		<div class="row">
+		<div style="margin:0 auto;width:700px;text-align:center">
+		<form style="margin:10 auto;" action="/v1/nt/search/" method="post">
+			<input style="width:550px; background-color:#FFF;" type="text" name="question">
+			<input style="width:100px" type="submit" value="搜索一下">
+		</form>
+		</div>
+		<div style="margin:0 auto; height:10px;" class="col-md-12"></div>
+		<br/>
+		<HR align=center width=100% color=#987cb9 SIZE=3px>
+		<br/>
+		<div style="margin:0 auto; height:10px;" class="col-md-12"></div>
+		
+		<div class="btn-box1" style="margin:0 auto;">
+			<button class="getDataBtn" onclick="getData();">保存脑图</button>
+			<button onclick="alignType('full');">两端对齐</button>
+			<button onclick="alignType('side');">右对齐</button>
+			<button>全屏打开</button>			
+			<button id="downloadJson">导出json</button>
+			<button id="downloadTxt">导出txt</button>
+			<button id="downloadYtm">导出ytm</button>	
+			<button id="importData">导入脑图</button>
+			<input id="importInput" type="file" onchange="importFn(this)" />
+		</div>
+		<!--上传文件框-->
+		<input id="fileInput" type="file" hidden/>
+		
+		<div style="margin:0 auto; height:10px;" class="col-md-12"></div>
+		
+		<div style="margin:0 auto; height:500px;" class="col-md-12">
+		<div id="jsmind_container"></div>
+		
+		
+		
+		
+
+		
+
+		<!--右键菜单-->
+		<ul id="right_menu">
+			<li onclick="add_subNode();"><em class="iconfont">&#xe639;</em><span>同级</span></li>
+			<li onclick="add_node();"><em class="iconfont">&#xe639;</em><span>下级</span></li>
+			<li onclick="delete_node();"><em class="iconfont">&#xe618;</em><span>删除</span></li>
+			<li onclick="showRemark();"><em class="iconfont">&#xe7d1;</em><span>备注</span></li>
+			<li onclick="delRemark();"><em class="iconfont">&#xe618;</em><span>删除备注</span></li>
+		</ul>
+		<!--备注弹框-->
+		<div id='remark_box' class="remarkBox">
+			<div class="remarkHint"></div>
+			<div class="remarkContent">
+				<h5 class="rmarkTitle"><img src="../bebrain/static/img/logo-101x107.png" alt="logo" />请录入节点备注</h5>
+				<div class="remarkBtn">
+					<button id="remark_sureBtn">确定</button>
+					<button id="remark_canaelBtn">取消</button>
+				</div>
+				<textarea id="remark_input" class="remarkInput"></textarea>
+			</div>
+		</div>
+		</div>
+		</div>
+	</div>
+	</div>
+		<script src="../bebrain/static/js/jquery.min.js"></script>
+		<script src="../bebrain/static/js/123.js"></script>
+		<script type="text/javascript" src="../bebrain/static/js/jsmind.js"></script>
+		<script type="text/javascript" src="../bebrain/static/js/jsmind.draggable.js"></script>
+		<script src="../bebrain/static/js/FileSaver.min.js"></script>
+		<script type="text/javascript" src="../bebrain/static/js/index.js"></script>
+
+	</body>
+
+</html>

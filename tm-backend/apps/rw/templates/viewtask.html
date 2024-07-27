@@ -1,0 +1,543 @@
+{% extends 'taskbase.html' %}
+{% block header_part %}
+<script src="/v1/auth/mystatic/js/vue.js"></script>
+<link rel="stylesheet" href="/v1/auth/mystatic/css/codemirror.css">
+<link rel="stylesheet" href="/v1/auth/mystatic/css/show-hint.css">
+<script src="/v1/auth/mystatic/js/codemirror.js"></script>
+<script src="/v1/auth/mystatic/js/show-hint.js"></script>
+<script src="/v1/auth/mystatic/js/xml-hint.js"></script>
+<script src="/v1/auth/mystatic/js/html-hint.js"></script>
+<script src="/v1/auth/mystatic/js/xml.js"></script>
+<script src="/v1/auth/mystatic/js/javascript.js"></script>
+<script src="/v1/auth/mystatic/js/css.js"></script>
+<script src="/v1/auth/mystatic/js/python.js"></script>
+<script src="/v1/auth/mystatic/js/htmlmixed.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.21.3/full/pyodide.js"></script>
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    .textbox {
+        margin-left:15px;
+        margin-right:15px;
+        padding:5px;
+    }
+    .CodeMirror {
+        border-top: 1px solid #888; 
+        border-bottom: 1px solid #888;
+        font-family:Consolas;
+        font-size:20px;
+    }
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+<div class="row">
+    <div style="display:inline-block;margin:0 auto;"><h2>查看任务</h2></div>
+    <div style="margin:0 auto; height:20px;" class="col-md-12"></div>
+    
+    </div>
+    <div id='app'>
+        <div>
+            <br/>
+            <div class="row" style="margin-top:10px">
+                <h4 class="col-md-2">标题：</h4>
+                <label v-if="tdata.admin_name==cuser" class="col-md-8 form-control textbox"><a style="color:#a0f" :href="'/v1/rw/edittask/'+tdata.taskid" target="_blank">{[tdata.task_title]}</a></label>
+                <label v-else class="col-md-8 form-control textbox">{[tdata.task_title]}</label>
+            </div>
+            <div class="row" style="margin-top:10px">
+                <h4 class="col-md-2">任务类型：</h4>
+                <input class="col-md-8 form-control textbox" v-model="tdata.task_type" disabled></input>
+            </div>
+            <div v-if="tdata.task_type=='问答任务'" class="row" style="margin-top:10px">
+                <h4 class="col-md-2">问题类型：</h4>
+                <input class="col-md-8 form-control textbox" v-model="tdata.ques_type" disabled></input>
+            </div>
+            <div v-if="tdata.task_type=='问答任务' && tdata.ques_type=='选择题'" class="row" style="margin-top:10px">
+                <h4 class="col-md-2">选项：</h4>
+                <div class="col-md-8 textbox">
+                <span v-if="tdata.item_a">A: {[tdata.item_a]}</span><br/>
+                <span v-if="tdata.item_b">B: {[tdata.item_b]}</span><br/>
+                <span v-if="tdata.item_c">C: {[tdata.item_c]}</span><br/>
+                <span v-if="tdata.item_d">D: {[tdata.item_d]}</span><br/>
+                </div>
+            </div>
+            <div class="row" style="margin-top:10px">
+                <h4 class="col-md-2">塾主：</h4>
+                <input class="col-md-2 form-control textbox" v-model="tdata.admin_name" disabled></input>
+            </div>
+            <div class="row" style="margin-top:10px">
+                <h4 class="col-md-2">处理人：</h4>
+                <input class="col-md-2 form-control textbox" v-model="tdata.task_taker" disabled></input>
+            </div>
+            <div class="row" style="margin-top:10px">
+                <h4 class="col-md-2 kaoyou">期限：</h4>
+                <input class="col-md-3 form-control textbox" v-model="tdata.deadline" disabled></input>
+            </div>
+            <div class="row" style="margin-top:10px">
+                <h4 class="col-md-2 kaoyou">说明：</h4>
+                <textarea rows="4" class="col-md-8 form-control textbox" v-model="tdata.task_desc" disabled></textarea>
+            </div>
+
+            <div class="row" style="margin-top:10px" v-if="tdata.admin_name==cuser">
+                <h4 class="col-md-2 kaoyou">任务阶段：</h4>
+                <input class="col-md-2 form-control textbox" v-model="tdata.task_phase" disabled></input>
+            </div>
+
+
+            <div v-if="tdata.task_type=='学习任务'" class="row" style="margin-top:10px">
+                <h4 class="col-md-2">学习列表：</h4>
+                <div class="col-md-8 textbox">
+                    <div v-for="item in tdata.learnlist">
+                        <span>{[item[1]]}</span>
+                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <span>{[item[2]]}</span>
+                        <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                        <span>当前成绩：{[item[3]]}分</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" style="margin-top:10px" v-if="tdata.admin_name==cuser && ['提交'].includes(tdata.task_phase) && tdata.task_type=='问答任务'">
+                <h4 class="col-md-2">答案：</h4>
+                <input v-if="['判断题', '选择题'].includes(tdata.ques_type)" class="col-md-2 form-control textbox" v-model="tdata.daan" disabled></input>
+                <textarea v-if="tdata.ques_type=='简答题'" rows="4" class="col-md-8 form-control textbox" v-model="tdata.daan" disabled></textarea>
+                <div class="col-md-8" v-if="tdata.ques_type=='填空题'">
+                    <div class="row textbox" v-if="tdata.item_a">
+                        <label>A:</label>
+                        <span>&nbsp;</span>
+                        <label class="col-md-9">{[tdata.item_a]}</label>
+                    </div>
+                    <div class="row" v-if="tdata.item_b">
+                        <label>B:</label>
+                        <span>&nbsp;</span>
+                        <label class="col-md-9 kaozuo">{[tdata.item_b]}</label>
+                    </div>
+                    <div class="row" v-if="tdata.item_c">
+                        <label>C:</label>
+                        <span>&nbsp;</span>
+                        <label class="col-md-9 kaozuo">{[tdata.item_c]}</label>
+                    </div>
+                    <div class="row" v-if="tdata.item_d">
+                        <label>D:</label>
+                        <span>&nbsp;</span>
+                        <label class="col-md-9 kaozuo">{[tdata.item_d]}</label>
+                    </div>
+                </div>
+            </div>
+
+            <p v-if="tdata.pubpic_url"><img style="max-width: 100%;height:auto;" :src="'/v1/task/mystatic/task/images/'+tdata.pubpic_url" /></p>
+            <div class="row" v-if="tdata.pubfile_url">
+            <div class="col-md-2"></div>
+            <div class="col-md-8" style="text-align: center;"> 
+                <label>任务文件：</label>
+                <a :href="'/task/mystatic/task/files/'+tdata.pubfile_url">{[tdata.pubfile_name]}</a>
+            </div>
+            </div>
+
+            <div v-show="tdata.online_coding=='true'" class="row kaozuo">
+                <div id="oricodeframe" class="col-md-8" style="min-height:80px;">
+                <label v-show="show_editor==0 || show_editor==1" class="btn" style="margin-top:20px;" for="orisend_content">原始css+html代码：</label>
+                <div v-show="show_editor==0 || show_editor==1" id="orisend_content" style="width: 100%;"></div>
+                
+                <label v-show="show_editor==1" style="margin-top:20px;" class="btn" for="orijscode">原始js代码：</label>
+                <div v-show="show_editor==1" id="orijscode" style="width: 100%; height:50px;"></div>
+                
+                <label v-show="show_editor==2" style="margin-top:20px;" class="btn" for="oripycode">原始python代码：</label>
+                <div v-show="show_editor==2" id="oripycode" style="width: 100%; height:50px;"></div>
+                
+                </div>
+            
+                <div class="col-md-4">
+                <label for="oripre"><input id="orisend" @click="oriyulan()" style="margin-top:20px;" class="btn btn-success" type="button" value="原始结果输出"></label>
+                <br>
+                <div v-show="show_editor!=2" id="oripre"></div>
+                <textarea v-show="show_editor==2" id="oripyout" rows="12" class="col-md-12 form-control"></textarea>
+                </div>
+            </div>
+
+            <div v-show="tdata.online_coding=='true'" class="row kaozuo">
+                <div id="codeframe" class="col-md-8" style="min-height:80px;">
+                <label v-show="show_editor==0 || show_editor==1" class="btn" style="margin-top:20px;" for="send_content">当前css+html代码：</label>
+                <div v-show="show_editor==0 || show_editor==1" id="send_content" style="width: 100%;"></div>
+                
+                <label v-show="show_editor==1" style="margin-top:20px;" class="btn" for="jscode">当前js代码：</label>
+                <div v-show="show_editor==1" id="jscode" style="width: 100%; height:50px;"></div>
+                
+                <label v-show="show_editor==2" style="margin-top:20px;" class="btn" for="pycode">当前python代码：</label>
+                <div v-show="show_editor==2" id="pycode" style="width: 100%; height:50px;"></div>
+                
+                </div>
+            
+                <div class="col-md-4">
+                <label for="pre"><input id="send" @click="yulan()" style="margin-top:20px;" class="btn btn-success" type="button" value="当前结果输出"></label>
+                <br>
+                <div v-show="show_editor!=2" id="pre"></div>
+                <textarea v-show="show_editor==2" id="pyout" rows="12" class="col-md-12 form-control"></textarea>
+                </div>
+            </div>
+
+
+            <div class="row" v-if="['提交'].includes(tdata.task_phase) && tdata.admin_name==cuser" style="margin-top:10px">
+                <h4 class="col-md-2">处理结果：</h4>
+                <textarea rows="4" class="col-md-8 form-control textbox" v-model="tdata.sln_desc" disabled></textarea>
+            </div>
+            
+            <p v-if="tdata.slnpic_url"><img style="max-width: 100%;height:auto;margin-top: 20px;" :src="'/task/mystatic/task/images/'+tdata.slnpic_url" /></p>
+            <div class="row" v-if="tdata.slnfile_url">
+            <div class="col-md-2"></div>
+            <div class="col-md-8" style="text-align: center;"> 
+                <label>任务文件：</label>
+                <a :href="'/v1/sp/spstatic/rw/files/'+tdata.slnfile_url">{[tdata.slnfile_name]}</a>
+            </div>
+            </div>
+            <br/>
+
+            
+
+            <div class="row" v-if="['接手', '返工'].includes(tdata.task_phase) && tdata.admin_name==cuser && tdata.task_type=='做事任务'">
+                <h4 class="col-md-2">当前进度：</h4>
+                <input class="col-md-8 form-control textbox" style="padding:10px 0px;" type="range" v-model="tdata.task_phase" disabled></input>
+            </div>
+
+            <div class="row" v-if="tdata.task_phase=='申领'">
+                <h4 class="col-md-2">决定：</h4>
+                <span class="col-md-8 textbox" style="text-align: left;">
+                    <input type="radio" id="yes" value="同意" v-model="shenling" v-bind:disabled=jinyong>
+                    <label for="yes">同意</label>
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="radio" id="no" value="拒绝" v-model="shenling" v-bind:disabled=jinyong>
+                    <label for="no">拒绝</label>
+                </span>
+            </div>
+
+            <div class="row" style="margin-top:10px" v-if="shenling=='拒绝'">
+                <h4 class="col-md-2">拒绝说明：</h4>
+                <textarea rows="4" class="col-md-8 form-control textbox" v-model="refudesc" v-bind:disabled=jinyong></textarea>
+            </div>
+
+            <div class="row" v-if="tdata.task_phase=='提交'">
+                <h4 class="col-md-2">验收：</h4>
+                <span class="col-md-8 textbox">
+                    <input type="radio" id="ok" value="合格" v-model="jueding" v-bind:disabled=jinyong>
+                    <label for="ok">合格</label>
+                    <span>&nbsp;&nbsp;</span>
+                    <input type="radio" id="notok" value="返工" v-model="jueding" v-bind:disabled=jinyong>
+                    <label for="notok">返工</label>
+                </span>
+            </div>
+
+            <div class="row" style="margin-top:10px" v-if="jueding=='返工'">
+                <h4 class="col-md-2">返工说明：</h4>
+                <textarea rows="4" class="col-md-8 form-control textbox" v-model="fangongdesc" v-bind:disabled=jinyong></textarea>
+            </div>
+
+            <div class="row" style="margin-top:10px" v-if="tdata.admin_name==cuser && tdata.task_type=='问答任务' && tdata.task_phase=='提交' && jueding=='合格'">
+                <div class="col-md-2"></div>
+                <label class="col-md-4 form-check-label kaozuo">
+                    <input type="checkbox" v-model="pub_ques" style="margin-right: 10px;" onclick="this.value=(this.value==false)?true:false" value=false v-bind:disabled=jinyong></input>发布问题
+                </label>
+            </div>
+
+            <input v-if="['讨价', '提交'].includes(tdata.task_phase) && tdata.admin_name==cuser" class="btn btn-primary" style="margin-top:10px" @click="tijiao()" type="submit" value="提交">
+            <input v-if="['申领'].includes(tdata.task_phase) && tdata.admin_name==cuser" class="btn btn-primary" style="margin-top:10px" @click="applyta()" type="submit" value="提交">
+
+            <div class="row" style="margin-top:10px">
+                <span id="showres" style="display:inline-block;margin:0 auto;"></span>
+            </div>
+            <br>
+            <br>
+            <br>
+        </div>
+    </div>
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+    td = {{dta|tojson}};
+
+    async function main() {
+    let pyodide = await loadPyodide();
+    return pyodide;
+}
+let pyodideReadyPromise = main();
+
+async function evaluatePython(pycode){
+    let pyodide = await pyodideReadyPromise;
+    var outstring = "";
+    try {
+        pyodide.runPython(`
+        import sys
+        import io
+        sys.stdout = io.StringIO()
+        `);
+        let output = pyodide.runPython(pycode);
+        let stdout = pyodide.runPython("sys.stdout.getvalue()");
+        outstring = stdout;
+        } catch (err) {
+            outstring = err;
+        }
+        return outstring;
+	}
+
+
+
+    taskvue = new Vue({
+        delimiters: ['{[', ']}'],
+        el: '#app',
+        data: {
+            tdata:td,
+            show_editor:2,
+            cuser:td.usrname,
+            jueding:'',
+            shenling:'',
+            pub_ques:false,
+            jinyong:false,
+            fangongdesc:'',
+            refudesc:''
+        },
+        created: function() {
+            this.show_editor = this.tdata.lang;
+        },
+        mounted: function () {
+            if (this.tdata.slnpic_url) {
+                this.slnposter_has = true;
+                this.slnposter_show=true;
+                var slnposterimg = new Image();
+                slnposterimg.src = "/v1/sp/spstatic/rw/images/"+this.tdata.slnpic_url;
+                slnposterimg.onload = function() {
+                    console.log("渲染任务图片1");
+                    slnposterCanvas.setAttribute('width', 480);
+                    slnposterCanvas.setAttribute('height', 270);
+                    slnposterCxt.drawImage(slnposterimg,0,0,480,270);
+                }
+                    
+            }
+
+            if (this.tdata.task_phase=='拒接'){
+                this.jieshou='拒接';
+            }
+
+            if (this.tdata.slnfile_url) {
+                this.slnfile_has = true;
+                this.slnfile_show=true;
+                $('#filedisplay').attr('href', '/v1/sp/spstatic/rw/files/'+this.tdata.slnfile_url);
+                this.file_oriname = this.tdata.slnfile_name;
+                    
+            }
+
+            if (this.tdata.sln_desc){
+                this.rst = this.tdata.sln_desc;
+            }
+
+            if (this.tdata.task_type == "学习任务"){
+                console.log(this.tdata.learnlist);
+            }
+
+            if (this.tdata.task_type == "问答任务" && this.tdata.ques_type == "填空题"){
+                var re = /__.?__/gi;
+                while (re.test(this.tdata.task_title)){
+                    this.reply.push("");
+                }
+                if (this.reply.length>0){
+                    this.reply[0]=this.tdata.item_a;
+                }
+                if (this.reply.length>1){
+                    this.reply[1]=this.tdata.item_b;
+                }
+                if (this.reply.length>2){
+                    this.reply[2]=this.tdata.item_c;
+                }
+                if (this.reply.length>3){
+                    this.reply[3]=this.tdata.item_d;
+                }
+            }
+
+            if (this.tdata.daan){
+                this.daan = this.tdata.daan;
+            }
+
+            orieditor = CodeMirror(document.getElementById("orisend_content"), {
+                mode: "htmlmixed",
+                lineNumbers: true,
+                indentUnit: 4,
+                styleActiveLine: true,
+                matchBrackets: true,
+                extraKeys: {"Ctrl-Space": "autocomplete"},
+                //value: textvalue
+                value: this.tdata.code1
+            });
+            
+            orieditorjs = CodeMirror(document.getElementById("orijscode"), {
+                mode: "javascript",
+                lineNumbers: true,
+                indentUnit: 4,
+                styleActiveLine: true,
+                matchBrackets: true,
+                extraKeys: {"Ctrl-Space": "autocomplete"},
+                //value: multiline(fjs)
+                value: this.tdata.code2
+            });
+
+            orieditorpy = CodeMirror(document.getElementById("oripycode"), {
+                mode: "python",
+                lineNumbers: true,
+                indentUnit: 4,
+                styleActiveLine: true,
+                matchBrackets: true,
+                extraKeys: {"Ctrl-Space": "autocomplete"},
+                //value: multiline(fjs)
+                value: this.tdata.code3
+            });
+
+            editor = CodeMirror(document.getElementById("send_content"), {
+                mode: "htmlmixed",
+                lineNumbers: true,
+                indentUnit: 4,
+                styleActiveLine: true,
+                matchBrackets: true,
+                extraKeys: {"Ctrl-Space": "autocomplete"},
+                //value: ""
+                value: this.tdata.curcode1
+            });
+            
+            editorjs = CodeMirror(document.getElementById("jscode"), {
+                mode: "javascript",
+                lineNumbers: true,
+                indentUnit: 4,
+                styleActiveLine: true,
+                matchBrackets: true,
+                extraKeys: {"Ctrl-Space": "autocomplete"},
+                //value: ""
+                value: this.tdata.curcode2
+            });
+
+            editorpy = CodeMirror(document.getElementById("pycode"), {
+                mode: "python",
+                lineNumbers: true,
+                indentUnit: 4,
+                styleActiveLine: true,
+                matchBrackets: true,
+                extraKeys: {"Ctrl-Space": "autocomplete"},
+                //value: ""
+                value: this.tdata.curcode3
+            });
+
+        },
+        methods:{
+            async oriyulan() {
+                if (this.show_editor==0){
+                    document.getElementById("oripre").innerHTML = orieditor.getValue();
+                }
+                else if (this.show_editor==1){
+                    document.getElementById("oripre").innerHTML = orieditor.getValue();
+                    var orijstext = orieditorjs.getValue();
+                    eval(orijstext);
+                }
+                else if (this.show_editor==2){
+                    
+
+
+                    // 用前端的wasm运行Python代码
+                    var oripy_code = orieditorpy.getValue();
+                    document.getElementById("oripyout").value = await evaluatePython(oripy_code);
+                }
+                
+            },
+
+            async yulan() {
+                var fdcurrent = new FormData();
+                fdcurrent.append("show_editor", this.show_editor);
+                fdcurrent.append("task_id", this.tdata.taskid);
+                if (this.show_editor==0){
+                    document.getElementById("pre").innerHTML = editor.getValue();
+                    fdcurrent.append("html_code", editor.getValue());
+                }
+                else if (this.show_editor==1){
+                    document.getElementById("pre").innerHTML = editor.getValue();
+                    var jstext = editorjs.getValue();
+                    eval(jstext);
+                    fdcurrent.append("html_code", editor.getValue());
+                    fdcurrent.append("js_code", editorjs.getValue());
+                }
+                else if (this.show_editor==2){
+                    // 用前端的wasm运行Python代码
+                    var py_code = editorpy.getValue();
+                    document.getElementById("pyout").value = await evaluatePython(py_code);
+                    fdcurrent.append("py_code", editorpy.getValue());
+                }
+            },
+            tijiao(){
+                console.log(this.jueding);
+                var fd = new FormData();
+                fd.append("taskid",this.tdata.taskid);
+                fd.append("task_type",this.tdata.task_type);
+                fd.append("jueding",this.jueding);
+                if (this.jueding=='返工'){
+                    fd.append("fangongdesc",this.fangongdesc);
+                }
+                if (this.tdata.task_type=='问答任务'){
+                    fd.append("pub_ques",this.pub_ques);
+                }
+                
+                $.ajax({
+                    url:"{{ url_for('rw.completeta') }}",
+                    type:"POST",
+                    processData: false,
+                    contentType: false,
+                    data:fd,
+                    dataType: "json",
+                    success: function(response) {
+                         taskvue.$data.jinyong = true;
+                         $("#showres").html("已提交任务结果:"+taskvue.$data.jueding);
+
+                    }
+                })
+                
+            },
+            applyta(){
+                var fd = new FormData();
+                fd.append("taskid",this.tdata.taskid);
+                fd.append("shenling",this.shenling);
+                if (this.shenling=='拒绝'){
+                    fd.append("refudesc",this.refudesc);
+                }
+                $.ajax({
+                    url:"{{ url_for('rw.reapplyta') }}",
+                    type:"POST",
+                    processData: false,
+                    contentType: false,
+                    data:fd,
+                    dataType: "json",
+                    success: function(response) {
+                         taskvue.$data.jinyong = true;
+                         $("#showres").html("已提交审批结果:"+taskvue.$data.shenling);
+
+                    }
+                })
+            }
+        },
+        watch: {
+            show_editor(newVal, oldVal){
+                if(newVal==1){
+                    $("#oricodeframe").attr("style","min-height:730px;")
+                    $("#codeframe").attr("style","min-height:730px;")
+                } else {
+                    $("#oricodeframe").attr("style","min-height:368px;")
+                    $("#codeframe").attr("style","min-height:368px;")
+                }
+            }
+        }
+        
+    })
+    
+    
+ 
+
+
+    
+</script>
+{% endblock %}

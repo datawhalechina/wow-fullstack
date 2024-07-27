@@ -1,5 +1,3 @@
-# Author Tom.Yang (https://github.com/7n8fail)
-
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from functools import lru_cache
 
@@ -11,6 +9,7 @@ class Settings(BaseSettings):
     PORT:int
     SQLALCHEMY_DATABASE_URL:str
     SQLALCHEMY_DATABASE_URL_BACKUP:str
+    SQLALCHEMY_DATABASE_URL_V1:str
 
     model_config = SettingsConfigDict(env_file='.env', _env_file_encoding='utf-8', extra='allow')
 

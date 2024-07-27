@@ -1,0 +1,87 @@
+{% extends 'adminbase.html' %}
+{% block header_part %}
+
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    img[src=""],img:not([src]){
+         opacity:0;
+    }
+    .table-css tr td{
+    padding-right:50px;
+    }
+    .table-css tr th{
+    padding-right:50px;
+    }
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+<div id="app">
+    <div style="margin:0 auto; height:50px;" class="col-md-12"></div>
+    <div class="row" style="margin-top:10px">
+    <div class="col-md-2 kaoyou">金额：</div>
+    <input class="col-md-8 form-control" type="number" v-model="amount" placeholder="请填写整数数字" v-bind:disabled=jinyong></input>
+    </div>
+
+    <div class="row" style="margin-top:10px">
+    <div class="col-md-2 kaoyou">备注：</div>
+    <input id="input" class="col-md-8 form-control" v-model="notice" v-bind:disabled=jinyong></input>
+    </div>
+
+    <div style="height:50px;" class="col-md-12"></div>
+    <input class="btn btn-primary" @click="tijiao()" type="submit" value="提交增发"></input>
+
+    <div class="row" style="margin-top:10px">
+        <span id="showres" style="display:inline-block;margin:0 auto;"></span>
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+const app = Vue.createApp({
+  data() {
+    return {
+      notice:"",
+      jinyong:false,
+      amount:0,
+    }
+  },
+  delimiters: ['{[', ']}'],
+  mounted: function(){
+    
+  },
+  methods: {
+    tijiao(){
+      var fd = new FormData();
+      fd.append("amount",this.amount);
+      fd.append("notice",this.notice);
+      $.ajax({ 
+          url:"{{ url_for('am.trasact') }}",
+          type:"POST",
+          processData: false,
+          contentType: false,
+          data:fd,
+          dataType: "json",
+          success: function(response) {
+              remitvue.jinyong = true;
+              $("#showres").html("增发成功！");
+              //taskvue.$data.optionsArr=response.result;
+
+          }
+      })
+    }
+  }
+})
+
+const remitvue = app.mount('#app')  
+
+
+    
+</script>
+{% endblock %}

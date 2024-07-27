@@ -1,0 +1,32 @@
+{% extends 'adminbase.html' %}
+{% block header_part %}
+
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    .outer {
+        margin:10px;
+    }
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+<div class="row">
+    <div><a class="btn btn-primary outer" href="/v1/am/mulu/?hpath={{ cpath }}">文件路径</a></div>
+    <div><a class="btn btn-primary outer" href="/v1/am/showerrors/">报错信息</a></div>
+    <div><a class="btn btn-primary outer" href="/v1/am/showlogins/">登录信息</a></div>
+</div>
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+    
+
+
+    
+</script>
+{% endblock %}

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+	<title>模态框</title>
+    <script src="https://unpkg.com/vue@2.6.14/dist/vue.js"></script>
+	<style>
+         /*模态框*/
+        .modal {
+            position: fixed; /* 根据浏览器定位 */
+            z-index: 1; /* 放在顶部 */
+            left: 0;
+            top: 0;
+            width: 100%; /* 全宽 */
+            height: 100%; /* 全高 */
+            overflow: auto; /* 允许滚动 */
+            background-color: rgba(0,0,0,0.4); /* 背景色 */
+        }
+        /*模态框内容*/
+        .modal-content {
+            display: flex; /*采用flexbox布局*/
+            flex-direction: column; /*垂直排列*/
+            position: relative;
+            background-color: #fefefe;
+            margin: 10% auto; /*距顶部15% 水平居中*/
+            padding-top: 15px;
+            padding-bottom: 20px;
+            padding-left: 20px;
+            padding-right: 20px;
+            border: 1px solid #888;
+            border-radius: 5px;
+            width: 400px;
+            animation: topDown 0.4s; /*自定义动画，从模态框内容上到下出现*/
+        }
+        @keyframes topDown {
+            from {top: -300px; opacity: 0}
+            to {top: 0; opacity: 1}
+        }
+        /*模态框头部*/
+        .modal-header {
+            display: flex; /*采用flexbox布局*/
+            flex-direction: row; /*水平布局*/
+            align-items: center; /*内容垂直居中*/
+            justify-content: space-between; 
+        }
+        /*模态框头部*/
+        .modal-footer {
+            display: flex; /*采用flexbox布局*/
+            flex-direction: row; /*水平布局*/
+            align-items: center; /*内容垂直居中*/
+            text-align: center;
+            justify-content: space-between; 
+        }
+        /*关闭X 样式*/
+        .close {
+            color: #aaa;
+            right: 20px;
+            position: absolute;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+    </style>
+</head>
+<body>
+<div id="app">
+    <!-- 触发按钮 -->
+    <button @click="shoucang">模态框</button>
+    <div v-for="item in monlist">
+        <span>{[item[0]]}</span>
+        <span>{[item[1]]}</span>
+    </div>
+    <!-- 模态框 -->
+    <div id="myModal" class="modal" @click="wai($event)" v-show="yincang">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 style="margin:0 auto">添加到收藏夹</h3>
+                <span class="close" @click="guan">×</span>
+            </div>
+            <hr style="width:100%" />
+            <div class="modal-body">
+                <p>这是一个模态框！</p>
+                <p>喜欢就点个赞吧！</p>
+            </div>
+            <hr style="width:100%" />
+            <div class="modal-footer">
+                <button @click="confirm" style="width:170px;height:40px;margin:0 auto;">确定</button>
+            </div>
+        </div>
+    </div>
+
+    <hr/>
+</div>
+<script type="text/javascript">
+new Vue({
+  el: '#app',
+  delimiters: ['{[', ']}'],
+  data: {
+    yincang: false
+  },
+  computed:{
+    monlist:function() {
+        tmpl = [];
+        for(i=1;i<19;i++){
+            var nowdate = new Date();
+            nowdate.setMonth(nowdate.getMonth()-i);
+            var year = nowdate.getFullYear();
+
+            var s_month = nowdate.getMonth() + 1;
+            let month = ("0" + s_month).slice(-2);
+            tmpl.push([year,month]);
+        }
+        
+        return tmpl;
+    }
+  },
+  methods: {
+    shoucang: function () {
+        this.yincang=true;
+    },
+    guan: function () {
+        this.yincang=false;
+    },
+    confirm: function () {
+        this.yincang=false;
+    },
+    wai: function (e) {
+        mod = document.getElementById("myModal")
+        if(e.target == mod) {
+            this.yincang=false;
+        }
+        
+    }
+  }
+})
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+{% extends 'userbase.html' %}
+{% block header_part %}
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    img[src=""],img:not([src]){
+         opacity:0;
+    }
+    .table-css{
+      vertical-align:middle;
+      text-align:center;
+      min-width:1200px;
+    }
+    .table-css tr td{
+    padding-right:50px;
+    }
+    .table-css tr th{
+    padding-right:50px;
+    }
+    .table-top{
+      text-align: center;
+      margin-bottom: 20px;
+      text-align: center;
+      width:100%;
+    }
+    .textlve{
+      max-width: 300px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+	<div id="app">
+		<div style="margin:0 auto; height:50px;" class="col-md-12"></div>
+    
+    <h2>亲爱的{[billname]}，您的当前积分为{[billbalance]}。   <a href="/v1/my/remit/" target="_blank"><button class="btn btn-primary">转账</button></a></h2>
+    <h4>1积分 = 看10个视频 = 做100道题目。</h4>
+    <h6>您也可以将积分用于<a href="/v1/task/newtask/">发布任务</a>，并指定任务执行人。任务分为学习任务、问答任务和做事任务。</h6>
+		<h6>想要赚取积分，请参阅<a href="/v1/biwen/article/2">赚分攻略</a>，加油！</h6>
+    <div style="display:inline-block;margin:auto;">
+    <div v-if="['admin','superviser'].includes(urole)" class="table-top">
+      <input type="text" style="width:200px;" @input="hidenum()" placeholder="姓名" v-model="qname">
+      <span>&nbsp;&nbsp;</span>
+      <button class="btn btn-primary" @click="queryname()">查询</button>
+      <h6 v-if="shownum" style="margin:5px">共查询出{[tdata.length]}条数据</h6>
+    </div>
+		<table class="table-css">
+			<tr>
+				<th>日期</th>
+        <th>标题</th>
+				<th>类型</th>
+				<th>变化</th>
+				<th>当时余额</th>
+				<th>说明</th>
+			</tr>
+			<tr v-for="dd in tdata">
+				<td>{[dd.create_time]}</td>
+				<td class="textlve">{[dd.task_title]}</td>
+				<td>{[dd.target_type]}</td>
+				<td>{[dd.change*dd.amount]}</td>
+				<td>{[dd.balance]}</td>
+				<td class="textlve">{[dd.comments]}</td>
+			</tr>
+		</table>
+        </div>  
+        <br>
+        <br>
+        <br>
+    </div>
+		
+	
+	
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+usrid = {{current_user.id|tojson}};
+usrname = {{current_user.name|tojson}};
+usrrole = {{current_user.role|tojson}};
+const app = Vue.createApp({
+  data() {
+    return {
+      tdata: [],
+      qname:'',
+      shownum:false,
+      urole:usrrole,
+      billname:usrname,
+      billbalance:0
+    }
+  },
+  delimiters: ['{[', ']}'],
+  mounted: function(){
+    this.fetchdata(usrname);
+  },
+  methods: {
+    fetchdata: function(candi){
+      var fd = new FormData();
+      fd.append("qname",candi);
+      $.ajax({
+          url:"{{ url_for('my.fetchbill') }}",
+          type:"POST",
+          processData: false,
+          contentType: false,
+          data:fd,
+          dataType: "json",
+          success: function(response) {
+            billvue.tdata = response.allitems;
+            billvue.billname = response.name;
+            billvue.billbalance = response.becoin;
+            billvue.shownum = true;
+
+          },
+          error : function(data) {  
+          alert("发送失败~~");
+        }
+      })
+    },
+    queryname: function(){
+      this.fetchdata(this.qname);
+    },
+    hidenum: function(){
+      this.shownum=false;
+    }
+  }
+})
+
+const billvue = app.mount('#app')
+
+
+    
+</script>
+{% endblock %}

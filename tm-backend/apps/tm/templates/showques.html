@@ -1,0 +1,158 @@
+{% extends 'tmbase.html' %}
+{% block header_part %}
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    img[src=""],img:not([src]){
+         opacity:0;
+    }
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+<div class="row">
+    <div style="display:inline-block;margin:0 auto;"><h2>全部题目</h2></div>
+</div>
+
+<div id='app'>
+
+    <div v-for="(item,index) in querylist">
+        <div class="row" style="margin:10px">
+        <select id="fclass" class="col-md-3 form-control" v-model="item[0]">
+            <option value="题型">题型</option>
+            <option value="作者">作者</option>
+            <option value="审核人">审核人</option>
+            <option value="ques_title">标题</option>
+            <option value="ques_desc">说明</option>
+            <option value="item_a/item_b/item_c/item_d">选项</option>
+            <option value="answer">答案</option>
+            <option value="explain">解析</option>
+            <option value="ques_title/ques_desc">标题/说明</option>
+            <option value="ques_title/ques_desc/item_a/item_b/item_c/item_d">标题/说明/选项</option>
+            <option value="item_a/item_b/item_c/item_d/answer/explain">选项/答案/解析</option>
+            <option value="answer/explain">答案/解析</option>
+            <option value="ques_title/ques_desc/item_a/item_b/item_c/item_d/answer/explain">标题/说明/选项/答案/解析</option>
+        </select>
+        <span>&nbsp;&nbsp;</span>
+        <input v-model="item[1]" class="col-md-5 form-control" @input="changewords()" placeholder="可以用and和or，不要用括号" type="text">
+        <span v-if="index<querylist.length-1">&nbsp;&nbsp;<label style="padding-top:10px;">AND</label></span>
+        <span v-if="index>0"><i class="fa fa-minus-circle" style="font-size:24px;color:#a0f;margin-left:10px;padding-top:10px;" @click="deletewords(index)"></i></span>
+        </div>
+    </div>
+    <div style="margin:10px">
+    <button class="btn btn-primary"  @click="addwords()">+增加字段</button>
+    <span>&nbsp;&nbsp;</span>
+    <button class="btn btn-primary" @click="query()" :disabled="disabled">开始检索</button>
+    </div>
+    <br/><br/>
+    
+
+    <div class="items" v-for="(item,index) in quesdata">
+    <h4 style="margin-bottom: 10px;">{[item.ques_title]}</h4>
+    <img v-if="item.descpic_url" style="max-width: 100%;height:auto;" :src="'/v1/sp/spstatic/images/quespic/'+item.descpic_url" /><br/>
+    <span>{[item.ques_desc]}</span><br/>
+    <span v-if="item.item_a && item.ques_type != '填空题'">A: {[item.item_a]}</span><br/>
+    <span v-if="item.item_b && item.ques_type != '填空题'">B: {[item.item_b]}</span><br/>
+    <span v-if="item.item_c && item.ques_type != '填空题'">C: {[item.item_c]}</span><br/>
+    <span v-if="item.item_d && item.ques_type != '填空题'">D: {[item.item_d]}</span><br/>
+    <span>答案: {[item.answer]}</span><br/>
+        {% if current_user.role=='admin' %}
+        <a :href="'/v1/tm/editques/'+item.quesid" target="_blank">编辑题目</a>
+        <button :id="item.quesid" onclick="deleteques(this)">删除题目</button>
+        {% endif %}
+    <br/><br/>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+
+
+    var authoid = {{current_user.id}};
+    var quesd= {{qdata|tojson}};
+    quesshow = new Vue({
+        delimiters: ['{[', ']}'],
+        el: '#app',
+        data: {
+            querylist:[['','']],
+            disabled:true,
+            quesdata:quesd,
+            
+        },
+        methods: {
+            created (){
+                if(subjectArr.length > 0){
+                    kong=false;
+                }
+            },
+            addwords (){
+                this.querylist.push(['','']);
+                this.disabled = true;
+            },
+            query (){
+                console.log(this.querylist);
+                let queryli = this.querylist;
+                $.ajax({
+                    url:"{{ url_for('tm.searchques') }}",
+                    type:"POST",
+                    data:{
+                        querywords:JSON.stringify(queryli)
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        //$("#showgym").html(response);
+                        quesshow.$data.quesdata=response;
+
+                    }
+                })
+            },
+            deletewords (i){
+                this.querylist.splice(i,1);
+                this.disabled = false;
+                this.querylist.forEach(el => {
+                    str1 = el[0];
+                    str2 = el[1].replace(/\s*/g,"");
+                    if(str1.length==0 | str2.length==0){
+                        this.disabled = true;
+                    }
+                });
+            },
+            changewords (){
+                this.disabled = false;
+                this.querylist.forEach(el => {
+                    str1 = el[0];
+                    str2 = el[1].replace(/\s*/g,"");
+                    if(str1.length==0 | str2.length==0){
+                        this.disabled = true;
+                    }
+                });
+            },
+        }
+    })
+
+
+function deleteques(obj){
+    var quesid = obj.id;
+    console.log(quesid);
+    $.ajax({
+        url:"{{ url_for('tm.deleteques') }}",
+        type:"POST",
+        data:{
+            ques_id:quesid
+        },
+        dataType: "json",
+        success: function(response) {
+            window.location.href = "{{ url_for('tm.showques') }}";
+
+        }
+    })
+} 
+
+
+    
+</script>
+{% endblock %}

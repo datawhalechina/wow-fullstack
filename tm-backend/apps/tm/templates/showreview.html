@@ -1,0 +1,92 @@
+{% extends 'tmbase.html' %}
+{% block header_part %}
+
+{% endblock %}
+
+{% block style_part %}
+<style type="text/css"> 
+    img[src=""],img:not([src]){
+         opacity:0;
+    }
+    
+</style> 
+{% endblock %}
+
+{% block body_part %}
+    <div class="row">
+    <div style="text-align:center;margin:0 auto;"><h2>审核中心</h2></div>
+    <div style="margin:0 auto; height:20px;" class="col-md-12"></div>
+    
+    </div>
+
+    <div class="container" id="showvideos">
+        <hr/>
+
+        <div style="text-align:left;margin:0 auto;"><h4>题目审核</h4></div>
+        <div v-for="(item,index) in queses">
+            <a :href="'/v1/tm/beginreques/'+item.quesid" target="_blank">{[item.ques_title]}</a>
+            <span>&nbsp;&nbsp;&nbsp;</span>
+            <span>作者：{[item.author_name]}</span>
+            <span>&nbsp;&nbsp;&nbsp;</span>
+            <span>创建时间：{[item.create_time]}</span>
+        </div>
+        
+        <hr/>
+        <div style="text-align:left;margin:0 auto;"><h4>简答题阅卷</h4></div>
+        <div v-for="(item,index) in jiandas">
+            <a :href="'/v1/tm/beginrejianda/'+item.pperformid" target="_blank">{[item.paper_title]}</a>
+            <span>&nbsp;&nbsp;&nbsp;</span>
+            <span>考生：{[item.user_name]}</span>
+            <span>&nbsp;&nbsp;&nbsp;</span>
+            <span>考试时间：{[item.test_time]}</span>
+        </div>
+
+        <hr/>
+            
+    </div>
+
+
+{% endblock %}
+
+{% block script_part %}
+<script type="text/javascript">
+    
+    var showvideos = new Vue({
+        delimiters: ['{[', ']}'],
+        el:'#showvideos',
+        mounted: function (){
+            console.log('加载完成')
+            $.ajax({
+                url:"{{ url_for('tm.reviewques') }}",
+                type:"POST",
+                data:{
+                    info:'ok',
+                },
+                dataType: "json",
+                success: function(data) {
+                    showvideos.$data.queses = data;
+                }
+            })
+
+
+            $.ajax({
+                url:"{{ url_for('tm.reviewjianda') }}",
+                type:"POST",
+                data:{
+                    info:'ok',
+                },
+                dataType: "json",
+                success: function(data) {
+                    showvideos.$data.jiandas = data;
+                }
+            })
+        },
+        data:{
+            jiandas:[],
+            queses:[],
+            
+        }
+    })
+    
+</script>
+{% endblock %}

@@ -1,0 +1,3 @@
+https://cdn.jsdelivr.net/npm/vditor@3.7.4
+
+,e.CDN="./"
