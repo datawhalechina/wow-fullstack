@@ -339,6 +339,7 @@ async def cal_mentors(user: UserBase = Depends(check_jwt_token), db: Session = D
         ).first()
     rtn = {}
     finished_selections = None
+    # 塾主的信息
     if selection:
         finished_selections = db.query(Selection).filter(
             Selection.course_id==selection.course_id,
@@ -356,6 +357,7 @@ async def cal_mentors(user: UserBase = Depends(check_jwt_token), db: Session = D
         rtn['mentor_count'] = mentor_count
         
     seles = []
+    # 塾师的信息列表
     if finished_selections:
         for f_sele in finished_selections:
             mentor_count = db.query(Mentors).filter(
@@ -366,6 +368,7 @@ async def cal_mentors(user: UserBase = Depends(check_jwt_token), db: Session = D
                 sele_dict = f_sele.__dict__
                 if "_sa_instance_state" in sele_dict:
                     del sele_dict["_sa_instance_state"]
+                sele_dict['shushi_id'] = f_sele.user_id
                 sele_dict['shushi_name'] = db.query(Users).filter_by(id=f_sele.user_id).first().username
                 seles.append(sele_dict)
     rtn['mentors'] = seles
