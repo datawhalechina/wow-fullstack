@@ -1,6 +1,6 @@
 代码运行地址：
 
-https://www.runoob.com/try/runcode.php?filename=ts-hw&type=typescript
+在线运行界面 https://www.typescriptlang.org/zh/play
 
 TypeScript 主要包含以下几种运算：
 

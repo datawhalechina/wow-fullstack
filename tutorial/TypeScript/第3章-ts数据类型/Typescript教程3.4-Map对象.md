@@ -1,9 +1,23 @@
 代码运行地址：
 
-https://www.runoob.com/try/runcode.php?filename=ts-hw&type=typescript
+在线运行界面 https://www.typescriptlang.org/zh/play
 
 ## 4.TypeScript Map对象
-在 TypeScript 中，`Map` 是一种键-值对的集合，其中键和值可以是任意类型。以下是 TypeScript 中 `Map` 对象常用的一些内置方法：
+在 TypeScript 中，`Map` 是一种键-值对的集合，其中键和值可以是任意类型。比普通的JavaScript对象功能更强大。
+
+
+一个普通的JavaScript对象如下：
+```typescript
+const user = {
+  firstName: "Angela",
+  lastName: "Davis",
+  role: "Professor",
+}
+```
+
+Map是ES6（ECMAScript 2015）中引入的一个新的数据结构，用于保存键值对，并且它可以记住键的原始插入顺序。Map的键可以是任何类型的值（包括函数、对象或任何原始值），而普通的JavaScript对象（包括TypeScript中的对象）的键只能是字符串或Symbol。
+
+以下是 TypeScript 中 `Map` 对象常用的一些内置方法：
 ### 内置方法：
 
 1.  **set(key: K, value: V): Map<K, V>:** 
@@ -125,6 +139,12 @@ for (let entry of entries) {
 // Key: one, Value: 1
 // Key: two, Value: 2
 ```
- 
 
-这只是 `Map` 对象提供的一小部分属性和方法。详细的列表可以在 TypeScript 官方文档中查找。
+
+Map对象和普通的对象（如user）之间的主要区别包括：
+
+- 键的类型：Map的键可以是任何类型的值，而普通对象的键只能是字符串或Symbol。
+- 大小（Size）：Map对象提供了一个size属性，可以直接获取其包含的键值对数量，而普通对象没有直接的方法来计算其属性数量（尽管可以使用Object.keys(obj).length等方式来间接获取）。
+- 迭代：Map是可迭代的，它提供了forEach、keys()、values()和entries()等方法来遍历它的元素，而普通对象虽然可以通过for...in循环、Object.keys()等方法进行遍历，但它们的迭代方式不如Map直接和灵活。
+
+这只是 `Map` 对象提供的一小部分属性和方法。详细的列表可以在 TypeScript 官方文档https://www.typescriptlang.org/zh 中查找。

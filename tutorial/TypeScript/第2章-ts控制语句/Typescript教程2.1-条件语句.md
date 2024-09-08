@@ -1,6 +1,6 @@
 代码运行地址：
 
-https://www.runoob.com/try/runcode.php?filename=ts-hw&type=typescript
+在线运行界面 https://www.typescriptlang.org/zh/play
 
 条件语句用于基于不同的条件来执行不同的动作。
 

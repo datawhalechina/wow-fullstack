@@ -1,6 +1,6 @@
 代码运行地址：
 
-https://www.runoob.com/try/runcode.php?filename=ts-hw&type=typescript
+在线运行界面 https://www.typescriptlang.org/zh/play
 
 ## 1.TypeScript Number
 ##### Number 对象是原始数值的包装对象。以下是使用一些`Number`的例子

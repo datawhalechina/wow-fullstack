@@ -1,3 +1,44 @@
+这节课的内容没办法在网页上运行，必须在本地电脑安装环境依赖才能做。
+
+首先确保你已经安装了 Node.js(推荐使用最新的稳定版)。然后在命令行中运行以下命令来全局安装 Vite:
+
+npm install -g create-vite
+
+使用 Vite 创建一个新的 Vue 3 + TypeScript 项目。运行以下命令并替换 vue3ts 为你的项目的名称：
+create-vite vue3ts --template vue-ts
+
+安装依赖：
+npm install
+
+
+启动开发服务器：
+npm run dev
+
+
+启动后可以打开浏览器输入http://localhost:5173/
+
+能看到页面即可。
+
+然后打开 文件 src\components\HelloWorld.vue
+
+
+## 单文件组件​
+在大多数启用了构建工具的 Vue 项目中，我们可以使用一种类似 HTML 格式的文件来书写 Vue 组件，它被称为单文件组件 (也被称为 *.vue 文件，英文 Single-File Components，缩写为 SFC)。顾名思义，Vue 的单文件组件会将一个组件的逻辑 (JavaScript)，模板 (HTML) 和样式 (CSS) 封装在同一个文件里。
+HelloWorld.vue就是一个单文件组件。
+
+我们观察里面的代码：
+```html
+<script setup lang="ts">
+import { ref } from 'vue'
+
+defineProps<{ msg: string }>()
+
+const count = ref(0)
+</script>
+```
+
+到这一步说明本地环境搭建成功，接下来我们来引入网络请求库axios。
+
 当在TS中使用axios库进行网络请求时，需要如下操作：
 
 ## 1. 安装Axios
@@ -30,7 +71,7 @@ axios.post('https://api.example.com/data', { name: 'John', age: 25 })
 </script>
 ```
 
-
+用FastAPI起一个后端。
 后端测试代码：
 ```python
 import uvicorn
@@ -157,3 +198,4 @@ const get_query = ()=>{
 点击按钮后控制台会看到
 5
 hello
+

@@ -107,10 +107,10 @@ def getprofile():
     maxc = db.session.execute(text(sql)).fetchone()[1]
     prodata.append(maxc)
     sql2 = '''show global status like 'Max_used_connections';'''
-    maxu = db.session.execute(text(sql)).fetchone()[1]
+    maxu = db.session.execute(text(sql2)).fetchone()[1]
     prodata.append(maxu)
     sql3 = "show status like 'Threads_connected';"
-    maxtco = db.session.execute(text(sql)).fetchone()[1]
+    maxtco = db.session.execute(text(sql3)).fetchone()[1]
     prodata.append(maxtco)
     return json.dumps(prodata)
 

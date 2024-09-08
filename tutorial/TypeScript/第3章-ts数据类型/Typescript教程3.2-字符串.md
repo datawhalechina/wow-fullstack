@@ -1,6 +1,6 @@
 代码运行地址：
 
-https://www.runoob.com/try/runcode.php?filename=ts-hw&type=typescript
+在线运行界面 https://www.typescriptlang.org/zh/play
 
 ## 2.TypeScript String
 在 TypeScript 中，String 是一个基本数据类型，用于表示文本数据。你可以使用单引号`'`或双引号`"`来创建字符串。还可以使用反引号```创建模板字符串，这种字符串可以跨越多行并嵌入表达式。以下是一些使用 String` 类型的例子：
@@ -95,4 +95,4 @@ console.log(str.toUpperCase()); // 输出 'HELLO, TYPESCRIPT!'
 let str: string = "Hello, TypeScript!";
 console.log(str.toLowerCase()); // 输出 'hello, typescript!'
 ```
- 这只是 `String` 类型提供的一小部分属性和方法。详细的列表可以在 TypeScript 官方文档中查找。
+ 这只是 `String` 类型提供的一小部分属性和方法。详细的列表可以在 TypeScript 官方文档https://www.typescriptlang.org/zh 中查找。

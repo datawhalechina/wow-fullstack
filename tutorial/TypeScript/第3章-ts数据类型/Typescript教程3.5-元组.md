@@ -1,6 +1,6 @@
 代码运行地址：
 
-https://www.runoob.com/try/runcode.php?filename=ts-hw&type=typescript
+在线运行界面 https://www.typescriptlang.org/zh/play
 
 ## 5.TypeScript 元组
 在 TypeScript 中，元组（Tuple）是一种固定长度且每个元素类型可以不同的数组。以下是 TypeScript 中元组常用的一些内置属性和方法：

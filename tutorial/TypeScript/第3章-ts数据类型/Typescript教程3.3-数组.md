@@ -1,6 +1,6 @@
 代码运行地址：
 
-https://www.runoob.com/try/runcode.php?filename=ts-hw&type=typescript
+在线运行界面 https://www.typescriptlang.org/zh/play
 
 ## 3.TypeScript Array(数组)
 在 TypeScript 中，数组（Array）是一种用来表示一系列相同类型元素的数据结构。以下是 TypeScript 中数组常用的一些内置属性和方法：
@@ -102,4 +102,4 @@ arr.forEach((value, index) => {
 ```
  
 
-这只是 TypeScript 中数组提供的一小部分属性和方法。详细的列表可以在 TypeScript 官方文档中查找。
+这只是 TypeScript 中数组提供的一小部分属性和方法。详细的列表可以在 TypeScript 官方文档https://www.typescriptlang.org/zh 中查找。
