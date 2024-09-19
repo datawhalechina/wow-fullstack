@@ -2,24 +2,22 @@
 
 首先确保你已经安装了 Node.js(推荐使用最新的稳定版)。然后在命令行中运行以下命令来全局安装 Vite:
 
-npm install -g create-vite
+`npm install -g create-vite`
 
 使用 Vite 创建一个新的 Vue 3 + TypeScript 项目。运行以下命令并替换 vue3ts 为你的项目的名称：
-create-vite vue3ts --template vue-ts
+`create-vite vue3ts --template vue-ts`
 
 安装依赖：
-npm install
-
+`npm install`
 
 启动开发服务器：
-npm run dev
+`npm run dev`
 
+启动后可以打开浏览器输入`http://localhost:5173/`
 
-启动后可以打开浏览器输入http://localhost:5173/
+能看到页面即可
 
-能看到页面即可。
-
-然后打开 文件 src\components\HelloWorld.vue
+然后打开文件`src\components\HelloWorld.vue`
 
 
 ## 单文件组件​
@@ -42,10 +40,10 @@ const count = ref(0)
 当在TS中使用axios库进行网络请求时，需要如下操作：
 
 ## 1. 安装Axios
-npm install axios
+`npm install axios`
 
 ## 2. 导入Axios模块
-import axios from 'axios';
+`import axios from 'axios';`
 
 ## 3. 发起网络请求
 使用Axios提供的方法（get、post等）去发送网络请求
@@ -112,11 +110,11 @@ if __name__ == '__main__':
 
 <script setup lang='ts'>
 import axios from 'axios'
-// 发起GET请求
 interface TestData {
   message: string;
 }
 const get_query = ()=>{
+  // 发起GET请求
   axios.get<TestData>('http://127.0.0.1:8009/')
   .then(response => {
     const testData: TestData = response.data;
@@ -170,7 +168,7 @@ if __name__ == '__main__':
 
 
 把原来的HelloWorld.vue内容清空，换成下面这些代码。
-```html
+```vue
 <template>
     <button @click="get_query()">发起POST请求</button>
 </template>
