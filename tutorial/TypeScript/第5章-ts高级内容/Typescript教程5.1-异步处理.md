@@ -4,7 +4,7 @@
 
 ```typescript
 async function asyncOperation(): Promise<string> {
-    return "Hello, async world!";
+    return Promise.resolve("Hello, async world!");
 }
  
 async function run() {
