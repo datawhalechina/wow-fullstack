@@ -70,6 +70,21 @@ axios.post('https://api.example.com/data', { name: 'John', age: 25 })
 ```
 
 用FastAPI起一个后端。
+
+FastAPI最好用python3.8以上。版本太低了不支持。我们这里采用的是python3.10.5
+
+```python
+import sys
+print(sys.version)
+```
+
+输出：3.10.5 (tags/v3.10.5:f377153, Jun  6 2022, 16:14:13) [MSC v.1929 64 bit (AMD64)]
+
+然后安装fastapi
+直接 `pip install fastapi -i https://pypi.tuna.tsinghua.edu.cn/simple`
+
+安装fastapi会自动安装uvicorn，所以可以直接建立一个 `test.py` 文件，文件里贴上下面的代码即可。
+
 后端测试代码：
 ```python
 import uvicorn
@@ -101,6 +116,30 @@ if __name__ == '__main__':
 
 ```
 
+在`test.py`所在的目录下打开终端，输入 python test.py，就可以在终端看到以下内容：
+INFO:     Started server process [16524]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://0.0.0.0:8009 (Press CTRL+C to quit)
+
+虽然启动后下面会出现 Uvicorn running on http://0.0.0.0:8009 。但是如果你直接点击这个链接，会发现打不开的。原因是0.0.0.0不是一个ip地址。它的含义是允许任何ip访问这个fastapi后端。因此你需要用一个有效的ip地址去访问它。如果是本机，那就打开浏览器访问 http://127.0.0.1:8009 。或者http://localhost:8009 。
+
+
+如果是局域网的其它电脑，你需要获知本台部署了fastapi的电脑的ip地址，这通常在cmd窗口输入 ipconfig可以查到，一般是192.168 开头的，192.168代表你们是在同一个局域网内。
+
+你将在浏览器页面看到如下的 JSON 
+```json
+{"message": "Hello World"}
+```
+交互式 API 文档  
+在浏览器中输入 http://127.0.0.1:8009/docs。
+
+你将会看到自动生成的交互式 API 文档（由 Swagger UI 提供）
+
+
+
+
+
 
 把原来的HelloWorld.vue内容清空，换成下面这些代码。
 ```html
@@ -126,6 +165,7 @@ const get_query = ()=>{
 }
 </script>
 ```
+按F12打开浏览器的控制台。
 点击按钮后控制台会看到Hello World
 
 
@@ -193,6 +233,7 @@ const get_query = ()=>{
 }
 </script>
 ```
+按F12打开浏览器的控制台。
 点击按钮后控制台会看到
 5
 hello
