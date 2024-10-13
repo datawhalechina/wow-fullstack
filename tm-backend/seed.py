@@ -1,15 +1,17 @@
-from sqlalchemy import create_engine,text
-from sqlalchemy.orm import scoped_session, sessionmaker
-engine = create_engine('mysql+pymysql://root:006622@localhost:3306/wow')
-db = scoped_session(sessionmaker(bind=engine))
-
-sql = '''
-INSERT INTO users (username, phone, role, email, password)
-    VALUES ('黎伟', '15821123639', 'admin', 'omige@live.cn', '$2b$12$sErK932BEaLyIisz30PubepN7w91RLwkISWbAFYgUgoIqh8goJLEW');
-'''
-db.execute(text(sql))
-
+from app.core.models.users import Users
+from app.dependencies import get_password_hash
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+from datetime import datetime
+engine = create_engine("sqlite:///mydatabase.db")
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+db = SessionLocal()
+new_user = Users(
+    username='自塾',
+    password=get_password_hash('zishu'),
+    email='zishu@zishu.co',
+    phone='15812345678',
+    register_time=datetime.now()
+)
+db.add(new_user)
 db.commit()
-# 关闭数据库连接
-db.close()
-engine.dispose()

@@ -34,14 +34,6 @@ onMounted(fetchAll)
             <span v-else>{{ scope.row.phone.slice(0,3) }}****{{ scope.row.phone.slice(-4) }}</span>
         </template>
     </el-table-column>
-    <el-table-column prop="learn_hour" label="学时" />
-    <el-table-column prop="create_hour" label="创时" />
-    <el-table-column prop="shuzhi" label="塾值" />
-    <el-table-column label="7天内计时">
-        <template #default="scope">
-            {{ Math.round(scope.row.total_hours_7d * 10) / 10 }}
-        </template>
-    </el-table-column>
   </el-table>
 </template>
 

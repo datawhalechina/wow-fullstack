@@ -1,4 +1,3 @@
-# Author Tom.Yang (https://github.com/7n8fail)
 from datetime import datetime
 from . import config
 from .database import SessionLocal

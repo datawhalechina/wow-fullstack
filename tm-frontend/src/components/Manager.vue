@@ -66,8 +66,7 @@
               >
                 <td class="row1" :name="index">{{ index + 1 }}</td>
                 <td class="row2">
-                  <!-- <input class="editable" v-model="item[0]" @input="submit" /> -->
-                  <el-autocomplete style="padding:0px;" v-model="item[0]" @select="handleSelect" @change="submit" :fetch-suggestions="querySearch" class="editable"/>
+                  <input class="editable" v-model="item[0]" @input="submit" />
                 </td>
                 <td class="row3">
                   <input class="editable" v-model="item[1]" @input="submit" />
@@ -209,7 +208,6 @@
 <script setup lang="ts">
 import { useLoginStore } from "../store";
 import { ref, reactive, onMounted, watchEffect } from "vue";
-import {fetchDocketsAPI} from '../request/inno/api'
 import {fetchTmAPI, fetchPrAPI, savePrAPI, finishTmAPI} from '../request/inno/api'
 const loginstate = useLoginStore();
 
@@ -248,23 +246,6 @@ const total_time = ref('')
 const validTime = ref('')
 
 
-interface IDockets{
-  value:string
-}
-const dockets = reactive<IDockets[]>([])
-
-const querySearch = (queryString: string, cb: any) => {
-  const results:any = queryString?[]:dockets
-  cb(results)
-}
-
-
-const getDockets = async () => {
-  if (loginstate.id > 0) {
-    let res = await fetchDocketsAPI({user_id:loginstate.id})
-    dockets.push(...res)
-  }
-}
 
 const getTm = async () => {
   if (loginstate.id > 0) {
@@ -298,7 +279,6 @@ const handleSelect = () => {
 
     onMounted(() => {
       getTm();
-      getDockets();
     });
 
     const addWorks = () => {

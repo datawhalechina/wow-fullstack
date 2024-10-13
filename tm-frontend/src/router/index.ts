@@ -15,36 +15,6 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import("../views/Home.vue"),
         },
         {
-            path: "/learn",
-            // 命名
-            name: "Course",
-            component: () => import("../views/course/Course.vue"),
-        },
-        {
-          path: "/course/add",
-          // 命名
-          name: "Addcourse",
-          component: () => import("../views/course/Add.vue"),
-        },
-        {
-          path: "/course/:id",
-          // 命名
-          name: "Coursedetail",
-          component: () => import("../views/course/Detail.vue"),
-        },
-        {
-          path: "/course/edit/:id",
-          // 命名
-          name: "Editcourse",
-          component: () => import("../views/course/Edit.vue"),
-       },
-        {
-          path: "/inno",
-          // 命名
-          name: "Inno",
-          component: () => import("../views/inno/Project.vue"),
-        },
-        {
           path: "/user",
           // 命名
           name: "User",
@@ -81,52 +51,10 @@ const routes: Array<RouteRecordRaw> = [
             component: () => import("../views/user/Profile.vue"),
         },
         {
-          path: "/user/report",
-          // 命名
-          name: "Report",
-          component: () => import("../views/user/Report.vue"),
-        },
-        {
-          path: "/user/shuzhi",
-          // 命名
-          name: "Shuzhi",
-          component: () => import("../views/user/Shuzhi.vue"),
-        },
-        {
           path: "/user/all",
           // 命名
           name: "All",
           component: () => import("../views/user/All.vue"),
-        },
-        {
-          path: "/user/mentor",
-          // 命名
-          name: "Mentor",
-          component: () => import("../views/user/Mentor.vue"),
-        },
-        {
-          path: "/user/goaltalk",
-          // 命名
-          name: "Goaltalk",
-          component: () => import("../views/user/Goaltalk.vue"),
-        },
-        {
-          path: "/user/mytalk",
-          // 命名
-          name: "Mytalk",
-          component: () => import("../views/user/Mytalk.vue"),
-        },
-        {
-          path: "/user/supervise",
-          // 命名
-          name: "Supervise",
-          component: () => import("../views/user/Supervise.vue"),
-        },
-        {
-          path: "/user/followup",
-          // 命名
-          name: "Followup",
-          component: () => import("../views/user/Followup.vue"),
         },
     ]
   },

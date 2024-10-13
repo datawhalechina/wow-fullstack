@@ -1,5 +1,3 @@
-# Author Tom.Yang (https://github.com/7n8fail)
-
 from typing import Optional
 from pydantic import BaseModel, EmailStr
 

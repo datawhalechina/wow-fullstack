@@ -11,21 +11,12 @@ const handleSelect = (key: string, keyPath: string[]) => {
 <template>
   <el-row>
     <el-col :span="9">
-      <a href="/">
+      <a href="https://zishu.co">
         <img src="/logo.png" class="logo" alt="你好" />
       </a>
     </el-col>
     <el-col :span="9">
-      <el-menu
-        :default-active="activeIndex"
-        mode="horizontal"
-        @select="handleSelect"
-        style="width: 50%"
-        router
-      >
-        <el-menu-item index="/learn">学习</el-menu-item>
-        <el-menu-item index="/inno">创新</el-menu-item>
-      </el-menu>
+
     </el-col>
 
     <el-col :span="6">
