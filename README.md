@@ -21,8 +21,7 @@ npm需要的版本是10.2.5
 进入tm-backend文件夹，确保requirement.txt文件是在的，然后
 pip install -r requirement.txt
 ### 生成数据库
-如果根目录有mydatabase.db这个文件，就先删掉。
-把alembic/versions文件夹下的py文件都删掉，但是versions这个文件夹保留着。
+如果根目录有mydatabase.db这个文件，其实是可以直接输入命令 python main.py 启动后端的，不过出于教学的目的，我们可以先把这个文件删掉，重新生成一遍。
 在alembic.ini所在的文件夹所在的cmd窗口输入命令创建迁移脚本：
 alembic revision --autogenerate -m "my first db"
 这将在alembic/versions 目录下创建一个新的迁移脚本，打开脚本，确认一下upgrade函数有没有问题，是不是想要的变更？如果没问题就输入
