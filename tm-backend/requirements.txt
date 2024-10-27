@@ -6,4 +6,5 @@ pydantic[email]
 passlib
 pydantic-settings
 sqlalchemy
+alembic
 python-jose
