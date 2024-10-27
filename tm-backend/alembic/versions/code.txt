@@ -1,0 +1,4 @@
+这两行是操作alembic最常用的两个命令，这两个命令一般就够用了。
+
+alembic revision --autogenerate -m "start"
+alembic upgrade head
