@@ -18,31 +18,32 @@ python需要的版本是3.10
 node需要的版本是v18.18.0
 npm需要的版本是10.2.5
 ### 安装后端依赖库
-进入tm-backend文件夹，确保requirement.txt文件是在的，然后
-pip install -r requirement.txt
+进入`tm-backend`文件夹，确保`requirement.txt`文件是在的，然后
+`pip install -r requirement.txt`
 ### 生成数据库
-如果根目录有mydatabase.db这个文件，其实是可以直接输入命令 python main.py 启动后端的，不过出于教学的目的，我们可以先把这个文件删掉，重新生成一遍。
-在alembic.ini所在的文件夹所在的cmd窗口输入命令创建迁移脚本：
-alembic revision --autogenerate -m "my first db"
-这将在alembic/versions 目录下创建一个新的迁移脚本，打开脚本，确认一下upgrade函数有没有问题，是不是想要的变更？如果没问题就输入
-alembic upgrade head
+如果根目录有`mydatabase.db`这个文件，其实是可以直接输入命令 `python main.py` 启动后端的，不过出于教学的目的，我们可以先把这个文件删掉，重新生成一遍。
+在`alembic.ini`所在的文件夹所在的cmd窗口输入命令创建迁移脚本：
+`alembic revision --autogenerate -m "my first db"`
+这将在`alembic/versions` 目录下创建一个新的迁移脚本，打开脚本，确认一下upgrade函数有没有问题，是不是想要的变更？如果没问题就输入
+`alembic upgrade head`
 在根目录下会看到mydatabase.db这个数据库文件。这样数据库就建好了。但是数据表里还没有数据
 
 ### 填充测试数据
 可以填写一些假数据，方便测试
-在cmd窗口输入 python seed.py 即可。
+在cmd窗口输入 `python seed.py` 即可。
 这个seed.py的作用是新建一下static文件夹以及下面的profiles文件夹，然后在数据库填充管理员的账号。
 运行完python seed.py可以看看mydatabase.db这个数据库文件是不是更新了，有数据了。
+查看sqlite数据库可以到https://sqlitebrowser.org/ 下载一个DB Browser for SQLite这样就可以用可视化的图形界面查看sqlite数据库里的数据了。
 
 ### 测试填充数据
-在cmd窗口输入 python check_password.py 即可。如果后端输出了
+在cmd窗口输入 `python check_password.py` 即可。如果后端输出了
 自塾
 True
 说明运行正确。数据库中的数据库有效。就不需要再去管seed.py。seed.py已经完成了它的历史使命。
 
 ### 启动后端
 在main.py 所在的文件开启cmd窗口，输入命令 python，查看是否是python3.10 版本？如果版本不对，请自行解决python版本问题。
-版本正确后，输入命令 python main.py 即可启动后端。
+版本正确后，输入命令 `python main.py` 即可启动后端。
 
 ### 测试后端是否正常运行
 
