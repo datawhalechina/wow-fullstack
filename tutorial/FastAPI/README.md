@@ -2,7 +2,21 @@
 
 本教程面向有一些python基础的学员，而且是需要在本地电脑上运行的。这个教程既有markdown格式的文档，也有ipynb格式的文档。我们推荐的学习方式是看markdown格式的文档。自己在本地的电脑上新建jupyter notebook，把markdown里的代码片段复制到jupyter notebook的格子中，然后在里面运行代码。实在没有时间，想要快速运行完整个教程的代码的同学，可以直接下载ipynb格式的文档，然后在jupyter notebook中打开，然后运行所有的代码。
 
-本教程的markdown文件中的代码片段也可以在py文件中运行，不过需要做一些修改，就是把最后一行里的await 去掉。把await server.serve()改成server.serve()。这是因为在jupyter notebook中运行异步函数server.serve()会报错，需要在前面加一个await。
+本教程的Jupyter notebook文件中的代码片段也可以在py文件中运行，不过需要做一些修改，就是把最后一行里
+```python
+if __name__ == '__main__':
+    config = uvicorn.Config(app, host='0.0.0.0', port=8009)
+    server = uvicorn.Server(config)
+    await server.serve()
+```
+
+改成
+```python
+if __name__ == '__main__':
+    uvicorn.run(app, host='0.0.0.0', port=8009)
+```
+
+这是因为在jupyter notebook中运行异步函数`uvicorn.run()`会报错，需要用`uvicorn.Server()`包装一下，并且在前面加一个await。
 
 另外需要注意的是Uvicorn running on http://0.0.0.0:8000，并不能直接把http://0.0.0.0:8000贴到浏览器的地址栏。0.0.0.0的含义是这个服务向所有ip地址开放，但是你想要访问它，需要用部署这个服务的本地IP，比如http://127.0.0.1:8000。
 
