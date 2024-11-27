@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 from app.dependencies import check_jwt_token, get_db, verify_password, get_password_hash
 from app.config import settings
 from jose import jwt
-import requests
+# import requests
 import os
 import json
 import glob

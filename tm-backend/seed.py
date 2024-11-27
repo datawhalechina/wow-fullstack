@@ -1,3 +1,4 @@
+import os
 from app.core.models.users import Users
 from app.dependencies import get_password_hash
 from sqlalchemy import create_engine
