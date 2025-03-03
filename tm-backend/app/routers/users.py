@@ -57,6 +57,119 @@ def check_user(db: Session, phone, password):
     if not verify_password(password, user.password):
         return '密码错误'
     return user
+def send_reset_password_email(email: str, reset_token: str):
+    """
+    发送密码重置邮件
+    :param email: 用户邮箱
+    :param reset_token: 重置密码的token
+    """
+    from email.mime.text import MIMEText
+    from email.mime.multipart import MIMEMultipart
+    import smtplib
+    from app.core.config import settings
+
+    # 创建邮件内容
+    msg = MIMEMultipart()
+    msg['From'] = settings.SMTP_USER
+    msg['To'] = email
+    msg['Subject'] = '密码重置'
+
+    # 邮件正文
+    reset_link = f"{settings.FRONTEND_URL}/reset-password?token={reset_token}"
+    body = f"""
+    您好,
+
+    您请求重置密码。请点击以下链接重置密码:
+
+    {reset_link}
+
+    此链接24小时内有效。如果您没有请求重置密码,请忽略此邮件。
+
+    祝好,
+    系统管理员
+    """
+    msg.attach(MIMEText(body, 'plain'))
+
+    # 发送邮件
+    try:
+        server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT)
+        server.starttls()
+        server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+        server.send_message(msg)
+        server.quit()
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"发送邮件失败: {str(e)}"
+        )
+
+def generate_password_reset_token(user_id: int) -> str:
+    """
+    生成密码重置token
+    """
+    expires = datetime.utcnow() + timedelta(hours=24)
+    to_encode = {"exp": expires, "user_id": user_id}
+    return create_access_token(data=to_encode)
+
+@router.post("/forgot-password")
+def forgot_password(phone: str, db: Session = Depends(get_db)):
+    """
+    忘记密码-发送重置邮件
+    """
+    user = db.query(Users).filter(Users.phone == phone).first()
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="用户不存在"
+        )
+    
+    if not user.email:
+        raise HTTPException(
+            status_code=400,
+            detail="该用户未绑定邮箱"
+        )
+        
+    reset_token = generate_password_reset_token(user.id)
+    send_reset_password_email(user.email, reset_token)
+    
+    return {"message": "密码重置邮件已发送,请查收邮箱"}
+
+@router.post("/reset-password")
+def reset_password(
+    token: str,
+    new_password: str,
+    db: Session = Depends(get_db)
+):
+    """
+    重置密码
+    """
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        user_id = payload.get("user_id")
+        if not user_id:
+            raise HTTPException(
+                status_code=400,
+                detail="无效的重置链接"
+            )
+    except jwt.JWTError:
+        raise HTTPException(
+            status_code=400,
+            detail="无效的重置链接"
+        )
+        
+    user = db.query(Users).filter(Users.id == user_id).first()
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="用户不存在"
+        )
+        
+    hashed_password = get_password_hash(new_password)
+    user.password = hashed_password
+    db.commit()
+    print("密码重置成功")   
+    
+    return {"message": "密码重置成功"}
 
 # import httpx 
 # async def login_flask(id,name,phone,role):
