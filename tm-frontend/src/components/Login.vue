@@ -66,6 +66,7 @@ import { useLoginStore } from "../store";
 import {loginAPI,RegisterAPI, resetPassAPI} from '../request/user/api'
 import router from "../router";
 import type { FormInstance, FormRules } from 'element-plus'
+import { ElMessage } from 'element-plus'
 
 const registerFormVisible = ref(false)
 const formLabelWidth = '70px'
@@ -145,7 +146,11 @@ const checklogin = async() => {
       form.password = ""
       window.location.reload();
     } else {
-      alert("用户名或密码错误,请重新输入")
+      // alert("用户名或密码错误,请重新输入")
+      ElMessage({
+        type: 'error',
+        message: res.error,
+      })
     }
     
     

@@ -52,10 +52,10 @@ def check_user(db: Session, phone, password):
     # user = users_db.get(username)
     user = db.query(Users).filter(Users.phone== phone).first()
     if not user:
-        return False
+        return '用户不存在'
     # if not verify_password(password, user.get("password")):
     if not verify_password(password, user.password):
-        return False
+        return '密码错误'
     return user
 
 # import httpx 
@@ -73,11 +73,10 @@ def check_user(db: Session, phone, password):
 @router.post("/token", response_model=TokenModel)
 async def login_for_access_token(phone: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     user = check_user(db, phone, password)
-    if not user:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="用户名或密码错误"
-        )
+    if  isinstance(user, str):
+        user.error=user
+        user.id=0
+        return user
     # access过期时间
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     # refresh过期时间
