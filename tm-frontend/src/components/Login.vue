@@ -24,9 +24,22 @@
     <template #footer>
       <span class="dialog-footer">
         <el-button type="primary" @click="checklogin">登录</el-button>
-        <el-button @click="forgetPass">
+        <el-button @click="forgetPassDialogVisible = true">
           忘记密码
         </el-button>
+      </span>
+    </template>
+  </el-dialog>
+
+  <el-dialog v-model="forgetPassDialogVisible" :width="diaglogwidth" :center="true" title="忘记密码">
+    <el-form :model="forgetPassForm">
+      <el-form-item label="手机号" :label-width="formLabelWidth">
+        <el-input v-model="forgetPassForm.phone" autocomplete="off" />
+      </el-form-item>
+    </el-form>
+    <template #footer>
+      <span class="dialog-footer">
+        <el-button type="primary" @click="sendResetEmail">发送重置邮件</el-button>
       </span>
     </template>
   </el-dialog>
@@ -61,14 +74,15 @@
 </template>
 
 <script lang="ts" setup>
-import { reactive,ref } from 'vue'
+import { reactive, ref } from 'vue'
 import { useLoginStore } from "../store";
-import {loginAPI,RegisterAPI, resetPassAPI} from '../request/user/api'
+import { loginAPI, RegisterAPI, resetPassAPI, forgotPasswordAPI } from '../request/user/api'
 import router from "../router";
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
 
 const registerFormVisible = ref(false)
+const forgetPassDialogVisible = ref(false)
 const formLabelWidth = '70px'
 const diaglogwidth = '370px'
 const loginstate = useLoginStore();
@@ -76,6 +90,10 @@ const loginstate = useLoginStore();
 const form = reactive({
   phone: '',
   password: '',
+})
+
+const forgetPassForm = reactive({
+  phone: '',
 })
 
 const ruleFormRef = ref<FormInstance>()
@@ -130,11 +148,12 @@ const rules = reactive<FormRules<RuleForm>>({
 
 
 const checklogin = async() => {
+  try {
     console.log("发送请求")
     let data = {phone: form.phone, password: form.password}
     let res = await loginAPI(data)
-    console.log(res);
-    console.log("接收数据")
+    // console.log(res);
+    // console.log("接收数据")
     if (res.id>0) {
       loginstate.id = res.id
       loginstate.name = res.username
@@ -145,15 +164,16 @@ const checklogin = async() => {
       form.phone = ""
       form.password = ""
       window.location.reload();
-    } else {
+    }
+  } catch (error) {
       // alert("用户名或密码错误,请重新输入")
       ElMessage({
         type: 'error',
-        message: res.error,
+        message: error,
       })
-    }
-    
-    
+
+    console.log(error)
+  }
 }
 
 const logOut = () => {
@@ -166,25 +186,25 @@ const logOut = () => {
   window.location.reload();
 }
 
-const forgetPass = async () => {
-  let regex = /^1[3456789]\d{9}$/;
-  let res;
-  if (regex.test(form.phone)){
-    let data = {phone: form.phone, password: "unkown"}
-    res = await resetPassAPI(data)
-  } else {
-    alert("请输入正确的手机号！")
-    return false;
-  }
-  
-  if (res && res.code == '200'){
-    alert("已收到您的第"+res.times+"次重置密码申请，会尽快为您办理！")
-    loginstate.dialogFormVisible = false
-    form.phone = ""
-    form.password = ""
+const sendResetEmail = async () => {
+  try {
+    let data = { phone: forgetPassForm.phone }
+    let res = await forgotPasswordAPI(data)
+    if (res.message === "密码重置邮件已发送,请查收邮箱") {
+      ElMessage({
+        type: 'success',
+        message: '密码重置邮件已发送,请查收邮箱',
+      })
+      forgetPassDialogVisible.value = false
+      forgetPassForm.phone = ''
+    }
+  } catch (error) {
+    ElMessage({
+      type: 'error',
+      message: error.message || '发送重置邮件失败',
+    })
   }
 }
-
 
 const register = async (formEl: FormInstance | undefined) => {
   if (!formEl) return

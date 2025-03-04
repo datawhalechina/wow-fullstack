@@ -186,9 +186,11 @@ def reset_password(
 async def login_for_access_token(phone: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
     user = check_user(db, phone, password)
     if  isinstance(user, str):
-        user.error=user
-        user.id=0
-        return user
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=user,
+            headers={"WWW-Authenticate": "Bearer"}, 
+        )
     # access过期时间
     access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
     # refresh过期时间
