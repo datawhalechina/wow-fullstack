@@ -8,6 +8,10 @@ class Settings(BaseSettings):
     HOST:str
     PORT:int
     SQLALCHEMY_DATABASE_URL:str
+    SMTP_HOST:str
+    SMTP_PORT:int
+    SMTP_USER:str
+    SMTP_PASSWORD:str
 
     model_config = SettingsConfigDict(env_file='.env', _env_file_encoding='utf-8', extra='allow')
 

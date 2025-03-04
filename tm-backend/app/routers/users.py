@@ -14,7 +14,10 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, desc 
 from app.core.models.users import Base, Users, Register
 from app.database import engine
-
+from email.mime.text import MIMEText
+from email.mime.multipart import MIMEMultipart
+import smtplib
+from app.core.config import settings
 Base.metadata.create_all(bind=engine)
 
 router = APIRouter(
@@ -63,10 +66,6 @@ def send_reset_password_email(email: str, reset_token: str):
     :param email: 用户邮箱
     :param reset_token: 重置密码的token
     """
-    from email.mime.text import MIMEText
-    from email.mime.multipart import MIMEMultipart
-    import smtplib
-    from app.core.config import settings
 
     # 创建邮件内容
     msg = MIMEMultipart()
@@ -75,7 +74,7 @@ def send_reset_password_email(email: str, reset_token: str):
     msg['Subject'] = '密码重置'
 
     # 邮件正文
-    reset_link = f"{settings.FRONTEND_URL}/reset-password?token={reset_token}"
+    reset_link = f"{settings.HOST}:{settings.PORT}/reset-password?token={reset_token}"
     body = f"""
     您好,
 
