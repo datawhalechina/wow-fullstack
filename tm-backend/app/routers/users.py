@@ -17,7 +17,7 @@ from app.database import engine
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 import smtplib
-from app.core.config import settings
+# from app.core.config import settings
 Base.metadata.create_all(bind=engine)
 
 router = APIRouter(

@@ -3,5 +3,7 @@ tm-frontend/node_modules
 
 tm-backend/**/__pycache__
 tm-backend/static
+tm-backend/.venv
 *.log
 **/.idea
+tm-backend/mydatabase.db
