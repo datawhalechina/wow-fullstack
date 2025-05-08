@@ -7,3 +7,6 @@ tm-backend/.venv
 *.log
 **/.idea
 tm-backend/mydatabase.db
+.venv
+__pycache__
+.DS_Store
