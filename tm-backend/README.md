@@ -15,7 +15,7 @@ cd tm-backend
 uv venv
 source venv/bin/activate
 uv add -r requirements.txt
-uv run fastapi dev
+uv run --env-file=.env fastapi dev --host 0.0.0.0 --port 8008
 ```
 
 ### Docker 部署
