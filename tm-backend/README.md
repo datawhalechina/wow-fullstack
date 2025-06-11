@@ -5,7 +5,7 @@
 ```bash
 cd tm-backend
 pip install -r requirements.txt
-uvicorn main:app --host 0.0.0.0 --port 8008
+uvicorn main:app --host 0.0.0.0 --port 8008 --evn-file .env
 ```
 
 ### uv 部署
@@ -23,7 +23,7 @@ uv run fastapi dev
 ```bash
 cd tm-backend
 docker build -t tm-backend .
-docker run -d -p 8000:8000 tm-backend 
+docker run -d -p 8008:8008 tm-backend 
 ```
 
 ### Docker Compose 部署
