@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  fastapi_app:
+    build: .
+    container_name: tm_backend_container
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/tm-backend
+      - /tm-backend/.venv  # 这行确保镜像内的 .venv 不被挂载覆盖
+    command: ["/tm-backend/.venv/bin/fastapi", "run", "main.py", "--port", "8000", "--host", "0.0.0.0"]
+    environment:
+      - ENV=production
+    restart: always
