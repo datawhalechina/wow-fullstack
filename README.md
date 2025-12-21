@@ -66,7 +66,7 @@ npm需要的版本是10.2.5
 
 ## 参与贡献
 
-本项目由[自塾](https://zishu.co/v1/tw/article/121)团队负责维护。
+本项目由[自塾](https://zishu.co)团队负责维护,在datawhale社区进行开源。
 
 - 如果你想参与到项目中来欢迎查看项目的 [Issue]() 查看没有被分配的任务。
 - 如果你发现了一些问题，欢迎在 [Issue]() 中进行反馈🐛。
@@ -87,11 +87,9 @@ npm需要的版本是10.2.5
 开发者需要根据自己的技能和兴趣选定一个开发产品作为主产品。  
 目前的开发人员安排：  
 Course：[Susan](https://github.com/Susan2048)  
-Tutorial：[Hoshino-wind](https://github.com/Hoshino-wind)、[KMnO4-zx](https://github.com/KMnO4-zx)  
-Guide：张某  、[WuXiaoMing](https://xlight5.github.io)  
-Docs：[Kailigithub](https://github.com/Kailigithub)  、[WuXiaoMing](https://xlight5.github.io)  
-Frontend：[lime](https://github.com/yyhhxx)  、[WuXiaoMing](https://xlight5.github.io)  
-Backend：[Tom.Yang](https://github.com/7n8fail)、[lish](https://github.com/kevin-light)、[wu](https://github.com/AIzealotwu)  、[WuXiaoMing](https://xlight5.github.io)
+Tutorial：[Hoshino-wind](https://github.com/Hoshino-wind)
+Docs：[Kailigithub](https://github.com/Kailigithub)  
+Backend：[Tom.Yang](https://github.com/7n8fail)[wu](https://github.com/AIzealotwu) 
 
 
 ## 关注我们
