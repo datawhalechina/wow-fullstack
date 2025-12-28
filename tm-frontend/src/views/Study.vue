@@ -391,34 +391,83 @@ import {
   FolderOpened, CircleCheck, Clock, ArrowLeft, ArrowRight, Check
 } from '@element-plus/icons-vue'
 
-// 简单的markdown渲染函数（实际项目中可使用marked等库）
+// HTML转义函数
+const escapeHtml = (str: string) => {
+  const htmlEscapes: Record<string, string> = {
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#39;'
+  }
+  return str.replace(/[&<>"']/g, char => htmlEscapes[char])
+}
+
+// 简单的markdown渲染函数
 const renderMarkdown = (content: string) => {
   if (!content) return ''
-  // 标题
-  let html = content
+
+  // 0. 先规范化换行（统一为\n）
+  content = content.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
+
+  // 1. 先处理代码块，保留占位符
+  const codeBlocks: string[] = []
+  let codeBlockIndex = 0
+
+  const processedContent = content.replace(/```(\w*)\n?([\s\S]*?)```/gim, (_, lang, code) => {
+    // 代码末尾的换行要保留
+    const codeWithNewlines = code.endsWith('\n') ? code : code + '\n'
+    const placeholder = `___CODE_BLOCK_${codeBlockIndex}___`
+    codeBlocks.push(`<pre class="code-block"><code class="language-${lang}">${escapeHtml(codeWithNewlines)}</code></pre>`)
+    codeBlockIndex++
+    return placeholder + '\n'
+  })
+
+  // 2. 处理其他markdown语法
+  let html = processedContent
+    // 标题
     .replace(/^### (.*$)/gim, '<h3>$1</h3>')
     .replace(/^## (.*$)/gim, '<h2>$1</h2>')
     .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-  // 粗体
-    .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-  // 斜体
-    .replace(/\*(.*)\*/gim, '<em>$1</em>')
-  // 列表
+    // 粗体
+    .replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>')
+    // 斜体
+    .replace(/\*(.*?)\*/gim, '<em>$1</em>')
+    // 列表
     .replace(/^- (.*$)/gim, '<li>$1</li>')
-  // 引用
+    // 引用
     .replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>')
-  // 分割线
+    // 分割线
     .replace(/^---$/gim, '<hr>')
-  // 代码块
-    .replace(/```([\s\S]*?)```/gim, '<pre><code>$1</code></pre>')
-  // 行内代码
-    .replace(/`(.*)`/gim, '<code>$1</code>')
-  // 链接
+    // 行内代码（非贪婪匹配）
+    .replace(/`(.*?)`/gim, '<code>$1</code>')
+    // 链接
     .replace(/\[(.*?)\]\((.*?)\)/gim, '<a href="$2" target="_blank">$1</a>')
-  // 段落
-    .replace(/\n\n/g, '</p><p>')
 
-  return `<p>${html}</p>`
+  // 3. 处理段落（代码块占位符周围需要特殊处理）
+  // 先把代码块占位符临时替换为特殊标记，避免被段落替换破坏
+  codeBlocks.forEach((_, index) => {
+    html = html.replace(`___CODE_BLOCK_${index}___`, `<div class="code-wrapper">___CODE_BLOCK_${index}___</div>`)
+  })
+
+  // 段落替换（确保换行正确保留）
+  html = html.replace(/\n\n+/g, '</p><p>')
+
+  // 4. 还原代码块占位符
+  codeBlocks.forEach((block, index) => {
+    html = html.replace(`<div class="code-wrapper">___CODE_BLOCK_${index}___</div>`, block)
+  })
+
+  // 5. 处理单个换行（代码块内的不处理）
+  // 先把代码块内容中的换行临时保护起来
+  html = html.replace(/<pre class="code-block">[\s\S]*?<\/pre>/g, (match) => {
+    return match.replace(/\n/g, '___NEWLINE___')
+  })
+  html = html.replace(/\n/g, '<br>')
+  // 还原代码块内的换行
+  html = html.replace(/___NEWLINE___/g, '\n')
+
+  return `<div class="markdown-body">${html}</div>`
 }
 </script>
 
@@ -521,12 +570,24 @@ const renderMarkdown = (content: string) => {
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+}
+
+.content-card :deep(.el-card__body) {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 0;
 }
 
 .content-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  flex-shrink: 0;
+  padding: 16px 20px;
+  border-bottom: 1px solid #ebeef5;
 }
 
 .header-left {
@@ -556,8 +617,11 @@ const renderMarkdown = (content: string) => {
 .markdown-content {
   flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
   padding: 20px;
   line-height: 1.8;
+  word-break: break-word;
+  min-height: 0;
 }
 
 .markdown-content :deep(h1),
@@ -606,5 +670,67 @@ const renderMarkdown = (content: string) => {
   margin: 24px 0;
   border: none;
   border-top: 1px solid #ebeef5;
+}
+
+.markdown-content :deep(.code-block) {
+  margin: 16px 0;
+  padding: 16px;
+  background: #282c34;
+  border-radius: 6px;
+  overflow-x: auto;
+  overflow-y: visible;
+  max-width: 100%;
+}
+
+.markdown-content :deep(.code-block code) {
+  font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+  font-size: 13px;
+  color: #abb2bf;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+.markdown-content :deep(.markdown-body) {
+  display: block;
+  min-height: 100%;
+}
+
+.markdown-content :deep(.code-wrapper) {
+  display: block;
+  margin: 16px 0;
+}
+
+.markdown-content :deep(br) {
+  display: block;
+  margin: 4px 0;
+  content: '';
+}
+
+.markdown-content :deep(h1),
+.markdown-content :deep(h2),
+.markdown-content :deep(h3),
+.markdown-content :deep(h4),
+.markdown-content :deep(h5),
+.markdown-content :deep(h6) {
+  display: block;
+  margin: 16px 0 12px;
+}
+
+.markdown-content :deep(ul),
+.markdown-content :deep(ol) {
+  display: block;
+  margin: 12px 0;
+  padding-left: 24px;
+}
+
+.markdown-content :deep(blockquote) {
+  display: block;
+  margin: 16px 0;
+}
+
+.markdown-content :deep(hr) {
+  display: block;
+  margin: 24px 0;
 }
 </style>
