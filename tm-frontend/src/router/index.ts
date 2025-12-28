@@ -88,13 +88,6 @@ const routes: Array<RouteRecordRaw> = [
   },
 
   {
-    path: "/login",
-    name: "Login",
-    component: () => import("../components/Login.vue"),
-    meta: { guest: true }
-  },
-
-  {
     path: "/reset-password",
     name: "ResetPassword",
     component: () => import("../views/ResetPassword.vue"),
@@ -128,11 +121,9 @@ router.beforeEach(async (to, from, next) => {
   // 需要认证的路由
   if (to.meta.requiresAuth) {
     if (!isAuthenticated) {
-      // 未登录，重定向到登录页
-      next({
-        name: "Login",
-        query: { redirect: to.fullPath }
-      })
+      // 未登录，打开登录对话框
+      userStore.dialogFormVisible = true
+      next({ name: "Home" })
       return
     }
 
@@ -141,12 +132,6 @@ router.beforeEach(async (to, from, next) => {
       next({ name: "Home" })
       return
     }
-  }
-
-  // 游客-only的路由（如登录页）
-  if (to.meta.guest && isAuthenticated) {
-    next({ name: "Home" })
-    return
   }
 
   next()
