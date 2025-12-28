@@ -17,6 +17,12 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("../views/Home.vue")
       },
       {
+        path: "/manager",
+        name: "Manager",
+        component: () => import("../components/Main.vue"),
+        meta: { requiresAuth: true }
+      },
+      {
         path: "/user",
         // 命名
         name: "User",
@@ -56,6 +62,12 @@ const routes: Array<RouteRecordRaw> = [
         // 命名
         name: "Profile",
         component: () => import("../views/user/Profile.vue"),
+        meta: { requiresAuth: true }
+      },
+      {
+        path: "/user/shuzhi",
+        name: "Shuzhi",
+        component: () => import("../views/user/Shuzhi.vue"),
         meta: { requiresAuth: true }
       },
       {

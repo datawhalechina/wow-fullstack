@@ -10,15 +10,17 @@ const isAdmin = computed(() => loginstate.id === 1)
 
 const menuItems = computed(() => {
   const items = [
-    { path: '/user/profile/' + userid.value, icon: 'User', label: '个人信息', target: '_blank' },
-    { path: '/user/editprofile', icon: 'Edit', label: '编辑资料', target: '_blank' },
-    { path: '/user/changepass', icon: 'Lock', label: '修改密码', target: '_blank' },
+    { path: '/manager', icon: 'Timer', label: '时间管理', target: '' },
+    { path: '/user/shuzhi', icon: 'Coin', label: '塾值', target: '' },
+    { path: '/user/profile/' + userid.value, icon: 'User', label: '个人信息', target: '' },
+    { path: '/user/editprofile', icon: 'Edit', label: '编辑资料', target: '' },
+    { path: '/user/changepass', icon: 'Lock', label: '修改密码', target: '' },
     { path: '/agents', icon: 'ChatDotRound', label: '智能体', target: '' },
   ]
   if (isAdmin.value) {
-    items.unshift({ path: '/user/registers', icon: 'DocumentChecked', label: '注册审核', target: '_blank' })
-    items.unshift({ path: '/user/resetpass', icon: 'Refresh', label: '重置密码', target: '_blank' })
-    items.unshift({ path: '/user/all', icon: 'Users', label: '全塾用户', target: '_blank' })
+    items.push({ path: '/user/registers', icon: 'DocumentChecked', label: '注册审核', target: '' })
+    items.push({ path: '/user/resetpass', icon: 'Refresh', label: '重置密码', target: '' })
+    items.push({ path: '/user/all', icon: 'Users', label: '全塾用户', target: '' })
   }
   return items
 })
