@@ -3,7 +3,7 @@
 </script>
 
 <template>
-    <div class="centered-text">自塾 @ 2024</div>
+    <div class="centered-text">自塾 @ 2025</div>
 </template>
 
 <style lang="scss" scoped>

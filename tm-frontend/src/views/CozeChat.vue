@@ -1,5 +1,12 @@
 <template>
   <div class="coze-chat-container">
+    <div class="chat-header">
+      <el-page-header @back="$router.back()" title="返回智能体列表">
+        <template #content>
+          <span class="chat-title">智能体对话</span>
+        </template>
+      </el-page-header>
+    </div>
     <div ref="chatContainer" class="coze-chat-slot"></div>
   </div>
 </template>
@@ -72,10 +79,23 @@ onUnmounted(() => {
 .coze-chat-container {
   width: 100%;
   height: calc(100vh - 60px);
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  padding: 10px 20px;
+  background: #fff;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.chat-title {
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .coze-chat-slot {
+  flex: 1;
   width: 100%;
-  height: 100%;
 }
 </style>

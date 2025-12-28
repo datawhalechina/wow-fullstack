@@ -3,8 +3,14 @@
     <el-card class="box-card">
       <template #header>
         <div class="card-header">
-          <span>Coze 智能体列表</span>
-          <el-button type="primary" @click="dialogVisible = true">添加智能体</el-button>
+          <el-page-header @back="$router.back()" title="返回">
+            <template #content>
+              <span class="header-title">Coze 智能体列表</span>
+            </template>
+          </el-page-header>
+          <el-button type="primary" @click="dialogVisible = true">
+            <el-icon><Plus /></el-icon>添加智能体
+          </el-button>
         </div>
       </template>
 
@@ -61,6 +67,7 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
+import { Plus } from '@element-plus/icons-vue'
 
 interface Agent {
   id: string
@@ -132,6 +139,11 @@ const startChat = (id: string) => {
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .empty-tip {
