@@ -67,10 +67,17 @@ def send_reset_password_email(email: str, reset_token: str):
     :param email: 用户邮箱
     :param reset_token: 重置密码的token
     """
+    # 检查 SMTP 是否已配置
+    smtp_user = settings.SMTP_USER or settings.SMTP_USERNAME
+    if not smtp_user or not settings.SMTP_PASSWORD:
+        raise HTTPException(
+            status_code=500,
+            detail="邮件服务未配置，请联系管理员配置 SMTP"
+        )
 
     # 创建邮件内容
     msg = MIMEMultipart()
-    msg['From'] = settings.SMTP_USER
+    msg['From'] = smtp_user
     msg['To'] = email
     msg['Subject'] = '密码重置'
 
@@ -94,7 +101,7 @@ def send_reset_password_email(email: str, reset_token: str):
     try:
         server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT)
         server.starttls()
-        server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+        server.login(smtp_user, settings.SMTP_PASSWORD)
         server.send_message(msg)
         server.quit()
     except Exception as e:

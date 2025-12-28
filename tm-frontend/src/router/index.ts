@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
+import { useUserStore } from "../store";
 
 // 路由类型:RouteRecordRaw
 const routes: Array<RouteRecordRaw> = [
@@ -14,58 +15,97 @@ const routes: Array<RouteRecordRaw> = [
         // 命名
         name: "Home",
         component: () => import("../views/Home.vue"),
+        meta: { requiresAuth: true }
       },
       {
         path: "/user",
         // 命名
         name: "User",
         component: () => import("../views/user/Center.vue"),
+        meta: { requiresAuth: true }
       },
       {
         path: "/user/registers",
         // 命名
         name: "Register",
         component: () => import("../views/user/Registers.vue"),
+        meta: { requiresAuth: true, requiresAdmin: true }
       },
       {
         path: "/user/changepass",
         // 命名
         name: "Changepass",
         component: () => import("../views/user/Changepass.vue"),
+        meta: { requiresAuth: true }
       },
       {
         path: "/user/resetpass",
         // 命名
         name: "Resetpass",
         component: () => import("../views/user/Resetpass.vue"),
+        meta: { requiresAuth: true }
       },
       {
         path: "/user/editprofile",
         // 命名
         name: "Editprofile",
         component: () => import("../views/user/Editprofile.vue"),
+        meta: { requiresAuth: true }
       },
       {
         path: "/user/profile/:id",
         // 命名
         name: "Profile",
         component: () => import("../views/user/Profile.vue"),
+        meta: { requiresAuth: true }
       },
       {
         path: "/user/all",
         // 命名
         name: "All",
         component: () => import("../views/user/All.vue"),
+        meta: { requiresAuth: true, requiresAdmin: true }
       },
       {
         path: '/api-debug',
         name: 'ApiDebug',
-        component: () => import('../views/ApiDebugPage.vue')
+        component: () => import('../views/ApiDebugPage.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true }
+      },
+      {
+        path: '/agent/:id',
+        name: 'CozeAgent',
+        component: () => import('../views/CozeChat.vue'),
+        meta: { requiresAuth: true }
+      },
+      {
+        path: '/agents',
+        name: 'CozeAgentList',
+        component: () => import('../views/CozeAgentList.vue'),
+        meta: { requiresAuth: true }
       },
     ]
   },
 
+  {
+    path: "/login",
+    name: "Login",
+    component: () => import("../views/Login.vue"),
+    meta: { guest: true }
+  },
 
+  {
+    path: "/reset-password",
+    name: "ResetPassword",
+    component: () => import("../views/ResetPassword.vue"),
+    meta: { guest: true }
+  },
+
+  {
+    path: "/:pathMatch(.*)*",
+    name: "NotFound",
+    component: () => import("../views/NotFound.vue")
+  }
 
 ];
 
@@ -74,5 +114,44 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+
+// 导航守卫：验证用户认证状态
+router.beforeEach(async (to, from, next) => {
+  const userStore = useUserStore()
+  
+  // 如果用户Store未初始化，尝试从本地存储恢复
+  if (!userStore.isInitialized) {
+    await userStore.initializeFromStorage()
+  }
+  
+  const isAuthenticated = userStore.isLoggedIn
+  const userRole = userStore.userInfo?.role || 'user'
+  
+  // 需要认证的路由
+  if (to.meta.requiresAuth) {
+    if (!isAuthenticated) {
+      // 未登录，重定向到登录页
+      next({
+        name: "Login",
+        query: { redirect: to.fullPath }
+      })
+      return
+    }
+    
+    // 需要管理员权限
+    if (to.meta.requiresAdmin && userRole !== 'admin') {
+      next({ name: "Home" })
+      return
+    }
+  }
+  
+  // 游客-only的路由（如登录页）
+  if (to.meta.guest && isAuthenticated) {
+    next({ name: "Home" })
+    return
+  }
+  
+  next()
+})
 
 export default router;

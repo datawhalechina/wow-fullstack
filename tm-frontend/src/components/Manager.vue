@@ -41,6 +41,12 @@
             >
               归档
             </button>
+            <button
+              class="btn btn-primary spaced"
+              @click="goToAgents"
+            >
+              智能体
+            </button>
           </div>
 
           <table class="table-css">
@@ -207,9 +213,11 @@
 
 <script setup lang="ts">
 import { useLoginStore } from "../store";
+import { useRouter } from "vue-router";
 import { ref, reactive, onMounted, watchEffect } from "vue";
 import {fetchTmAPI, fetchPrAPI, savePrAPI, finishTmAPI} from '../request/inno/api'
 const loginstate = useLoginStore();
+const router = useRouter();
 
 document.title = "自塾时间管理"
 //const tasks = JSON.parse(localStorage.getItem("zishu_active")) || [];
@@ -581,7 +589,11 @@ const handleSelect = () => {
       total_time.value = cal_total_time(finishList.value);
     };
 
-    const export_list = () => {
+    const goToAgents = () => {
+  router.push('/agents')
+}
+
+const export_list = () => {
       const title = [
         "编号",
         "主题",

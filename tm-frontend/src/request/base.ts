@@ -30,15 +30,16 @@ instance.interceptors.request.use(
     config => {
         if (loginstate.atoken == '') {
             //添加请求头
-            config.headers["token"]=loginstate.rtoken
-        } else{
-            config.headers["token"]=loginstate.atoken
+            config.headers["token"] = loginstate.rtoken
+        } else {
+            config.headers["token"] = loginstate.atoken
         }
         return config
     },
     error => {
         // 对请求错误做些什么
-        Promise.reject(error)
+        console.error('请求拦截器错误:', error);
+        return Promise.reject(error)
     }
 )
  
@@ -48,27 +49,42 @@ instance.interceptors.response.use(
         // 对响应数据做点什么
         return response.data
     },
-    async error => {  
-        let { data, config } = error.response;
-        // 处理401错误
-        if (data.detail.code == 5000 && !config.url.includes('/refresh')) {
+    async error => {
+        // 安全修复: 添加空值检查，防止访问undefined属性
+        if (!error.response) {
+            // 网络错误或其他错误
+            console.error('请求错误:', error.message || '网络错误');
+            return Promise.reject(error);
+        }
+        
+        const { data, config } = error.response;
+        
+        // 处理401错误 - token过期
+        if (data?.detail?.code === 5000 && config && !config.url?.includes('/refresh')) {
             loginstate.atoken = ''
             console.log("准备刷新token");
-            const res = await refreshToken();
-            console.log(res);
-            if(res.id > 0) {
-                return instance(config);
-            } else {
-                // 跳转登录页
+            try {
+                const res = await refreshToken();
+                console.log(res);
+                if (res && res.id > 0) {
+                    return instance(config);
+                } else {
+                    // 跳转登录页
+                    loginstate.dialogFormVisible = true
+                    //router.push(`/login?returnUrl=${router.currentRoute.value.fullPath}`)
+                }
+            } catch (refreshError) {
+                console.error('刷新token失败:', refreshError);
                 loginstate.dialogFormVisible = true
-                //router.push(`/login?returnUrl=${router.currentRoute.value.fullPath}`)
             }
-        } else if(error.code==401) {
+        } else if (error.code === 401 || error.response?.status === 401) {
             // 跳转登录页
             loginstate.dialogFormVisible = true
             //router.push(`/login?returnUrl=${router.currentRoute.value.fullPath}`)
         }
-        return error.response.data
+        
+        // 返回错误响应数据，如果存在
+        return Promise.reject(error.response?.data || error);
     }
 )
 export default instance
