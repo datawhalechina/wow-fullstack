@@ -14,8 +14,7 @@ const routes: Array<RouteRecordRaw> = [
         path: "/",
         // 命名
         name: "Home",
-        component: () => import("../views/Home.vue"),
-        meta: { requiresAuth: true }
+        component: () => import("../views/Home.vue")
       },
       {
         path: "/user",
