@@ -118,15 +118,13 @@ const router = createRouter({
 // 导航守卫：验证用户认证状态
 router.beforeEach(async (to, from, next) => {
   const userStore = useUserStore()
-  
-  // 如果用户Store未初始化，尝试从本地存储恢复
-  if (!userStore.isInitialized) {
-    await userStore.initializeFromStorage()
-  }
-  
-  const isAuthenticated = userStore.isLoggedIn
-  const userRole = userStore.userInfo?.role || 'user'
-  
+
+  // pinia-use-persist 会在初始化时自动恢复状态
+  // 直接使用持久化的状态，不需要手动初始化
+
+  const isAuthenticated = userStore.logined && !!userStore.atoken
+  const userRole = userStore.role || 'user'
+
   // 需要认证的路由
   if (to.meta.requiresAuth) {
     if (!isAuthenticated) {
@@ -137,20 +135,20 @@ router.beforeEach(async (to, from, next) => {
       })
       return
     }
-    
+
     // 需要管理员权限
     if (to.meta.requiresAdmin && userRole !== 'admin') {
       next({ name: "Home" })
       return
     }
   }
-  
+
   // 游客-only的路由（如登录页）
   if (to.meta.guest && isAuthenticated) {
     next({ name: "Home" })
     return
   }
-  
+
   next()
 })
 

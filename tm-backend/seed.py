@@ -5,8 +5,8 @@ from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 import os
 
-def create_directory(directory):  
-    if not os.path.exists(directory):  
+def create_directory(directory):
+    if not os.path.exists(directory):
         os.makedirs(directory)
 
 create_directory("static")
