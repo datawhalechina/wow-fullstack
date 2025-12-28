@@ -1,0 +1,654 @@
+.app {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: #f8fafc;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.app-header {
+  background: #ffffff;
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.app-header h1 {
+  margin: 0 0 0.25rem 0;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #61dafb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.app-header h1::before {
+  content: "⚛️";
+  font-size: 1.5rem;
+}
+
+.app-header p {
+  margin: 0;
+  font-size: 1rem;
+  color: #64748b;
+  font-weight: 400;
+}
+
+.app-container {
+  display: flex;
+  flex: 1;
+  width: 100%;
+  height: 0;
+  overflow: hidden;
+}
+
+.sidebar {
+  width: 280px;
+  min-width: 280px;
+  background: #ffffff;
+  border-right: 1px solid #e2e8f0;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.sidebar h3 {
+  margin: 0 0 1rem 0;
+  color: #1e293b;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 1.5rem 1.5rem 0 1.5rem;
+  border-bottom: none;
+  flex-shrink: 0;
+}
+
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
+/* 自定义滚动条样式 */
+.nav-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.nav-list::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+
+.nav-list::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.nav-list::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.main-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.main-content::-webkit-scrollbar-track {
+  background: #f8fafc;
+}
+
+.main-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 4px;
+}
+
+.main-content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+.nav-list li {
+  margin-bottom: 0.25rem;
+}
+
+.nav-button {
+  width: 100%;
+  text-align: left;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: transparent;
+  border-radius: 0;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
+  color: #475569;
+  cursor: pointer;
+  font-weight: 500;
+  border-left: 3px solid transparent;
+}
+
+.nav-button:hover {
+  background: #f1f5f9;
+  color: #0f172a;
+  border-left-color: #e2e8f0;
+}
+
+.nav-button.active {
+  background: #f0f9ff;
+  color: #0369a1;
+  border-left-color: #61dafb;
+  font-weight: 600;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+  background: #ffffff;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0;
+}
+
+/* 教程内容样式 */
+.tutorial-section {
+  max-width: 100%;
+  margin: 0;
+  width: 100%;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.tutorial-section h2 {
+  color: #0f172a;
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin: 0 0 1.5rem 0;
+  padding-bottom: 0.75rem;
+  border-bottom: 2px solid #61dafb;
+}
+
+.tutorial-section h3 {
+  color: #334155;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 2rem 0 1rem 0;
+}
+
+.demo-container {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.demo-title {
+  color: #475569;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.code-block {
+  background: #1e293b;
+  color: #e2e8f0;
+  padding: 1rem;
+  border-radius: 6px;
+  font-family: "SF Mono", Monaco, "Cascadia Code", "Roboto Mono", Consolas,
+    "Courier New", monospace;
+  font-size: 0.875rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  border: 1px solid #334155;
+}
+
+.interactive-demo {
+  border: 1px solid #61dafb;
+  border-radius: 8px;
+  padding: 1.5rem;
+  background: #f0f9ff;
+  margin: 1.5rem 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.demo-controls {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.demo-controls button {
+  background: #61dafb;
+  color: #0f172a;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.demo-controls button:hover {
+  background: #0ea5e9;
+  color: white;
+}
+
+.demo-controls input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  background: white;
+}
+
+.demo-controls input:focus {
+  outline: none;
+  border-color: #61dafb;
+  box-shadow: 0 0 0 3px rgba(97, 218, 251, 0.1);
+}
+
+.highlight {
+  background: rgba(97, 218, 251, 0.15);
+  color: #0369a1;
+  padding: 0.125rem 0.375rem;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+  .app {
+    height: 100vh;
+  }
+
+  .app-container {
+    flex-direction: column;
+    height: 0;
+  }
+
+  .sidebar {
+    width: 100%;
+    min-width: auto;
+    border-right: none;
+    border-bottom: 1px solid #e2e8f0;
+    height: auto;
+    flex: 0 0 auto;
+    max-height: 30vh;
+    overflow: hidden;
+  }
+
+  .main-content {
+    flex: 1;
+    height: 0;
+    overflow-y: auto;
+  }
+
+  .tutorial-section {
+    padding: 1rem;
+    height: auto;
+  }
+
+  .nav-list {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 0 1rem 1rem 1rem;
+    flex: none;
+  }
+
+  .nav-list li {
+    margin-bottom: 0;
+    margin-right: 0.5rem;
+    white-space: nowrap;
+  }
+
+  .nav-button {
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border-left: none;
+    border-bottom: 2px solid transparent;
+  }
+
+  .nav-button.active {
+    border-left: none;
+    border-bottom-color: #61dafb;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    padding: 1rem;
+  }
+
+  .app-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .tutorial-section {
+    padding: 0.75rem;
+  }
+
+  .demo-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .demo-controls button,
+  .demo-controls input {
+    width: 100%;
+  }
+}
+
+/* React Hooks 专用样式 */
+.hooks-overview {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 2rem;
+  border-radius: 12px;
+  margin: 2rem 0;
+}
+
+.hooks-overview h3 {
+  color: white;
+  margin: 0 0 1rem 0;
+}
+
+.hooks-overview ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.hooks-overview li {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  backdrop-filter: blur(10px);
+}
+
+.hook-demo {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.hook-demo h4 {
+  color: #1e293b;
+  margin: 0 0 1rem 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #61dafb;
+}
+
+.demo-content {
+  margin: 1rem 0;
+}
+
+.demo-item {
+  background: #f8fafc;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  border-left: 4px solid #61dafb;
+}
+
+.demo-item p {
+  margin: 0.5rem 0;
+  color: #334155;
+  font-weight: 500;
+}
+
+.demo-item input {
+  padding: 0.5rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  margin-right: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.demo-item input:focus {
+  outline: none;
+  border-color: #61dafb;
+  box-shadow: 0 0 0 3px rgba(97, 218, 251, 0.1);
+}
+
+.demo-item button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  margin: 0.25rem;
+  transition: all 0.2s;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.demo-item button:hover {
+  background: #2563eb;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(59, 130, 246, 0.3);
+}
+
+.button-group {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1rem 0;
+}
+
+.step-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.step-control label {
+  font-weight: 500;
+  color: #374151;
+}
+
+.step-control input {
+  width: 80px;
+}
+
+.code-explanation {
+  background: #fff7ed;
+  border: 1px solid #fed7aa;
+  border-radius: 6px;
+  padding: 1rem;
+  margin-top: 1rem;
+  color: #9a3412;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.code-explanation strong {
+  color: #ea580c;
+}
+
+.best-practices {
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem 0;
+}
+
+.best-practices h3 {
+  color: #166534;
+  margin: 0 0 1.5rem 0;
+}
+
+.practice-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.practice-item {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-left: 4px solid #10b981;
+}
+
+.practice-item h4 {
+  color: #065f46;
+  margin: 0 0 0.75rem 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.practice-item p {
+  color: #374151;
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.advanced-tips {
+  background: #fef3c7;
+  border: 1px solid #f59e0b;
+  border-radius: 12px;
+  padding: 2rem;
+  margin: 2rem 0;
+}
+
+.advanced-tips h3 {
+  color: #92400e;
+  margin: 0 0 1rem 0;
+}
+
+.advanced-tips ul {
+  color: #78350f;
+  line-height: 1.6;
+}
+
+.advanced-tips li {
+  margin: 0.5rem 0;
+}
+
+.advanced-tips code {
+  background: #fed7aa;
+  color: #9a3412;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+/* 移动端优化 */
+@media (max-width: 768px) {
+  .hooks-overview ul {
+    grid-template-columns: 1fr;
+  }
+
+  .practice-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .button-group {
+    flex-direction: column;
+  }
+
+  .demo-item button {
+    width: 100%;
+    margin: 0.25rem 0;
+  }
+
+  .step-control {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .step-control input {
+    width: 100%;
+  }
+}
+
+/* 内容底部的哲理文字 */
+.main-footer {
+  padding: 2rem 2rem;
+  margin: 3rem 2rem 2rem 2rem;
+}
+
+.quote-text {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.125rem;
+  line-height: 1.8;
+  text-align: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.quote-author {
+  margin: 0;
+  font-size: 0.875rem;
+  text-align: right;
+  background: linear-gradient(90deg, #667eea, #764ba2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* 移动端底部文字优化 */
+@media (max-width: 768px) {
+  .main-footer {
+    padding: 1rem 1.5rem;
+  }
+
+  .quote-text {
+    font-size: 0.875rem;
+  }
+
+  .quote-author {
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .main-footer {
+    padding: 0.75rem 1rem;
+  }
+
+  .quote-text {
+    font-size: 0.8rem;
+    line-height: 1.5;
+  }
+
+  .quote-author {
+    font-size: 0.7rem;
+  }
+}

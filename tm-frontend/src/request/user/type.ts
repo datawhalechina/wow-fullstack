@@ -59,3 +59,12 @@ export interface IDeleteProfile {
 export interface ISubmitProfile {
     info:string
 }
+
+export interface IForgetPassword {
+    phone: string
+}
+
+export interface IResetPassword {
+    token: string
+    new_password: string
+}    

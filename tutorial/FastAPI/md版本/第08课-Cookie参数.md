@@ -18,7 +18,7 @@ if __name__ == '__main__':
     server = uvicorn.Server(config)
     await server.serve()
 ```
-
+```log
 INFO:     Started server process [20348]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
@@ -31,7 +31,7 @@ INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
 INFO:     Finished server process [20348]
-
+```
 声明 Cookie 参数的结构与声明 Query 参数和 Path 参数时相同。
 
 你需要使用 Cookie 来声明 cookie 参数，否则参数将会被解释为查询参数。
