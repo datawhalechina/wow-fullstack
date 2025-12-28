@@ -34,7 +34,7 @@
 
   <!-- 登录对话框 -->
   <el-dialog
-    v-model="loginDialogVisible"
+    v-model="loginstate.dialogFormVisible"
     title="用户登录"
     :width="400"
     center
@@ -80,7 +80,7 @@
 
   <!-- 注册对话框 -->
   <el-dialog
-    v-model="registerDialogVisible"
+    v-model="loginstate.registerFormVisible"
     title="用户注册"
     :width="450"
     center
@@ -154,7 +154,7 @@
     </el-form>
     <template #footer>
       <div class="dialog-footer">
-        <el-button @click="registerDialogVisible = false">取消</el-button>
+        <el-button @click="loginstate.registerFormVisible = false">取消</el-button>
         <el-button type="primary" :loading="registerLoading" @click="handleRegister">
           注册
         </el-button>
@@ -220,9 +220,7 @@ import {
 const router = useRouter()
 const loginstate = useLoginStore()
 
-// 对话框状态
-const loginDialogVisible = ref(false)
-const registerDialogVisible = ref(false)
+// 对话框状态 - 使用 store 中的状态
 const forgetDialogVisible = ref(false)
 
 // 加载状态
@@ -308,15 +306,15 @@ const forgetRules: FormRules = {
 
 // 打开对话框
 const openLoginDialog = () => {
-  loginDialogVisible.value = true
+  loginstate.dialogFormVisible = true
 }
 
 const openRegisterDialog = () => {
-  registerDialogVisible.value = true
+  loginstate.registerFormVisible = true
 }
 
 const openForgetDialog = () => {
-  loginDialogVisible.value = false
+  loginstate.dialogFormVisible = false
   forgetDialogVisible.value = true
 }
 
@@ -336,10 +334,9 @@ const handleLogin = async () => {
         loginstate.atoken = res.atoken
         loginstate.rtoken = res.rtoken
         loginstate.logined = true
-        loginDialogVisible.value = false
+        loginstate.dialogFormVisible = false
         ElMessage.success('登录成功，欢迎回来！')
-        router.push('/')
-        window.location.reload()
+        router.push('/user')
       }
     } catch (error: any) {
       ElMessage.error(error.detail || error.message || '登录失败')
@@ -367,7 +364,7 @@ const handleRegister = async () => {
 
       if (res.code === 200) {
         ElMessage.success('注册成功，请等待审核！')
-        registerDialogVisible.value = false
+        loginstate.registerFormVisible = false
         // 清空表单
         registerForm.name = ''
         registerForm.phone = ''
@@ -426,7 +423,6 @@ const handleLogout = () => {
   loginstate.logined = false
   ElMessage.success('已退出登录')
   router.push('/')
-  window.location.reload()
 }
 </script>
 
