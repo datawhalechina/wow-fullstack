@@ -66,4 +66,22 @@ def check_jwt_token(token: Optional[str] = Header(""), db: Session = Depends(get
                 'data': "Token Error",
             }
         )
+
+
+def require_admin(user: users.Users = Depends(check_jwt_token)):
+    """
+    检查用户是否为管理员
+    :param user: 当前登录用户
+    :return: 如果是管理员则返回用户，否则抛出异常
+    """
+    if user.role != "admin":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                'code': 5003,
+                'message': "Permission denied. Admin access required.",
+                'data': None,
+            }
+        )
+    return user
     
