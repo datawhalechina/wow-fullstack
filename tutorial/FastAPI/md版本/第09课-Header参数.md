@@ -24,7 +24,7 @@ if __name__ == '__main__':
     server = uvicorn.Server(config)
     await server.serve()
 ```
-
+```log
 INFO:     Started server process [16572]
 INFO:     Waiting for application startup.
 INFO:     Application startup complete.
@@ -36,7 +36,7 @@ INFO:     Shutting down
 INFO:     Waiting for application shutdown.
 INFO:     Application shutdown complete.
 INFO:     Finished server process [16572]
-
+```
 ## requests库
 
 ```python

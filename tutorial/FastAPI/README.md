@@ -5,7 +5,7 @@
 本教程的Jupyter notebook文件中的代码片段也可以在py文件中运行，不过需要做一些修改，就是把最后一行里
 ```python
 if __name__ == '__main__':
-    config = uvicorn.Config(app, host='0.0.0.0', port=8009)
+    config = uvicorn.Config(app, host='0.0.0.0', port=8000)
     server = uvicorn.Server(config)
     await server.serve()
 ```
@@ -13,14 +13,14 @@ if __name__ == '__main__':
 改成
 ```python
 if __name__ == '__main__':
-    uvicorn.run(app, host='0.0.0.0', port=8009)
+    uvicorn.run(app, host='0.0.0.0', port=8000)
 ```
 
 这是因为在jupyter notebook中运行异步函数`uvicorn.run()`会报错，需要用`uvicorn.Server()`包装一下，并且在前面加一个await。
 
 另外需要注意的是Uvicorn running on http://0.0.0.0:8000，并不能直接把http://0.0.0.0:8000贴到浏览器的地址栏。0.0.0.0的含义是这个服务向所有ip地址开放，但是你想要访问它，需要用部署这个服务的本地IP，比如http://127.0.0.1:8000。
 
-我们把FastAPI的学习分为五个大章，每个大章下面有若干小节。你可以按照自己的节奏进行学习。全部学完需要大约540分钟。
+我们把FastAPI的学习分为六个大章，每个大章下面有若干小节。你可以按照自己的节奏进行学习。全部学完需要大约630分钟。
 
 
 - 第1章-url参数（共计90分钟）
@@ -48,6 +48,9 @@ if __name__ == '__main__':
 - - 第5.3节-18-子依赖项（15分钟）
 - - 第5.4节-19-路径装饰器依赖项（15分钟）
 - - 第5.5节-20-全局依赖项（15分钟）
+- 第6章-MCP（共计90分钟）
+- - 第6.1节-21-FastAPI MCP（30分钟）
+- - 第6.2节-22-实现天气查询MCP（60分钟）
 
 如果您在学习中有任何疑问可以通过以下方式解决：
 1. 搜索引擎查找

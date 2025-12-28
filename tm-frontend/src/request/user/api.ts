@@ -38,6 +38,10 @@ export const submitProfileAPI = (data: User.ISubmitProfile): Promise<any> =>
 
 export const fetchAllUsersAPI = (): Promise<any> =>
     instance.get("/api/users/fetch_all_users");
+export const forgetPasswordAPI = (data: User.IForgetPassword): Promise<any> =>
+    instance.post("/api/users/forget-password", data);
+export const resetPasswordAPI = (data: User.IResetPassword): Promise<any> =>
+    instance.post("/api/users/reset-password", data);
 
 // 忘记密码 - 发送重置邮件
 export const forgotPasswordAPI = (data: { phone: string }): Promise<any> =>
