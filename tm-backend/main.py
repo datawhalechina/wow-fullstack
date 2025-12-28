@@ -6,6 +6,7 @@ from fastapi.middleware.wsgi import WSGIMiddleware
 
 from app.routers import users
 from app.routers import inno
+from app.routers import tutorial
 
 from app.config import settings
 
@@ -30,6 +31,7 @@ app.add_middleware(
 
 app.include_router(users.router)
 app.include_router(inno.inno)
+app.include_router(tutorial.router, prefix="/api/tutorial")
 
 @app.get("/")
 def read_root():

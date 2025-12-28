@@ -24,6 +24,15 @@
           <el-dropdown-item command="profile">
             <el-icon><User /></el-icon> 个人中心
           </el-dropdown-item>
+          <el-dropdown-item v-if="isAdmin" command="users" divided>
+            <el-icon><UserFilled /></el-icon> 全塾用户
+          </el-dropdown-item>
+          <el-dropdown-item v-if="isAdmin" command="registers">
+            <el-icon><Menu /></el-icon> 注册审核
+          </el-dropdown-item>
+          <el-dropdown-item v-if="isAdmin" command="admin">
+            <el-icon><Setting /></el-icon> 系统管理
+          </el-dropdown-item>
           <el-dropdown-item command="logout" divided>
             <el-icon><SwitchButton /></el-icon> 退出登录
           </el-dropdown-item>
@@ -214,7 +223,8 @@ import { loginAPI, RegisterAPI, forgotPasswordAPI } from '../request/user/api'
 import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import {
-  User, Plus, Lock, Phone, Message, ArrowDown, SwitchButton
+  User, Plus, Lock, Phone, Message, ArrowDown, SwitchButton,
+  Setting, UserFilled, Menu
 } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -333,6 +343,7 @@ const handleLogin = async () => {
         loginstate.name = res.username
         loginstate.atoken = res.atoken
         loginstate.rtoken = res.rtoken
+        loginstate.role = res.role || 'user'
         loginstate.logined = true
         loginstate.dialogFormVisible = false
         ElMessage.success('登录成功，欢迎回来！')
@@ -409,10 +420,21 @@ const handleForget = async () => {
 const handleCommand = (command: string) => {
   if (command === 'profile') {
     router.push('/user')
+  } else if (command === 'admin') {
+    router.push('/admin')
+  } else if (command === 'users') {
+    router.push('/user/all')
+  } else if (command === 'registers') {
+    router.push('/user/registers')
   } else if (command === 'logout') {
     handleLogout()
   }
 }
+
+// 判断是否是管理员
+const isAdmin = computed(() => {
+  return loginstate.id === 1 || loginstate.role === 'admin'
+})
 
 // 处理退出
 const handleLogout = () => {

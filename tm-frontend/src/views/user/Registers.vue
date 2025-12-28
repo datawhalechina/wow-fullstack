@@ -76,7 +76,11 @@ const handleAction = async (action: 'activate' | 'delete') => {
     <el-card class="table-card">
       <template #header>
         <div class="card-header">
-          <span>待审核注册列表</span>
+          <el-page-header @back="$router.back()" title="返回">
+            <template #content>
+              <span class="header-title">待审核注册列表</span>
+            </template>
+          </el-page-header>
           <el-button type="primary" link @click="fetchData">
             <el-icon><Refresh /></el-icon> 刷新
           </el-button>
@@ -130,6 +134,11 @@ import { ElMessageBox } from 'element-plus'
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: 600;
 }
 
 .action-bar {

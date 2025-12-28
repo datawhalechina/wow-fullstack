@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useLoginStore } from '../../store'
-import { getProfileAPI, fetchGoalAPI } from '../../request/user/api'
+import { getProfileAPI } from '../../request/user/api'
 import { ref, reactive, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElImage } from 'element-plus'
@@ -22,15 +22,6 @@ const form = reactive({
   desc: ''
 })
 
-const goal = reactive({
-  goal_id: 0,
-  content: '',
-  start_date: '',
-  deadline: '',
-  process: 0,
-  review: ''
-})
-
 const who = computed(() => {
   if (currentUserId.value === targetUserId) return '我'
   if (currentUserId.value !== targetUserId && form.gender === '男') return '他'
@@ -49,16 +40,6 @@ const getProfile = async () => {
     fileList.length = 0
     if (res.profiles && res.profiles.length) {
       fileList.push(...res.profiles)
-    }
-
-    const rtn = await fetchGoalAPI({ userid: targetUserId })
-    if (rtn && rtn.id > 0) {
-      goal.goal_id = rtn.id
-      goal.content = rtn.content
-      goal.start_date = rtn.start_time
-      goal.deadline = rtn.deadline
-      goal.process = rtn.process
-      goal.review = rtn.review
     }
   } catch (error) {
     console.error('获取信息失败', error)
@@ -112,21 +93,7 @@ const getImageUrl = (url: string) => {
         </div>
       </div>
 
-      <!-- 目标 -->
-      <div class="section" v-if="goal.goal_id > 0">
-        <h3 class="section-title">当前目标</h3>
-        <el-descriptions :column="2" border size="small">
-          <el-descriptions-item label="目标内容" :span="2">{{ goal.content }}</el-descriptions-item>
-          <el-descriptions-item label="开始时间">{{ goal.start_date }}</el-descriptions-item>
-          <el-descriptions-item label="截止时间">{{ goal.deadline }}</el-descriptions-item>
-          <el-descriptions-item label="完成进度">
-            <el-progress :percentage="goal.process" />
-          </el-descriptions-item>
-          <el-descriptions-item label="进度说明" :span="2">{{ goal.review }}</el-descriptions-item>
-        </el-descriptions>
-      </div>
-
-      <el-empty v-if="!loading && !form.name && goal.goal_id === 0" description="暂无信息" />
+      <el-empty v-if="!loading && !form.name" description="暂无信息" />
     </el-card>
   </div>
 </template>

@@ -38,7 +38,11 @@ const maskPhone = (phone: string) => {
     <el-card class="table-card">
       <template #header>
         <div class="card-header">
-          <span>全塾用户</span>
+          <el-page-header @back="$router.back()" title="返回">
+            <template #content>
+              <span class="header-title">全塾用户</span>
+            </template>
+          </el-page-header>
           <el-button type="primary" link @click="fetchAll">
             <el-icon><Refresh /></el-icon> 刷新
           </el-button>
@@ -98,5 +102,10 @@ import { computed } from 'vue'
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: 600;
 }
 </style>

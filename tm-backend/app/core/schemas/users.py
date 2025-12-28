@@ -6,6 +6,7 @@ class UserBase(BaseModel):
     username: str = None
     # pip install pydantic[email] 使用email验证的时候需要增加这个库
     email: Optional[EmailStr] = None
+    role: Optional[str] = 'user'
 
     class Config:
         from_attributes = True

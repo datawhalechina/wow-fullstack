@@ -2,15 +2,20 @@
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useLoginStore } from '../../store'
+import {
+  Timer, Reading, Coin, User, Edit, Lock, ChatDotRound,
+  DocumentChecked, Refresh, Users, Setting
+} from '@element-plus/icons-vue'
 
 const router = useRouter()
 const loginstate = useLoginStore()
 const userid = computed(() => loginstate.id)
-const isAdmin = computed(() => loginstate.id === 1)
+const isAdmin = computed(() => loginstate.id === 1 || loginstate.role === 'admin')
 
 const menuItems = computed(() => {
   const items = [
     { path: '/manager', icon: 'Timer', label: '时间管理', target: '' },
+    { path: '/courses', icon: 'Reading', label: '课程学习', target: '' },
     { path: '/user/shuzhi', icon: 'Coin', label: '塾值', target: '' },
     { path: '/user/profile/' + userid.value, icon: 'User', label: '个人信息', target: '' },
     { path: '/user/editprofile', icon: 'Edit', label: '编辑资料', target: '' },

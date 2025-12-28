@@ -95,6 +95,24 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../views/CozeAgentList.vue'),
         meta: { requiresAuth: true }
       },
+      {
+        path: '/courses',
+        name: 'Courses',
+        component: () => import('../views/Courses.vue'),
+        meta: { requiresAuth: true }
+      },
+      {
+        path: '/study',
+        name: 'Study',
+        component: () => import('../views/Study.vue'),
+        meta: { requiresAuth: true }
+      },
+      {
+        path: '/admin',
+        name: 'Admin',
+        component: () => import('../views/Admin.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true }
+      },
     ]
   },
 
@@ -128,6 +146,7 @@ router.beforeEach(async (to, from, next) => {
 
   const isAuthenticated = userStore.logined && !!userStore.atoken
   const userRole = userStore.role || 'user'
+  const isAdmin = userStore.id === 1 || userRole === 'admin'
 
   // 需要认证的路由
   if (to.meta.requiresAuth) {
@@ -139,7 +158,7 @@ router.beforeEach(async (to, from, next) => {
     }
 
     // 需要管理员权限
-    if (to.meta.requiresAdmin && userRole !== 'admin') {
+    if (to.meta.requiresAdmin && !isAdmin) {
       next({ name: "Home" })
       return
     }
