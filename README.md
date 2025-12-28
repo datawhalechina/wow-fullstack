@@ -3,15 +3,42 @@
 好的教程可以一路运行。
 我们要做一个能够一路拷贝代码运行的全栈开发教程。集成了许多优秀代码片段，在开发过程中可以随时复制。同时搭配了一个练手项目，一个用来做时间管理的项目。前端采用ts+vue3+vite架构，后端采用fastapi架构。开源项目和开源教程可以打配合。开源项目里用到的知识写入开源教程。开源教程所用到的例子来源于开源项目。互相印证。
 
+# 网站功能
+
+本项目不仅是一个全栈开发教程，还提供了一个完整的时间管理和学习系统：
+
+- **时间管理** - 自塾时间管理，记录每日任务和学习时间
+- **课程学习** - 13门完整教程课程，均可在线学习
+- **塾值系统** - 记录学习、工作、创作等各类事务的塾值积分
+- **智能体** - 集成Coze AI智能体，可进行智能对话
+- **系统管理** - 管理员可管理用户、配置权限、添加塾值
+
 # 教程使用方法
 
-- TS：进入tutorial文件夹，再进入[TypeScript](https://github.com/datawhalechina/wow-fullstack/tree/main/tutorial/TypeScript)文件夹，自行阅读各个章节。文档都是Markdown，点开后可直接阅读。代码的输出结果已经写在相应代码下方了。需要什么代码尽管拷贝。
-- Vue3：进入tutorial文件夹，再进入[Vue3](https://github.com/datawhalechina/wow-fullstack/tree/main/tutorial/Vue3)文件夹，自行阅读各个章节。文档都是Markdown，点开后可直接阅读。代码的输出结果已经写在相应代码下方了。需要什么代码尽管拷贝。
-- FastAPI：进入tutorial文件夹，再进入[FastAPI](https://github.com/datawhalechina/wow-fullstack/tree/main/tutorial/FastAPI)文件夹。文档都是jupyter notebook，需要把ipynb文件下载到本地去运行。直接运行每个代码格子就可以。
+- **综合教程**：进入`tutorial`文件夹，查看以下目录：
+  - [ElementUI-Plus](tutorial/Elementui-plus) - 前端UI组件教程
+  - [Excel自动化](tutorial/Excel自动化) - Python Excel处理教程
+  - [FastAPI入门](tutorial/FastAPI) - 后端API开发教程
+  - [PDF自动化](tutorial/PDF自动化) - PDF处理教程
+  - [PPT自动化](tutorial/PPT自动化) - PPT制作教程
+  - [TypeScript](tutorial/TypeScript) - TypeScript教程
+  - [Vue3前端开发](tutorial/Vue3) - Vue3框架教程
+  - [Word自动化](tutorial/Word自动化) - Word处理教程
+  - [CSS教程](tutorial/css教程导论) - CSS入门教程
+  - [时间管理](tutorial/时间管理) - 时间管理方法论
+  - [知识产权](tutorial/知识产权) - 知识产权基础
+  - [键鼠自动化](tutorial/键鼠自动化) - 自动化脚本教程
+  - [压缩包自动化](tutorial/压缩包自动化) - 文件处理教程
+
+- **开发文档**：
+  - [开发文档](tm-docs/tm开发文档.md) - 项目开发技术文档
+  - [用户手册](tm-guide/tm用户手册.md) - 系统使用指南
+
+文档都是Markdown格式，可直接阅读。代码可直接拷贝使用。
 
 # 前后端使用方法
 
-首先如果是首次拉取代码，用git clone https://github.com/datawhalechina/wow-fullstack.git ，把所有代码拉取下来。如果以前有拉取过，就用git pull
+首先如果是首次拉取代码，用`git clone https://github.com/datawhalechina/wow-fullstack.git`，把所有代码拉取下来。如果以前有拉取过，就用`git pull`
 
 ### 确保版本正确
 python需要的版本是3.10
@@ -55,13 +82,17 @@ True
 ### 启动前端
 node需要的版本是v18.18.0
 npm需要的版本是10.2.5
-进入 tm-fronfend，输入命令 npm install
+进入 tm-frontend，输入命令 npm install
 如果出现报错可尝试删除package-lock.json项目
 如果运行顺利，输入 npm run dev
 如果顺利，会输出浏览器链接，不要用localhost：5173。我们找一个 192.168 的贴到浏览器，就可以打开页面了。
 打开前端页面后，点右上角的登录按钮，输入手机号15812345678，密码 zishu，即可进入网站。
 
-
+管理员账号登录后，头像下拉菜单会显示更多管理功能：
+- 个人中心
+- 全塾用户
+- 注册审核
+- 系统管理
 
 
 ## 参与贡献
@@ -69,29 +100,29 @@ npm需要的版本是10.2.5
 本项目由[自塾](https://zishu.co/v1/tw/article/121)团队负责维护。
 
 - 如果你想参与到项目中来欢迎查看项目的 [Issue]() 查看没有被分配的任务。
-- 如果你发现了一些问题，欢迎在 [Issue]() 中进行反馈🐛。
-- 如果你对本项目感兴趣想要参与进来可以通过 [Discussion]() 进行交流💬。
+- 如果你发现了一些问题，欢迎在 [Issue]() 中进行反馈。
+- 如果你对本项目感兴趣想要参与进来可以通过 [Discussion]() 进行交流。
 
-如果你对 Datawhale 很感兴趣并想要发起一个新的项目，欢迎查看 [Datawhale 贡献指南](https://github.com/datawhalechina/DOPMC#%E4%B8%BA-datawhale-%E5%81%9A%E5%87%BA%E8%B4%A1%E7%8C%AE)。
+如果你对 Datawhale 很感兴趣并想要发起一个新的项目，欢迎查看 [Datawhale 贡献指南](https://github.com/datawhalechina/DOPMC#为-datawhale-做贡献)。
 
 ## 贡献者名单
 
-需要开发的产品和对应的大写首字母有：  
-1.时间管理课程 Course  
-2.技术教程 Tutorial  
-3.用户使用指南 Guide  
-4.开发文档 Docs  
-5.前端代码 Frontend  
-6.后端代码 Backend  
+需要开发的产品和对应的大写首字母有：
+1.时间管理课程 Course
+2.技术教程 Tutorial
+3.用户使用指南 Guide
+4.开发文档 Docs
+5.前端代码 Frontend
+6.后端代码 Backend
 
-开发者需要根据自己的技能和兴趣选定一个开发产品作为主产品。  
-目前的开发人员安排：  
-Course：[Susan](https://github.com/Susan2048)  
-Tutorial：[Hoshino-wind](https://github.com/Hoshino-wind)、[KMnO4-zx](https://github.com/KMnO4-zx)  
-Guide：张某  、[WuXiaoMing](https://xlight5.github.io)  
-Docs：[Kailigithub](https://github.com/Kailigithub)  、[WuXiaoMing](https://xlight5.github.io)  
-Frontend：[lime](https://github.com/yyhhxx)  、[WuXiaoMing](https://xlight5.github.io)  
-Backend：[Tom.Yang](https://github.com/7n8fail)、[lish](https://github.com/kevin-light)、[wu](https://github.com/AIzealotwu)  、[WuXiaoMing](https://xlight5.github.io)
+开发者需要根据自己的技能和兴趣选定一个开发产品作为主产品。
+目前的开发人员安排：
+Course：[Susan](https://github.com/Susan2048)
+Tutorial：[Hoshino-wind](https://github.com/Hoshino-wind)、[KMnO4-zx](https://github.com/KMnO4-zx)
+Guide：张某、[WuXiaoMing](https://xlight5.github.io)
+Docs：[Kailigithub](https://github.com/Kailigithub)、[WuXiaoMing](https://xlight5.github.io)
+Frontend：[lime](https://github.com/yyhhxx)、[WuXiaoMing](https://xlight5.github.io)
+Backend：[Tom.Yang](https://github.com/7n8fail)、[lish](https://github.com/kevin-light)、[wu](https://github.com/AIzealotwu)、[WuXiaoMing](https://xlight5.github.io)
 
 
 ## 关注我们
