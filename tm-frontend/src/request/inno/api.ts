@@ -30,3 +30,7 @@ export const savePrAPI = (params: Inno.Itm): Promise<any> =>
 
 export const finishTmAPI = (params: Inno.Itm): Promise<any> =>
     instance.put(`/api/inno/finish_tm/${params.user_id}`, { params });
+
+// 添加学习时间到时间管理
+export const addStudyTimeAPI = (userId: number, taskinfo: any[]): Promise<any> =>
+    instance.post(`/api/inno/add_study_time/${userId}`, { taskinfo });

@@ -47,19 +47,53 @@ async def get_pr(user_id:int):
 async def save_pr(request: Request, user_id:int):
     userid = str(user_id)
     form_data = await request.form()
-    tasklist = json.loads(form_data.get("params[taskinfo]"))
-    with open(f"static/tm/t{userid}.txt", "w", encoding="utf-8") as f:
-        for line in tasklist:
-            f.write(str(line) + "\n")
+    # 尝试多种参数格式
+    taskinfo_str = form_data.get("params[taskinfo]") or form_data.get("taskinfo") or form_data.get("params")
+    if taskinfo_str:
+        tasklist = json.loads(taskinfo_str)
+        with open(f"static/tm/t{userid}.txt", "w", encoding="utf-8") as f:
+            for line in tasklist:
+                f.write(str(line) + "\n")
     return {"code": "200"}
 
 @inno.put('/finish_tm/{user_id}')
 async def finish_tm(request: Request, user_id:int):
     userid = str(user_id)
     form_data = await request.form()
-    finishitem = json.loads(form_data.get("params[finishitem]"))
-    finishitem.reverse()
-    with open(f"static/tm/f{userid}.txt", "a", encoding="utf-8") as f:
-        for line in finishitem:
-            f.write(str(line) + "\n")
+    # 尝试多种参数格式
+    finishitem_str = form_data.get("params[finishitem]") or form_data.get("finishitem") or form_data.get("params")
+    if finishitem_str:
+        finishitem = json.loads(finishitem_str)
+        finishitem.reverse()
+        with open(f"static/tm/f{userid}.txt", "a", encoding="utf-8") as f:
+            for line in finishitem:
+                f.write(str(line) + "\n")
     return {"code": "200"}
+
+
+@inno.post('/add_study_time/{user_id}')
+async def add_study_time(request: Request, user_id:int):
+    """添加学习时间到时间管理"""
+    userid = str(user_id)
+    try:
+        data = await request.json()
+        tasklist = data.get("taskinfo", [])
+
+        # 读取现有数据
+        existing_pr = []
+        if os.path.exists(f"static/tm/t{userid}.txt"):
+            with open(f"static/tm/t{userid}.txt", "r", encoding="utf-8") as f:
+                existing_pr = [ast.literal_eval(x) for x in f.readlines()]
+
+        # 追加新的学习记录
+        for line in tasklist:
+            existing_pr.append(line)
+
+        # 保存
+        with open(f"static/tm/t{userid}.txt", "w", encoding="utf-8") as f:
+            for line in existing_pr:
+                f.write(str(line) + "\n")
+
+        return {"code": "200", "message": "添加成功"}
+    except Exception as e:
+        return {"code": "500", "message": str(e)}

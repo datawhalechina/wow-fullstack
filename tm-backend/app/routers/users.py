@@ -67,10 +67,17 @@ def send_reset_password_email(email: str, reset_token: str):
     :param email: 用户邮箱
     :param reset_token: 重置密码的token
     """
+    # 检查 SMTP 是否已配置
+    smtp_user = settings.SMTP_USER or settings.SMTP_USERNAME
+    if not smtp_user or not settings.SMTP_PASSWORD:
+        raise HTTPException(
+            status_code=500,
+            detail="邮件服务未配置，请联系管理员配置 SMTP"
+        )
 
     # 创建邮件内容
     msg = MIMEMultipart()
-    msg['From'] = settings.SMTP_USER
+    msg['From'] = smtp_user
     msg['To'] = email
     msg['Subject'] = '密码重置'
 
@@ -94,7 +101,7 @@ def send_reset_password_email(email: str, reset_token: str):
     try:
         server = smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT)
         server.starttls()
-        server.login(settings.SMTP_USER, settings.SMTP_PASSWORD)
+        server.login(smtp_user, settings.SMTP_PASSWORD)
         server.send_message(msg)
         server.quit()
     except Exception as e:
@@ -795,3 +802,146 @@ def validate_password_format(password: str) -> bool:
     if not re.search(r"[A-Za-z]", password):
         return False
     return True
+
+
+@router.get("/fetch_shuzhi")
+async def fetch_shuzhi(userid: int):
+    """获取用户塾值记录"""
+    userid_str = str(userid)
+    shuzhi_list = []
+    file_path = f"static/shuzhi/s{userid_str}.txt"
+
+    if os.path.exists(file_path):
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+            for line in lines:
+                line = line.strip()
+                if line:
+                    try:
+                        shuzhi_list.append(ast.literal_eval(line))
+                    except (ValueError, SyntaxError):
+                        continue
+        except (IOError, OSError):
+            pass
+
+    return shuzhi_list
+
+
+@router.post("/add_shuzhi")
+async def add_shuzhi(request: Request, db: Session = Depends(get_db)):
+    """添加塾值记录"""
+    try:
+        data = await request.json()
+        user_id = data.get("user_id")
+        target_type = data.get("target_type")
+        target_title = data.get("target_title")
+        amount = data.get("amount", 0)
+        balance = data.get("balance", 0)
+        comments = data.get("comments", "")
+        create_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        # 保存到文件
+        userid_str = str(user_id)
+        os.makedirs("static/shuzhi/", exist_ok=True)
+
+        record = {
+            "target_type": target_type,
+            "target_title": target_title,
+            "amount": amount,
+            "balance": balance,
+            "comments": comments,
+            "create_time": create_time
+        }
+
+        with open(f"static/shuzhi/s{userid_str}.txt", "a", encoding="utf-8") as f:
+            f.write(str(record) + "\n")
+
+        # 更新用户表中的塾值
+        useritem = db.query(Users).filter_by(id=user_id).first()
+        if useritem:
+            useritem.shuzhi = (useritem.shuzhi or 0) + balance
+            db.commit()
+
+        return {"code": 200, "message": "添加成功"}
+    except Exception as e:
+        return {"code": 500, "message": str(e)}
+
+
+@router.post("/update_user_role")
+async def update_user_role(request: Request, user: TokenModel = Depends(require_admin), db: Session = Depends(get_db)):
+    """更新用户角色"""
+    try:
+        data = await request.json()
+        target_user_id = data.get("user_id")
+        new_role = data.get("role")
+
+        if target_user_id == user.id:
+            return {"code": 400, "message": "不能修改自己的角色"}
+
+        useritem = db.query(Users).filter_by(id=target_user_id).first()
+        if not useritem:
+            return {"code": 404, "message": "用户不存在"}
+
+        useritem.role = new_role
+        db.commit()
+
+        return {"code": 200, "message": "角色更新成功"}
+    except Exception as e:
+        db.rollback()
+        return {"code": 500, "message": str(e)}
+
+
+@router.get("/fetch_permissions")
+async def fetch_permissions(user: TokenModel = Depends(require_admin)):
+    """获取权限配置"""
+    file_path = "static/am/permissions.txt"
+    permissions = []
+
+    if os.path.exists(file_path):
+        try:
+            with open(file_path, "r", encoding="utf-8") as f:
+                lines = f.readlines()
+            for line in lines:
+                line = line.strip()
+                if line:
+                    try:
+                        permissions.append(ast.literal_eval(line))
+                    except (ValueError, SyntaxError):
+                        continue
+        except (IOError, OSError):
+            pass
+
+    # 如果没有配置，返回默认配置
+    if not permissions:
+        permissions = [
+            {"id": "courses", "name": "课程学习", "enabled": True},
+            {"id": "manager", "name": "时间管理", "enabled": True},
+            {"id": "shuzhi", "name": "塾值记录", "enabled": True},
+            {"id": "agents", "name": "智能体", "enabled": True},
+            {"id": "profile", "name": "个人资料", "enabled": True},
+            {"id": "registers", "name": "注册审核", "enabled": False},
+            {"id": "all_users", "name": "全塾用户", "enabled": False},
+            {"id": "reset_pass", "name": "重置密码", "enabled": False},
+            {"id": "admin", "name": "系统管理", "enabled": False}
+        ]
+
+    return permissions
+
+
+@router.post("/save_permissions")
+async def save_permissions(request: Request, user: TokenModel = Depends(require_admin)):
+    """保存权限配置"""
+    try:
+        data = await request.json()
+        permissions = data.get("permissions", [])
+
+        os.makedirs("static/am/", exist_ok=True)
+
+        with open("static/am/permissions.txt", "w", encoding="utf-8") as f:
+            for perm in permissions:
+                f.write(str(perm) + "\n")
+
+        return {"code": 200, "message": "权限配置已保存"}
+    except Exception as e:
+        return {"code": 500, "message": str(e)}

@@ -1,5 +1,13 @@
 <template>
   <el-card>
+    <template #header>
+      <el-page-header @back="$router.back()" title="返回">
+        <template #content>
+          <span class="header-title">API 调试</span>
+        </template>
+      </el-page-header>
+    </template>
+
     <el-form :model="form" label-width="120px">
       <el-form-item label="接口地址">
         <el-input v-model="form.endpoint" placeholder="请输入接口地址" />
@@ -40,7 +48,10 @@
 
 <script setup>
 import { ref, reactive } from 'vue'
+import { useRouter } from 'vue-router'
 import axios from 'axios'
+
+const router = useRouter()
 
 const props = defineProps({
   defaultEndpoint: {
@@ -88,5 +99,10 @@ const onSubmit = async () => {
 pre {
   white-space: pre-wrap;
   word-wrap: break-word;
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: 600;
 }
 </style>

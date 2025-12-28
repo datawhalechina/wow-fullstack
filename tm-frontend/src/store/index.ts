@@ -7,6 +7,7 @@ export const useUserStore = defineStore('user',{
       id:0,
       logined: false,
       dialogFormVisible: false,
+      registerFormVisible: false,
       name: '',
       atoken: '',
       rtoken: '',

@@ -5,12 +5,13 @@ from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 import os
 
-def create_directory(directory):  
-    if not os.path.exists(directory):  
+def create_directory(directory):
+    if not os.path.exists(directory):
         os.makedirs(directory)
 
 create_directory("static")
 create_directory("static/profiles")
+create_directory("static/tm")
 engine = create_engine("sqlite:///mydatabase.db")
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 db = SessionLocal()

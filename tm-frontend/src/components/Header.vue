@@ -9,23 +9,21 @@ const handleSelect = (key: string, keyPath: string[]) => {
 </script>
 
 <template>
-  <el-row>
-    <el-col :span="9">
+  <el-row align="middle">
+    <el-col :span="8">
       <a href="https://zishu.co">
         <img src="/logo.png" class="logo" alt="你好" />
       </a>
     </el-col>
-    <el-col :span="9">
+    <el-col :span="8">
 
     </el-col>
 
-    <el-col :span="6">
-      <el-link style="float: right;margin-top:20px;" type="primary">
-        <Login />
-      </el-link>
+    <el-col :span="8" style="text-align: right;">
+      <Login />
     </el-col>
   </el-row>
-  
+
 </template>
 
 <style lang="scss" scoped>
