@@ -113,6 +113,18 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import('../views/Admin.vue'),
         meta: { requiresAuth: true, requiresAdmin: true }
       },
+      {
+        path: '/statistics',
+        name: 'Statistics',
+        component: () => import('../views/statistics/PersonalDashboard.vue'),
+        meta: { requiresAuth: true }
+      },
+      {
+        path: '/admin/statistics',
+        name: 'GlobalStatistics',
+        component: () => import('../views/statistics/GlobalDashboard.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true }
+      },
     ]
   },
 

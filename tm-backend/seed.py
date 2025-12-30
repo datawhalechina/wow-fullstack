@@ -20,6 +20,7 @@ new_user = Users(
     password=get_password_hash('zishu'),
     email='zishu@zishu.co',
     phone='15812345678',
+    role='admin',
     register_time=datetime.now()
 )
 db.add(new_user)

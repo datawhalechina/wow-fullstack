@@ -1,0 +1,396 @@
+@use 'variables.scss' as *;
+
+// ===== 全局重置 =====
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: $font-family-base;
+  background: $light-bg;
+  color: $light-text;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+// ===== 链接样式 =====
+
+a {
+  color: $primary-color;
+  text-decoration: none;
+  transition: color $transition-fast;
+
+  &:hover {
+    color: $primary-light;
+  }
+}
+
+// ===== 滚动条样式 =====
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: $light-bg-secondary;
+}
+
+::-webkit-scrollbar-thumb {
+  background: $light-text-muted;
+  border-radius: $radius-full;
+
+  &:hover {
+    background: $light-text-secondary;
+  }
+}
+
+// ===== Element Plus 覆盖样式 =====
+
+// Card 组件美化
+.el-card {
+  background: $light-bg-secondary !important;
+  border: 1px solid $light-border !important;
+  border-radius: $radius-lg !important;
+  box-shadow: $shadow-base !important;
+  transition: all $transition-base !important;
+
+  &:hover {
+    box-shadow: $shadow-md !important;
+    transform: translateY(-2px);
+  }
+
+  .el-card__header {
+    background: $light-bg-tertiary !important;
+    border-bottom: 1px solid $light-border !important;
+    color: $light-text !important;
+  }
+
+  .el-card__body {
+    color: $light-text-secondary !important;
+  }
+}
+
+// Button 组件美化
+.el-button {
+  border-radius: $radius-md !important;
+  font-weight: 500 !important;
+  transition: all $transition-base !important;
+
+  &--primary {
+    background: $primary-gradient !important;
+    border: none !important;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: $glow-primary;
+    }
+  }
+
+  &--success {
+    background: $success-gradient !important;
+    border: none !important;
+  }
+
+  &--warning {
+    background: $warning-gradient !important;
+    border: none !important;
+  }
+
+  &--danger {
+    background: $danger-gradient !important;
+    border: none !important;
+  }
+}
+
+// 输入框样式
+.el-input__wrapper {
+  background: $light-bg-secondary !important;
+  border: 1px solid $light-border !important;
+  border-radius: $radius-md !important;
+  box-shadow: none !important;
+  transition: all $transition-fast !important;
+
+  &:hover {
+    border-color: $primary-color !important;
+  }
+
+  &.is-focus {
+    border-color: $primary-color !important;
+    box-shadow: 0 0 0 2px rgba($primary-color, 0.2) !important;
+  }
+}
+
+.el-input__inner {
+  color: $light-text !important;
+
+  &::placeholder {
+    color: $light-text-muted !important;
+  }
+}
+
+// Select 组件
+.el-select {
+  .el-input__wrapper {
+    background: $light-bg-secondary !important;
+  }
+}
+
+// Table 组件
+.el-table {
+  background: transparent !important;
+
+  &::before {
+    display: none !important;
+  }
+
+  tr {
+    background: transparent !important;
+  }
+
+  th.el-table__cell {
+    background: $light-bg-tertiary !important;
+    color: $light-text !important;
+    border-bottom: 1px solid $light-border !important;
+  }
+
+  td.el-table__cell {
+    border-bottom: 1px solid $light-border !important;
+    color: $light-text-secondary !important;
+  }
+
+  .el-table__row:hover > td.el-table__cell {
+    background: $light-bg-tertiary !important;
+  }
+}
+
+// Dialog 组件
+.el-dialog {
+  background: $light-bg-secondary !important;
+  border-radius: $radius-xl !important;
+  border: 1px solid $light-border !important;
+
+  .el-dialog__header {
+    border-bottom: 1px solid $light-border !important;
+  }
+
+  .el-dialog__title {
+    color: $light-text !important;
+  }
+
+  .el-dialog__body {
+    color: $light-text-secondary !important;
+  }
+
+  .el-dialog__footer {
+    border-top: 1px solid $light-border !important;
+  }
+}
+
+// Message 消息提示
+.el-message {
+  background: $light-bg-secondary !important;
+  border: 1px solid $light-border !important;
+  border-radius: $radius-md !important;
+
+  .el-message__content {
+    color: $light-text !important;
+  }
+}
+
+// Tabs 组件
+.el-tabs {
+  .el-tabs__item {
+    color: $light-text-muted !important;
+
+    &:hover {
+      color: $primary-color !important;
+    }
+
+    &.is-active {
+      color: $primary-color !important;
+    }
+  }
+
+  .el-tabs__active-bar {
+    background: $primary-color !important;
+  }
+}
+
+// Menu 组件
+.el-menu {
+  background: transparent !important;
+  border: none !important;
+
+  .el-menu-item {
+    color: $light-text-secondary !important;
+
+    &:hover {
+      background: $light-bg-tertiary !important;
+    }
+
+    &.is-active {
+      background: $primary-gradient !important;
+      color: white !important;
+    }
+  }
+}
+
+// Tag 组件
+.el-tag {
+  border: none !important;
+  border-radius: $radius-full !important;
+}
+
+// Avatar 组件
+.el-avatar {
+  background: $primary-gradient !important;
+}
+
+// Page Header
+.el-page-header {
+  color: $light-text !important;
+}
+
+// Empty 状态
+.el-empty {
+  .el-empty__description p {
+    color: $light-text-muted !important;
+  }
+}
+
+// Alert 组件
+.el-alert {
+  border-radius: $radius-md !important;
+  border: 1px solid $light-border !important;
+}
+
+// ===== 实用工具类 =====
+
+// 渐变文字
+.gradient-text {
+  background: $primary-gradient;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+// 卡片悬浮效果
+.card-hover {
+  transition: all $transition-base;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+  }
+}
+
+// 统计卡片
+.stat-card {
+  padding: $spacing-lg;
+  border-radius: $radius-lg;
+  background: $light-bg-secondary;
+  border: 1px solid $light-border;
+  transition: all $transition-base;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+}
+
+// 骨架屏
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    $light-bg-tertiary 25%,
+    #e2e8f0 50%,
+    $light-bg-tertiary 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+  border-radius: $radius-md;
+}
+
+@keyframes skeleton-loading {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+// 淡入动画
+.fade-in {
+  animation: fadeIn $transition-base ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// 脉冲动画
+.pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// 渐变边框
+.gradient-border {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: $primary-gradient;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+  }
+}
+
+// ===== 响应式工具 =====
+
+.hide-on-mobile {
+  @media (max-width: 768px) {
+    display: none !important;
+  }
+}
+
+.show-on-mobile {
+  @media (min-width: 769px) {
+    display: none !important;
+  }
+}

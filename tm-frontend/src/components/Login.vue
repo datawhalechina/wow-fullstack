@@ -33,6 +33,9 @@
           <el-dropdown-item v-if="isAdmin" command="admin">
             <el-icon><Setting /></el-icon> 系统管理
           </el-dropdown-item>
+          <el-dropdown-item command="statistics" :divided="isAdmin">
+            <el-icon><DataAnalysis /></el-icon> 数据统计
+          </el-dropdown-item>
           <el-dropdown-item command="logout" divided>
             <el-icon><SwitchButton /></el-icon> 退出登录
           </el-dropdown-item>
@@ -224,7 +227,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { ElMessage } from 'element-plus'
 import {
   User, Plus, Lock, Phone, Message, ArrowDown, SwitchButton,
-  Setting, UserFilled, Menu
+  Setting, UserFilled, Menu, DataAnalysis
 } from '@element-plus/icons-vue'
 
 const router = useRouter()
@@ -426,6 +429,8 @@ const handleCommand = (command: string) => {
     router.push('/user/all')
   } else if (command === 'registers') {
     router.push('/user/registers')
+  } else if (command === 'statistics') {
+    router.push('/statistics')
   } else if (command === 'logout') {
     handleLogout()
   }

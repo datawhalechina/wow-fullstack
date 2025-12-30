@@ -1,0 +1,114 @@
+// ===== 颜色变量 =====
+
+// 主色调
+$primary-color: #6366f1;
+$primary-dark: #4f46e5;
+$primary-light: #818cf8;
+
+// 语义色
+$success-color: #10b981;
+$success-light: #34d399;
+$warning-color: #f59e0b;
+$warning-light: #fbbf24;
+$danger-color: #ef4444;
+$danger-light: #f87171;
+$info-color: #8b5cf6;
+$info-light: #a78bfa;
+
+// 中性色 - 深色主题
+$dark-bg: #0f172a;
+$dark-bg-secondary: #1e293b;
+$dark-bg-tertiary: #334155;
+$dark-bg-elevated: #475569;
+$dark-text: #f1f5f9;
+$dark-text-secondary: #94a3b8;
+$dark-text-muted: #64748b;
+$dark-border: #334155;
+
+// 中性色 - 浅色主题
+$light-bg: #f8fafc;
+$light-bg-secondary: #ffffff;
+$light-bg-tertiary: #f1f5f9;
+$light-text: #1e293b;
+$light-text-secondary: #64748b;
+$light-text-muted: #94a3b8;
+$light-border: #e2e8f0;
+
+// ===== 渐变变量 =====
+
+$primary-gradient: linear-gradient(135deg, $primary-color 0%, $primary-light 100%);
+$success-gradient: linear-gradient(135deg, $success-color 0%, $success-light 100%);
+$warning-gradient: linear-gradient(135deg, $warning-color 0%, $warning-light 100%);
+$danger-gradient: linear-gradient(135deg, $danger-color 0%, $danger-light 100%);
+$info-gradient: linear-gradient(135deg, $info-color 0%, $info-light 100%);
+
+// 背景渐变
+$dark-bg-gradient: linear-gradient(180deg, $dark-bg 0%, darken($dark-bg, 5%) 100%);
+$card-gradient: linear-gradient(145deg, $dark-bg-secondary 0%, $dark-bg 100%);
+
+// ===== 阴影变量 =====
+
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-base: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+$shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+// 内部阴影（用于输入框等）
+$shadow-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+// 发光效果
+$glow-primary: 0 0 20px rgba($primary-color, 0.3);
+$glow-success: 0 0 20px rgba($success-color, 0.3);
+
+// ===== 过渡动画 =====
+
+$transition-fast: 0.15s ease;
+$transition-base: 0.3s ease;
+$transition-slow: 0.5s ease;
+$transition-spring: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+// ===== 圆角变量 =====
+
+$radius-sm: 6px;
+$radius-md: 12px;
+$radius-lg: 16px;
+$radius-xl: 24px;
+$radius-full: 9999px;
+
+// ===== 字体变量 =====
+
+$font-family-base: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+$font-size-xs: 12px;
+$font-size-sm: 14px;
+$font-size-base: 16px;
+$font-size-lg: 18px;
+$font-size-xl: 20px;
+$font-size-2xl: 24px;
+$font-size-3xl: 30px;
+$font-size-4xl: 36px;
+
+// ===== 间距变量 =====
+
+$spacing-xs: 4px;
+$spacing-sm: 8px;
+$spacing-md: 16px;
+$spacing-lg: 24px;
+$spacing-xl: 32px;
+$spacing-2xl: 48px;
+
+// ===== 布局变量 =====
+
+$header-height: 64px;
+$sidebar-width: 220px;
+$content-max-width: 1400px;
+
+// ===== Z-index层级 =====
+
+$z-dropdown: 1000;
+$z-sticky: 1020;
+$z-fixed: 1030;
+$z-modal-backdrop: 1040;
+$z-modal: 1050;
+$z-popover: 1060;
+$z-tooltip: 1070;

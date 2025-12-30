@@ -11,11 +11,14 @@
   "dependencies": {
     "@element-plus/icons-vue": "^2.3.1",
     "axios": "^1.6.7",
+    "echarts": "^5.4.3",
     "element-plus": "^2.5.5",
+    "highlight.js": "^11.9.0",
     "pinia": "^2.1.7",
     "pinia-use-persist": "^0.0.21",
     "vue": "^3.3.11",
-    "vue-router": "^4.2.5"
+    "vue-router": "^4.2.5",
+    "vue-syntax-highlight": "^0.1.8"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.5.2",

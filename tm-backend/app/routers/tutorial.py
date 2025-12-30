@@ -1,7 +1,7 @@
 import os
 import glob
 from datetime import datetime
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Form
 from pydantic import BaseModel
 from typing import List, Optional
 
@@ -150,7 +150,12 @@ class ReportStudyTime(BaseModel):
 
 
 @router.post("/report-study-time")
-async def report_study_time(data: ReportStudyTime):
+async def report_study_time(
+    user_id: int = Form(...),
+    course_name: str = Form(...),
+    lesson_title: str = Form(...),
+    duration: int = Form(...)
+):
     """申报学习时间，同步到时间管理"""
     # 生成时间记录
     now = datetime.now()
@@ -159,13 +164,13 @@ async def report_study_time(data: ReportStudyTime):
     # 构建时间管理记录格式
     study_record = [
         "",  # 编号
-        f"学习-{data.course_name}",  # 主题
-        data.duration,  # 目标用时（分钟）
-        data.lesson_title,  # 分拆事项
-        data.duration,  # 计划用时（分钟）
+        f"学习-{course_name}",  # 主题
+        duration,  # 目标用时（分钟）
+        lesson_title,  # 分拆事项
+        duration,  # 计划用时（分钟）
         "",  # 开始时间
         "",  # 结束时间
-        data.duration,  # 实际用时（分钟）
+        duration,  # 实际用时（分钟）
         date_string  # 日期
     ]
 
@@ -173,10 +178,10 @@ async def report_study_time(data: ReportStudyTime):
         "code": 200,
         "message": "申报成功",
         "data": {
-            "user_id": data.user_id,
-            "course_name": data.course_name,
-            "lesson_title": data.lesson_title,
-            "duration": data.duration,
+            "user_id": user_id,
+            "course_name": course_name,
+            "lesson_title": lesson_title,
+            "duration": duration,
             "record": study_record
         }
     }
@@ -191,7 +196,13 @@ class SyncStudyTime(BaseModel):
 
 
 @router.post("/sync-study-time")
-async def sync_study_time(data: SyncStudyTime):
+async def sync_study_time(
+    user_id: int = Form(...),
+    course_name: str = Form(...),
+    lesson_title: str = Form(...),
+    duration: int = Form(...),
+    date: str = Form(...)
+):
     """同步学习时间到时间管理系统"""
     return {
         "code": 200,
@@ -199,14 +210,14 @@ async def sync_study_time(data: SyncStudyTime):
         "data": {
             "taskinfo": [[
                 "",  # 编号
-                f"学习-{data.course_name}",  # 主题
-                data.duration,  # 目标用时
-                data.lesson_title,  # 分拆事项
-                data.duration,  # 计划用时
+                f"学习-{course_name}",  # 主题
+                duration,  # 目标用时
+                lesson_title,  # 分拆事项
+                duration,  # 计划用时
                 "",  # 开始时间
                 "",  # 结束时间
-                data.duration,  # 实际用时
-                data.date  # 日期
+                duration,  # 实际用时
+                date  # 日期
             ]]
         }
     }

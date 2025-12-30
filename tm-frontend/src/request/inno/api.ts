@@ -33,4 +33,9 @@ export const finishTmAPI = (params: Inno.Itm): Promise<any> =>
 
 // 添加学习时间到时间管理
 export const addStudyTimeAPI = (userId: number, taskinfo: any[]): Promise<any> =>
-    instance.post(`/api/inno/add_study_time/${userId}`, { taskinfo });
+    instance.post(`/api/inno/add_study_time/${userId}`,
+        JSON.stringify({ taskinfo }),
+        {
+            headers: { "Content-Type": "application/json" }
+        }
+    );

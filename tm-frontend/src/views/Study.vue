@@ -5,6 +5,18 @@ import { useLoginStore } from '../store'
 import { fetchCourseDetailAPI, fetchTutorialContentAPI, reportStudyTimeAPI, syncStudyTimeAPI } from '../request/tutorial/api'
 import { addStudyTimeAPI } from '../request/inno/api'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import hljs from 'highlight.js'
+import 'highlight.js/styles/atom-one-light.css'
+
+// 注册常用语言（如果不存在则使用 plaintext）
+hljs.registerLanguage('vue', () => ({ inherit: hljs['xml'] } as any))
+hljs.registerLanguage('javascript', () => hljs.getLanguage('js') || hljs.getLanguage('javascript') || { aliases: ['js'] } as any)
+hljs.registerLanguage('typescript', () => hljs.getLanguage('ts') || hljs.getLanguage('typescript') || { aliases: ['ts'] } as any)
+hljs.registerLanguage('html', () => hljs.getLanguage('xml') || { aliases: ['html'] } as any)
+hljs.registerLanguage('css', () => hljs.getLanguage('css') || { aliases: ['css'] } as any)
+hljs.registerLanguage('python', () => hljs.getLanguage('py') || hljs.getLanguage('python') || { aliases: ['py'] } as any)
+hljs.registerLanguage('bash', () => hljs.getLanguage('sh') || hljs.getLanguage('bash') || { aliases: ['sh'] } as any)
+hljs.registerLanguage('json', () => hljs.getLanguage('json') || { aliases: ['json'] } as any)
 
 document.title = '学习'
 
@@ -178,6 +190,9 @@ const submitReport = async () => {
     return
   }
 
+  // 确保 user_id 是数字类型
+  const userId = Number(loginstate.id)
+
   try {
     await ElMessageBox.confirm(
       `确认申报学习时间 ${reportDuration.value} 分钟？\n申报后将同步到时间管理页面。`,
@@ -191,7 +206,7 @@ const submitReport = async () => {
 
     // 1. 申报学习时间
     const res = await reportStudyTimeAPI({
-      user_id: loginstate.id,
+      user_id: userId,
       course_name: course.value?.name || '',
       lesson_title: currentTitle.value,
       duration: reportDuration.value
@@ -215,7 +230,7 @@ const submitReport = async () => {
         dateString  // 日期
       ]
 
-      await addStudyTimeAPI(loginstate.id, [studyRecord])
+      await addStudyTimeAPI(userId, [studyRecord])
 
       ElMessage.success('申报成功！时间已同步到时间管理')
       showReportDialog.value = false
@@ -394,8 +409,28 @@ import {
 // 简单的markdown渲染函数（实际项目中可使用marked等库）
 const renderMarkdown = (content: string) => {
   if (!content) return ''
+
+  // 先处理代码块，提取语言类型并进行高亮
+  const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g
+  const codeBlocks: { placeholder: string, lang: string, code: string }[] = []
+
+  // 替换代码块为占位符
+  let processedContent = content.replace(codeBlockRegex, (match, lang, code) => {
+    // 对代码进行HTML转义
+    const escapedCode = code
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+    // 使用highlight.js高亮，尝试获取语言，如果不存在则使用plaintext
+    const safeLang = lang && hljs.getLanguage(lang) ? lang : 'plaintext'
+    const highlighted = hljs.highlight(escapedCode, { language: safeLang }).value
+    const placeholder = `__CODE_BLOCK_${codeBlocks.length}__`
+    codeBlocks.push({ placeholder, lang: safeLang, code: highlighted })
+    return `<pre class="code-block"><code class="hljs language-${safeLang}">${highlighted}</code></pre>`
+  })
+
   // 标题
-  let html = content
+  let html = processedContent
     .replace(/^### (.*$)/gim, '<h3>$1</h3>')
     .replace(/^## (.*$)/gim, '<h2>$1</h2>')
     .replace(/^# (.*$)/gim, '<h1>$1</h1>')
@@ -409,14 +444,23 @@ const renderMarkdown = (content: string) => {
     .replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>')
   // 分割线
     .replace(/^---$/gim, '<hr>')
-  // 代码块
-    .replace(/```([\s\S]*?)```/gim, '<pre><code>$1</code></pre>')
   // 行内代码
-    .replace(/`(.*)`/gim, '<code>$1</code>')
+    .replace(/`(.*)`/gim, (match, code) => {
+      const escapedCode = code
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+      return `<code class="inline-code">${escapedCode}</code>`
+    })
   // 链接
     .replace(/\[(.*?)\]\((.*?)\)/gim, '<a href="$2" target="_blank">$1</a>')
   // 段落
     .replace(/\n\n/g, '</p><p>')
+
+  // 恢复代码块占位符
+  codeBlocks.forEach(({ placeholder, code }) => {
+    html = html.replace(placeholder, code)
+  })
 
   return `<p>${html}</p>`
 }
@@ -588,18 +632,34 @@ const renderMarkdown = (content: string) => {
 .markdown-content :deep(pre) {
   margin: 16px 0;
   padding: 16px;
-  background: #282c34;
+  background: #f5f7fa;
   border-radius: 6px;
   overflow-x: auto;
-}
-
-.markdown-content :deep(code) {
-  font-family: 'Fira Code', 'Consolas', monospace;
-  font-size: 13px;
+  max-width: 100%;
 }
 
 .markdown-content :deep(pre code) {
-  color: #abb2bf;
+  font-family: 'Fira Code', 'Consolas', 'Monaco', monospace;
+  font-size: 13px;
+  color: #24292e;
+  white-space: pre;
+  word-wrap: normal;
+  word-break: normal;
+}
+
+.markdown-content :deep(.inline-code) {
+  font-family: 'Fira Code', 'Consolas', monospace;
+  font-size: 13px;
+  background: #f5f7fa;
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: #d73a49;
+}
+
+.markdown-content :deep(.code-block) {
+  background: #f5f7fa;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
 }
 
 .markdown-content :deep(hr) {

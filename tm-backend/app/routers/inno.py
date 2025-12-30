@@ -76,8 +76,32 @@ async def add_study_time(request: Request, user_id:int):
     """添加学习时间到时间管理"""
     userid = str(user_id)
     try:
-        data = await request.json()
-        tasklist = data.get("taskinfo", [])
+        content_type = request.headers.get("content-type", "")
+        if "application/json" in content_type:
+            data = await request.json()
+            tasklist = data.get("taskinfo", [])
+        else:
+            # 支持表单格式
+            form_data = await request.form()
+            tasklist = form_data.getlist("taskinfo")
+
+            # 如果 getlist 返回空，尝试从原始请求体解析
+            if not tasklist:
+                body = await request.body()
+                try:
+                    body_str = body.decode('utf-8')
+                    # 解析 URL 编码的数据
+                    import urllib.parse
+                    parsed = urllib.parse.parse_qs(body_str)
+                    # parse_qs 返回列表格式，需要提取第一个元素并解析 JSON
+                    if 'taskinfo[]' in parsed:
+                        tasklist_str = parsed['taskinfo[]'][0]
+                        tasklist = json.loads(tasklist_str)
+                    elif 'taskinfo' in parsed:
+                        tasklist_str = parsed['taskinfo'][0]
+                        tasklist = json.loads(tasklist_str)
+                except Exception as parse_err:
+                    print(f"URL解析错误: {parse_err}")
 
         # 读取现有数据
         existing_pr = []
@@ -87,6 +111,13 @@ async def add_study_time(request: Request, user_id:int):
 
         # 追加新的学习记录
         for line in tasklist:
+            if isinstance(line, str):
+                line = line.strip()
+                if line:
+                    try:
+                        line = ast.literal_eval(line)
+                    except:
+                        continue
             existing_pr.append(line)
 
         # 保存

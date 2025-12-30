@@ -256,17 +256,17 @@ const addWorks = () => {
   if (cur.value > -1) {
     const curList = taskList.value[cur.value];
     const newList = [
-      curList[0], curList[1], curList[2], "", "", "", "", "", "",
+      curList[0], curList[1], curList[2], "", 0, "", "", "", "",
     ];
     taskList.value.splice(cur.value + 1, 0, newList);
   } else if (cur_archive.value > -1) {
     const curList = finishList.value[cur_archive.value];
     const newList = [
-      curList[0], curList[1], curList[2], "", "", "", "", "", "",
+      curList[0], curList[1], curList[2], "", 0, "", "", "", "",
     ];
     taskList.value.push(newList);
   } else {
-    taskList.value.push(["", "", "", "", "", "", "", "", ""]);
+    taskList.value.push(["", "", 0, "", 0, "", "", "", ""]);
   }
   submit();
 };
