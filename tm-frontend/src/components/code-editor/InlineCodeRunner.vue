@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import MonacoEditor from './MonacoEditor.vue'
 import ExecutionResult from './ExecutionResult.vue'
 import type { ExecutionOutput } from './ExecutionResult.vue'
@@ -28,6 +28,17 @@ const localCode = ref(props.code)
 // 执行状态
 const output = ref<ExecutionOutput | null>(null)
 const loading = ref(false)
+
+// 监听 props.code 变化，当切换章节时更新代码
+watch(() => props.code, (newCode) => {
+  localCode.value = newCode
+  output.value = null
+})
+
+// 监听 props.language 变化
+watch(() => props.language, (newLang) => {
+  selectedLanguage.value = normalizeLanguage(newLang)
+})
 
 // 编辑器高度
 const editorHeight = computed(() => {

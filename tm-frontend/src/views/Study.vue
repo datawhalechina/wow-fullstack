@@ -431,7 +431,7 @@ const courseDefaultLanguage = computed(() => {
   <!-- 渲染代码块组件 -->
   <CodeBlock
     v-for="block in parsedContent.codeBlocks"
-    :key="block.id"
+    :key="`${block.id}-${currentPath}`"
     :code="block.code"
     :language="block.language"
     :course-default-language="courseDefaultLanguage"
