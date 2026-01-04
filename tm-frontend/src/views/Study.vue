@@ -1,12 +1,29 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue'
+import { ref, onMounted, onUnmounted, watch, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useLoginStore } from '../store'
 import { fetchCourseDetailAPI, fetchTutorialContentAPI, reportStudyTimeAPI, syncStudyTimeAPI } from '../request/tutorial/api'
 import { addStudyTimeAPI } from '../request/inno/api'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import hljs from 'highlight.js'
+import { marked } from 'marked'
 import 'highlight.js/styles/atom-one-light.css'
+import CodeBlock from '@/components/code-editor/CodeBlock.vue'
+import { getDefaultLanguageForCourse } from '@/utils/languageMapping'
+
+// 配置 marked 选项
+marked.setOptions({
+  breaks: true,  // 支持单个换行符转换为 <br>
+  gfm: true,     // 启用 GitHub 风格 Markdown
+})
+
+// 配置 marked 代码高亮
+marked.setOptions({
+  highlight: function(code, lang) {
+    const language = hljs.getLanguage(lang) ? lang : 'plaintext'
+    return hljs.highlight(code, { language }).value
+  }
+})
 
 // 注册常用语言（如果不存在则使用 plaintext）
 hljs.registerLanguage('vue', () => ({ inherit: hljs['xml'] } as any))
@@ -51,6 +68,19 @@ const timerInterval = ref<number | null>(null)
 const showReportDialog = ref(false)
 const reportDuration = ref(30)
 const completedLessons = ref<Set<string>>(new Set())
+
+// 代码块数据接口
+interface CodeBlockData {
+  id: string
+  code: string
+  language: string
+}
+
+// 解析后的内容接口
+interface ParsedContent {
+  html: string
+  codeBlocks: CodeBlockData[]
+}
 
 // 获取课程详情
 const fetchCourse = async () => {
@@ -278,6 +308,46 @@ onUnmounted(() => {
 watch(() => route.query, () => {
   fetchCourse()
 })
+
+// 使用 marked 库渲染 Markdown，但先提取代码块用于 CodeBlock 组件
+const renderMarkdown = (content: string): ParsedContent => {
+  if (!content) return { html: '', codeBlocks: [] }
+
+  // 先处理代码块，提取语言类型和代码
+  const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g
+  const codeBlocks: CodeBlockData[] = []
+  let blockIndex = 0
+
+  // 替换代码块为占位符
+  let processedContent = content.replace(codeBlockRegex, (match, lang, code) => {
+    const safeLang = lang && hljs.getLanguage(lang) ? lang : 'plaintext'
+    const blockId = `code-block-${blockIndex++}`
+
+    codeBlocks.push({
+      id: blockId,
+      code: code.trim(),
+      language: safeLang
+    })
+
+    return `<!--CODE_BLOCK:${blockId}-->`
+  })
+
+  // 使用 marked 渲染其余的 Markdown 内容
+  const html = marked.parse(processedContent) as string
+
+  return { html, codeBlocks }
+}
+
+// 解析当前内容为 HTML 和代码块数据
+const parsedContent = computed((): ParsedContent => {
+  if (!currentContent.value) return { html: '', codeBlocks: [] }
+  return renderMarkdown(currentContent.value)
+})
+
+// 根据课程名称获取默认语言
+const courseDefaultLanguage = computed(() => {
+  return getDefaultLanguageForCourse(course.value?.name || '')
+})
 </script>
 
 <template>
@@ -355,7 +425,18 @@ watch(() => route.query, () => {
           </div>
         </template>
 
-        <div v-if="currentContent" class="markdown-content" v-html="renderMarkdown(currentContent)"></div>
+        <div v-if="currentContent" class="markdown-content">
+  <!-- 渲染普通 HTML 内容 -->
+  <div v-html="parsedContent.html"></div>
+  <!-- 渲染代码块组件 -->
+  <CodeBlock
+    v-for="block in parsedContent.codeBlocks"
+    :key="block.id"
+    :code="block.code"
+    :language="block.language"
+    :course-default-language="courseDefaultLanguage"
+  />
+</div>
         <el-empty v-else-if="!loading" description="请从左侧选择课程开始学习">
           <el-button type="primary" @click="router.push('/courses')">浏览课程</el-button>
         </el-empty>
@@ -405,65 +486,6 @@ watch(() => route.query, () => {
 import {
   FolderOpened, CircleCheck, Clock, ArrowLeft, ArrowRight, Check
 } from '@element-plus/icons-vue'
-
-// 简单的markdown渲染函数（实际项目中可使用marked等库）
-const renderMarkdown = (content: string) => {
-  if (!content) return ''
-
-  // 先处理代码块，提取语言类型并进行高亮
-  const codeBlockRegex = /```(\w+)?\n([\s\S]*?)```/g
-  const codeBlocks: { placeholder: string, lang: string, code: string }[] = []
-
-  // 替换代码块为占位符
-  let processedContent = content.replace(codeBlockRegex, (match, lang, code) => {
-    // 对代码进行HTML转义
-    const escapedCode = code
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-    // 使用highlight.js高亮，尝试获取语言，如果不存在则使用plaintext
-    const safeLang = lang && hljs.getLanguage(lang) ? lang : 'plaintext'
-    const highlighted = hljs.highlight(escapedCode, { language: safeLang }).value
-    const placeholder = `__CODE_BLOCK_${codeBlocks.length}__`
-    codeBlocks.push({ placeholder, lang: safeLang, code: highlighted })
-    return `<pre class="code-block"><code class="hljs language-${safeLang}">${highlighted}</code></pre>`
-  })
-
-  // 标题
-  let html = processedContent
-    .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-    .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-    .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-  // 粗体
-    .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-  // 斜体
-    .replace(/\*(.*)\*/gim, '<em>$1</em>')
-  // 列表
-    .replace(/^- (.*$)/gim, '<li>$1</li>')
-  // 引用
-    .replace(/^> (.*$)/gim, '<blockquote>$1</blockquote>')
-  // 分割线
-    .replace(/^---$/gim, '<hr>')
-  // 行内代码
-    .replace(/`(.*)`/gim, (match, code) => {
-      const escapedCode = code
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-      return `<code class="inline-code">${escapedCode}</code>`
-    })
-  // 链接
-    .replace(/\[(.*?)\]\((.*?)\)/gim, '<a href="$2" target="_blank">$1</a>')
-  // 段落
-    .replace(/\n\n/g, '</p><p>')
-
-  // 恢复代码块占位符
-  codeBlocks.forEach(({ placeholder, code }) => {
-    html = html.replace(placeholder, code)
-  })
-
-  return `<p>${html}</p>`
-}
 </script>
 
 <style scoped>

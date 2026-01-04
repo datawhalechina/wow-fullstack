@@ -9,11 +9,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@coze/chat-sdk": "^0.1.11-beta.19",
     "@element-plus/icons-vue": "^2.3.1",
+    "@monaco-editor/loader": "^1.7.0",
     "axios": "^1.6.7",
     "echarts": "^5.4.3",
     "element-plus": "^2.5.5",
     "highlight.js": "^11.9.0",
+    "marked": "^17.0.1",
+    "monaco-editor": "^0.55.1",
     "pinia": "^2.1.7",
     "pinia-use-persist": "^0.0.21",
     "vue": "^3.3.11",

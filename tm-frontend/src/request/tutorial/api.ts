@@ -30,3 +30,15 @@ export const syncStudyTimeAPI = (data: {
   date: string;
 }): Promise<any> =>
   instance.post("/api/tutorial/sync-study-time", data);
+
+// 执行代码
+export const executeCodeAPI = (data: {
+  language: string;
+  code: string;
+  timeout?: number;
+}): Promise<any> =>
+  instance.post("/api/code/execute", data, {
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  });
