@@ -12,12 +12,14 @@ const navItems = [
   { path: '/', name: '首页', icon: 'HomeFilled' },
   { path: '/courses', name: '课程', icon: 'Reading' },
   { path: '/manager', name: '时间管理', icon: 'Clock' },
-  { path: '/statistics', name: '统计', icon: 'DataAnalysis' },
+  { path: '/statistics/users', name: '学习情况', icon: 'User' },
+  { path: '/statistics/analysis', name: '统计分析', icon: 'DataAnalysis' },
 ]
 
 const adminNavItems = [
   { path: '/admin', name: '管理', icon: 'Setting' },
   { path: '/admin/statistics', name: '数据', icon: 'TrendCharts' },
+  { path: '/admin/statistics-config', name: '配置', icon: 'Tools' },
 ]
 
 const isActive = (path: string) => {

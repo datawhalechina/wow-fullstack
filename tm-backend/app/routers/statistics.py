@@ -298,3 +298,512 @@ async def get_course_stats(
     ]
 
     return {"code": 200, "data": course_data}
+
+
+# ============ 新增：全局用户学习情况 API ============
+
+@router.get("/global/users-list")
+async def get_users_learning_list(
+    page: int = 1,
+    page_size: int = 20,
+    sort_by: str = "learn_hour",
+    sort_order: str = "desc",
+    location: Optional[str] = None,
+    bumen: Optional[str] = None,
+    user: TokenModel = Depends(check_jwt_token),
+    db: Session = Depends(get_db)
+):
+    """获取所有用户学习情况列表（所有认证用户可见）"""
+    from app.core.models.users import Users
+    from app.core.models.config import SystemConfig
+    from sqlalchemy import or_
+
+    # 获取不活跃阈值配置
+    config = db.query(SystemConfig).filter(SystemConfig.key == "inactive_days_threshold").first()
+    inactive_threshold = int(config.value) if config else 7
+    threshold_date = datetime.now() - timedelta(days=inactive_threshold)
+
+    # 构建查询
+    query = db.query(Users)
+
+    # 筛选条件
+    if location:
+        query = query.filter(Users.location == location)
+    if bumen:
+        query = query.filter(Users.bumen == bumen)
+
+    # 排序
+    sort_column = getattr(Users, sort_by, Users.learn_hour)
+    if sort_order == "desc":
+        query = query.order_by(desc(sort_column))
+    else:
+        query = query.order_by(sort_column)
+
+    # 分页
+    total = query.count()
+    users = query.offset((page - 1) * page_size).limit(page_size).all()
+
+    # 获取每个用户的课程进度
+    users_data = []
+    for u in users:
+        userid_str = str(u.id)
+
+        # 读取已完成任务获取课程学习记录
+        fn_file = f"static/tm/f{userid_str}.txt"
+        finished_tasks = read_user_file(fn_file)
+
+        # 统计学习相关课程
+        courses_completed = 0
+        courses_in_progress = set()
+
+        for task in finished_tasks:
+            if len(task) > 1 and isinstance(task[1], str) and task[1].startswith("学习-"):
+                courses_completed += 1
+                # 提取课程名称
+                course_name = task[1].replace("学习-", "", 1).split("/")[0]
+                courses_in_progress.add(course_name)
+
+        # 判断是否不活跃
+        last_study = u.last_study_time or u.last_login_time
+        is_inactive = last_study and last_study < threshold_date
+
+        users_data.append({
+            "id": u.id,
+            "username": u.username,
+            "location": u.location or '-',
+            "bumen": u.bumen or '-',
+            "role": u.role or 'user',
+            "learn_hour": round(u.learn_hour or 0, 1),
+            "create_hour": round(u.create_hour or 0, 1),
+            "shuzhi": round(u.shuzhi or 0, 1),
+            "last_study_time": last_study.strftime("%Y-%m-%d") if last_study else None,
+            "last_login_time": u.last_login_time.strftime("%Y-%m-%d") if u.last_login_time else None,
+            "is_inactive": is_inactive,
+            "days_inactive": (datetime.now() - last_study).days if last_study else None,
+            "courses_completed": courses_completed,
+            "courses_in_progress": len(courses_in_progress)
+        })
+
+    # 统计概览数据
+    all_users = db.query(Users).all()
+    active_count = sum(1 for u in all_users if (u.last_study_time or u.last_login_time) and (u.last_study_time or u.last_login_time) >= threshold_date)
+    total_learn = sum(u.learn_hour or 0 for u in all_users)
+
+    return {
+        "code": 200,
+        "data": {
+            "total": total,
+            "active_users": active_count,
+            "inactive_users": len(all_users) - active_count,
+            "avg_learn_hours": round(total_learn / len(all_users), 1) if all_users else 0,
+            "users": users_data,
+            "inactive_threshold": inactive_threshold
+        }
+    }
+
+
+@router.get("/global/inactive-users")
+async def get_inactive_users(
+    user: TokenModel = Depends(check_jwt_token),
+    db: Session = Depends(get_db)
+):
+    """获取不活跃用户列表"""
+    from app.core.models.users import Users
+    from app.core.models.config import SystemConfig
+
+    # 获取不活跃阈值配置
+    config = db.query(SystemConfig).filter(SystemConfig.key == "inactive_days_threshold").first()
+    inactive_threshold = int(config.value) if config else 7
+    threshold_date = datetime.now() - timedelta(days=inactive_threshold)
+
+    # 获取所有用户
+    users = db.query(Users).all()
+
+    inactive_users = []
+    for u in users:
+        last_study = u.last_study_time or u.last_login_time
+        if last_study and last_study < threshold_date:
+            days_inactive = (datetime.now() - last_study).days
+            inactive_users.append({
+                "id": u.id,
+                "username": u.username,
+                "location": u.location or '-',
+                "bumen": u.bumen or '-',
+                "last_study_time": last_study.strftime("%Y-%m-%d"),
+                "last_login_time": u.last_login_time.strftime("%Y-%m-%d") if u.last_login_time else None,
+                "days_inactive": days_inactive,
+                "learn_hour": round(u.learn_hour or 0, 1),
+                "shuzhi": round(u.shuzhi or 0, 1)
+            })
+
+    # 按不活跃天数排序
+    inactive_users.sort(key=lambda x: x["days_inactive"], reverse=True)
+
+    return {
+        "code": 200,
+        "data": {
+            "threshold": inactive_threshold,
+            "count": len(inactive_users),
+            "users": inactive_users
+        }
+    }
+
+
+@router.get("/global/locations")
+async def get_locations(
+    user: TokenModel = Depends(check_jwt_token),
+    db: Session = Depends(get_db)
+):
+    """获取所有地区选项（用于筛选）"""
+    from app.core.models.users import Users
+
+    locations = db.query(Users.location).distinct().all()
+    location_list = [loc[0] for loc in locations if loc[0]]
+
+    return {
+        "code": 200,
+        "data": location_list
+    }
+
+
+@router.get("/global/departments")
+async def get_departments(
+    user: TokenModel = Depends(check_jwt_token),
+    db: Session = Depends(get_db)
+):
+    """获取所有部门选项（用于筛选）"""
+    from app.core.models.users import Users
+
+    departments = db.query(Users.bumen).distinct().all()
+    dept_list = [dept[0] for dept in departments if dept[0]]
+
+    return {
+        "code": 200,
+        "data": dept_list
+    }
+
+
+# ============ 新增：个人深度统计分析 API ============
+
+@router.get("/personal/detail/{user_id}")
+async def get_user_detail_analysis(
+    user_id: int,
+    user: TokenModel = Depends(check_jwt_token),
+    db: Session = Depends(get_db)
+):
+    """获取用户详细统计分析（管理员或本人）"""
+    from app.core.models.users import Users
+
+    # 权限检查
+    if user.id != user_id and user.role != "admin":
+        raise HTTPException(status_code=403, detail="无权访问此用户数据")
+
+    user_data = db.query(Users).filter(Users.id == user_id).first()
+    if not user_data:
+        raise HTTPException(status_code=404, detail="用户不存在")
+
+    userid_str = str(user_id)
+
+    # 读取时间管理数据
+    tm_file = f"static/tm/t{userid_str}.txt"
+    fn_file = f"static/tm/f{userid_str}.txt"
+
+    planned_tasks = read_user_file(tm_file)
+    finished_tasks = read_user_file(fn_file)
+
+    # 统计各类任务
+    study_tasks = []
+    create_tasks = []
+    other_tasks = []
+
+    for task in finished_tasks:
+        if len(task) > 1:
+            theme = task[1] if isinstance(task[1], str) else ""
+            if theme.startswith("学习-"):
+                study_tasks.append(task)
+            elif theme.startswith("创作-"):
+                create_tasks.append(task)
+            else:
+                other_tasks.append(task)
+
+    # 计算平均完成时间
+    planned_hours = sum(len(t) > 4 and t[4] or 0 for t in planned_tasks if isinstance(t[4], (int, float))) / 60
+    actual_hours = sum(len(t) > 7 and t[7] or 0 for t in finished_tasks if isinstance(t[7], (int, float))) / 60
+
+    return {
+        "code": 200,
+        "data": {
+            "user": {
+                "id": user_data.id,
+                "username": user_data.username,
+                "location": user_data.location,
+                "bumen": user_data.bumen,
+                "shuzhi": round(user_data.shuzhi or 0, 1),
+                "learn_hour": round(user_data.learn_hour or 0, 1),
+                "create_hour": round(user_data.create_hour or 0, 1),
+                "register_time": user_data.register_time.strftime("%Y-%m-%d") if user_data.register_time else None,
+                "last_login_time": user_data.last_login_time.strftime("%Y-%m-%d") if user_data.last_login_time else None,
+                "last_study_time": user_data.last_study_time.strftime("%Y-%m-%d") if user_data.last_study_time else None
+            },
+            "tasks": {
+                "total_planned": len(planned_tasks),
+                "total_finished": len(finished_tasks),
+                "study_count": len(study_tasks),
+                "create_count": len(create_tasks),
+                "other_count": len(other_tasks),
+                "planned_hours": round(planned_hours, 1),
+                "actual_hours": round(actual_hours, 1)
+            },
+            "recent_tasks": finished_tasks[:10] if finished_tasks else []
+        }
+    }
+
+
+@router.get("/personal/study-calendar/{user_id}")
+async def get_study_calendar(
+    user_id: int,
+    days: int = 365,
+    user: TokenModel = Depends(check_jwt_token),
+    db: Session = Depends(get_db)
+):
+    """获取学习日历热力图数据"""
+    from app.core.models.users import Users
+
+    # 权限检查
+    if user.id != user_id and user.role != "admin":
+        raise HTTPException(status_code=403, detail="无权访问此用户数据")
+
+    userid_str = str(user_id)
+    fn_file = f"static/tm/f{userid_str}.txt"
+
+    finished_tasks = read_user_file(fn_file)
+
+    # 按日期统计学习时长
+    daily_data = {}
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=days)
+
+    for task in finished_tasks:
+        if len(task) > 8:
+            date_str = task[8] if isinstance(task[8], str) else ""
+            duration = task[7] if len(task) > 7 and isinstance(task[7], (int, float)) else 0
+
+            if date_str:
+                if date_str not in daily_data:
+                    daily_data[date_str] = 0
+                daily_data[date_str] += duration / 60  # 转换为小时
+
+    # 格式化为日历热力图数据
+    calendar_data = []
+    for date, hours in daily_data.items():
+        try:
+            calendar_data.append({
+                "date": date,
+                "value": round(hours, 1),
+                "level": min(4, int(hours / 2))  # 0-4级热力
+            })
+        except:
+            continue
+
+    return {
+        "code": 200,
+        "data": calendar_data
+    }
+
+
+@router.get("/personal/course-progress/{user_id}")
+async def get_course_progress(
+    user_id: int,
+    user: TokenModel = Depends(check_jwt_token),
+    db: Session = Depends(get_db)
+):
+    """获取课程学习进度"""
+    from app.core.models.users import Users
+
+    # 权限检查
+    if user.id != user_id and user.role != "admin":
+        raise HTTPException(status_code=403, detail="无权访问此用户数据")
+
+    userid_str = str(user_id)
+    fn_file = f"static/tm/f{userid_str}.txt"
+
+    finished_tasks = read_user_file(fn_file)
+
+    # 统计课程学习记录
+    course_progress = {}
+    for task in finished_tasks:
+        if len(task) > 1:
+            theme = task[1] if isinstance(task[1], str) else ""
+            if theme.startswith("学习-"):
+                # 提取课程和课时
+                parts = theme.replace("学习-", "", 1).split("/")
+                course_name = parts[0] if parts else "未知课程"
+                lesson_name = task[3] if len(task) > 3 and isinstance(task[3], str) else ""
+
+                if course_name not in course_progress:
+                    course_progress[course_name] = {
+                        "course_name": course_name,
+                        "lessons": [],
+                        "total_hours": 0
+                    }
+
+                duration = task[7] if len(task) > 7 and isinstance(task[7], (int, float)) else 0
+                course_progress[course_name]["lessons"].append({
+                    "title": lesson_name,
+                    "duration": round(duration / 60, 1)  # 分钟转小时
+                })
+                course_progress[course_name]["total_hours"] += duration / 60
+
+    # 转换为列表并计算进度
+    progress_list = []
+    for course, data in course_progress.items():
+        progress_list.append({
+            "course_name": data["course_name"],
+            "lessons_count": len(data["lessons"]),
+            "total_hours": round(data["total_hours"], 1),
+            "recent_lessons": data["lessons"][-5:]  # 最近5个课时
+        })
+
+    # 按学习时长排序
+    progress_list.sort(key=lambda x: x["total_hours"], reverse=True)
+
+    return {
+        "code": 200,
+        "data": progress_list
+    }
+
+
+@router.get("/personal/time-analysis/{user_id}")
+async def get_time_analysis(
+    user_id: int,
+    days: int = 30,
+    user: TokenModel = Depends(check_jwt_token),
+    db: Session = Depends(get_db)
+):
+    """获取时间管理分析"""
+    from app.core.models.users import Users
+
+    # 权限检查
+    if user.id != user_id and user.role != "admin":
+        raise HTTPException(status_code=403, detail="无权访问此用户数据")
+
+    userid_str = str(user_id)
+    tm_file = f"static/tm/t{userid_str}.txt"
+    fn_file = f"static/tm/f{userid_str}.txt"
+
+    planned_tasks = read_user_file(tm_file)
+    finished_tasks = read_user_file(fn_file)
+
+    # 计算计划vs实际
+    total_planned = sum(len(t) > 4 and isinstance(t[4], (int, float)) and t[4] or 0 for t in planned_tasks) / 60
+    total_actual = sum(len(t) > 7 and isinstance(t[7], (int, float)) and t[7] or 0 for t in finished_tasks) / 60
+
+    # 按日期统计最近N天的完成情况
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=days)
+
+    daily_completion = {}
+    for task in finished_tasks:
+        if len(task) > 8:
+            date_str = task[8] if isinstance(task[8], str) else ""
+            duration = task[7] if len(task) > 7 and isinstance(task[7], (int, float)) else 0
+
+            try:
+                task_date = datetime.strptime(date_str, "%Y/%m/%d")
+                if start_date <= task_date <= end_date:
+                    if date_str not in daily_completion:
+                        daily_completion[date_str] = 0
+                    daily_completion[date_str] += duration / 60
+            except:
+                continue
+
+    # 按天统计
+    trend_data = []
+    current = start_date
+    while current <= end_date:
+        date_str = current.strftime("%Y/%m/%d")
+        trend_data.append({
+            "date": current.strftime("%Y-%m-%d"),
+            "value": round(daily_completion.get(date_str, 0), 1)
+        })
+        current += timedelta(days=1)
+
+    # 时间分布统计
+    time_distribution = {
+        "学习": 0,
+        "创作": 0,
+        "其他": 0
+    }
+
+    for task in finished_tasks:
+        if len(task) > 1:
+            theme = task[1] if isinstance(task[1], str) else ""
+            duration = task[7] if len(task) > 7 and isinstance(task[7], (int, float)) else 0
+
+            if theme.startswith("学习-"):
+                time_distribution["学习"] += duration / 60
+            elif theme.startswith("创作-"):
+                time_distribution["创作"] += duration / 60
+            else:
+                time_distribution["其他"] += duration / 60
+
+    distribution_data = [
+        {"name": k, "value": round(v, 1)}
+        for k, v in time_distribution.items()
+    ]
+
+    return {
+        "code": 200,
+        "data": {
+            "planned_hours": round(total_planned, 1),
+            "actual_hours": round(total_actual, 1),
+            "completion_rate": round(total_actual / total_planned * 100, 1) if total_planned > 0 else 0,
+            "trend": trend_data,
+            "distribution": distribution_data
+        }
+    }
+
+
+@router.get("/personal/trend")
+async def get_personal_trend_fixed(
+    days: int = 7,
+    user: TokenModel = Depends(check_jwt_token),
+    db: Session = Depends(get_db)
+):
+    """获取个人学习时长趋势（修复版，从真实文件读取）"""
+    userid_str = str(user.id)
+    fn_file = f"static/tm/f{userid_str}.txt"
+
+    finished_tasks = read_user_file(fn_file)
+
+    # 按日期统计
+    end_date = datetime.now()
+    start_date = end_date - timedelta(days=days)
+
+    daily_data = {}
+    for task in finished_tasks:
+        if len(task) > 8:
+            date_str = task[8] if isinstance(task[8], str) else ""
+            duration = task[7] if len(task) > 7 and isinstance(task[7], (int, float)) else 0
+
+            try:
+                task_date = datetime.strptime(date_str, "%Y/%m/%d")
+                if start_date <= task_date <= end_date:
+                    if date_str not in daily_data:
+                        daily_data[date_str] = 0
+                    daily_data[date_str] += duration / 60
+            except:
+                continue
+
+    # 生成完整的日期序列
+    trend_data = []
+    current = start_date
+    while current <= end_date:
+        date_str = current.strftime("%Y/%m/%d")
+        trend_data.append({
+            "date": current.strftime("%Y-%m-%d"),
+            "value": round(daily_data.get(date_str, 0), 1)
+        })
+        current += timedelta(days=1)
+
+    return {"code": 200, "data": trend_data}

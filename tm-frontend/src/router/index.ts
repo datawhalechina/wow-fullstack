@@ -120,9 +120,33 @@ const routes: Array<RouteRecordRaw> = [
         meta: { requiresAuth: true }
       },
       {
+        path: '/statistics/users',
+        name: 'UserLearningList',
+        component: () => import('../views/statistics/UserLearningList.vue'),
+        meta: { requiresAuth: true }
+      },
+      {
+        path: '/statistics/analysis',
+        name: 'UserAnalysis',
+        component: () => import('../views/statistics/UserAnalysis.vue'),
+        meta: { requiresAuth: true }
+      },
+      {
+        path: '/statistics/analysis/:id',
+        name: 'UserAnalysisDetail',
+        component: () => import('../views/statistics/UserAnalysis.vue'),
+        meta: { requiresAuth: true }
+      },
+      {
         path: '/admin/statistics',
         name: 'GlobalStatistics',
         component: () => import('../views/statistics/GlobalDashboard.vue'),
+        meta: { requiresAuth: true, requiresAdmin: true }
+      },
+      {
+        path: '/admin/statistics-config',
+        name: 'StatisticsConfig',
+        component: () => import('../views/admin/StatisticsConfig.vue'),
         meta: { requiresAuth: true, requiresAdmin: true }
       },
     ]

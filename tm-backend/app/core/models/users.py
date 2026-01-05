@@ -20,6 +20,7 @@ class Users(Base):
     desc = Column(VARCHAR(1000))
     register_time = Column(DateTime)
     last_login_time = Column(DateTime)
+    last_study_time = Column(DateTime)  # 最后学习时间
 
 class Register(Base):
     __tablename__ = 'register'
