@@ -114,9 +114,8 @@ def generate_password_reset_token(user_id: int) -> str:
     """
     生成密码重置token
     """
-    expires = datetime.utcnow() + timedelta(hours=24)
-    to_encode = {"exp": expires, "user_id": user_id}
-    return create_access_token(data=to_encode)
+    to_encode = {"user_id": user_id}
+    return create_access_token(data=to_encode, expires_delta=timedelta(hours=24))
 
 @router.post("/forgot-password")
 def forgot_password(phone: str, db: Session = Depends(get_db)):
