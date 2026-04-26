@@ -79,7 +79,7 @@ def parse_tutorial_structure():
                             num = int(''.join(filter(str.isdigit, title.split('课')[0].split('节')[-1])))
                             duration = num * 5  # 简单估算：每个数字5分钟
                             duration = min(max(duration, 15), 60)  # 限制在15-60分钟
-                        except:
+                        except (ValueError, IndexError):
                             pass
 
                     chapters[chapter_name]['lessons'].append({

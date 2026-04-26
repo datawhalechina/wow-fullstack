@@ -116,7 +116,7 @@ async def add_study_time(request: Request, user_id:int):
                 if line:
                     try:
                         line = ast.literal_eval(line)
-                    except:
+                    except Exception:
                         continue
             existing_pr.append(line)
 
