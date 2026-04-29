@@ -527,8 +527,8 @@ async def get_user_detail_analysis(
                 other_tasks.append(task)
 
     # 计算平均完成时间
-    planned_hours = sum(len(t) > 4 and t[4] or 0 for t in planned_tasks if isinstance(t[4], (int, float))) / 60
-    actual_hours = sum(len(t) > 7 and t[7] or 0 for t in finished_tasks if isinstance(t[7], (int, float))) / 60
+    planned_hours = sum(t[4] or 0 for t in planned_tasks if len(t) > 4 and isinstance(t[4], (int, float))) / 60
+    actual_hours = sum(t[7] or 0 for t in finished_tasks if len(t) > 7 and isinstance(t[7], (int, float))) / 60
 
     return {
         "code": 200,
