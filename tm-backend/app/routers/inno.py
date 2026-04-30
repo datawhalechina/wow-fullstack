@@ -100,8 +100,8 @@ async def add_study_time(request: Request, user_id:int):
                     elif 'taskinfo' in parsed:
                         tasklist_str = parsed['taskinfo'][0]
                         tasklist = json.loads(tasklist_str)
-                except Exception as parse_err:
-                    print(f"URL解析错误: {parse_err}")
+                except Exception:
+                    pass
 
         # 读取现有数据
         existing_pr = []
