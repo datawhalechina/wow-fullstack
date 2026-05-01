@@ -3,7 +3,7 @@ from pydantic import BaseModel, EmailStr
 
 class UserBase(BaseModel):
     id: Optional[int] = False
-    username: str = None
+    username: Optional[str] = None
     # pip install pydantic[email] 使用email验证的时候需要增加这个库
     email: Optional[EmailStr] = None
     role: Optional[str] = 'user'
@@ -12,12 +12,12 @@ class UserBase(BaseModel):
         from_attributes = True
 
 class TokenModel(UserBase):
-    atoken: str = None
-    rtoken: str = None
+    atoken: Optional[str] = None
+    rtoken: Optional[str] = None
 
 class LoginModel(BaseModel):
-    phone: str = None
-    password: str = None
+    phone: Optional[str] = None
+    password: Optional[str] = None
 
     class Config:
         from_attributes = True
