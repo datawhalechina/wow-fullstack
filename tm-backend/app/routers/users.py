@@ -82,7 +82,7 @@ def send_reset_password_email(email: str, reset_token: str):
     msg['Subject'] = '密码重置'
 
     # 邮件正文
-    reset_link = f"{settings.HOST}:{settings.PORT}/reset-password?token={reset_token}"
+    reset_link = f"http://{settings.HOST}:{settings.PORT}/reset-password?token={reset_token}"
     body = f"""
     您好,
 
