@@ -86,7 +86,6 @@ async def get_personal_trend(
 ):
     """获取个人学习时长趋势"""
     from app.core.models.users import Users
-    from datetime import datetime, timedelta
 
     end_date = datetime.now()
     start_date = end_date - timedelta(days=days)
@@ -260,7 +259,6 @@ async def get_growth_trend(
 ):
     """获取用户增长趋势"""
     from app.core.models.users import Users
-    from datetime import datetime, timedelta
     from sqlalchemy import cast, Date
 
     end_date = datetime.now()
