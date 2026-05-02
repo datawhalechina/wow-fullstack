@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     SQLALCHEMY_DATABASE_URL:str
     # SMTP 邮件配置（可选，配置后可发送密码重置邮件）
     SMTP_HOST:str = "smtp.163.com"
-    SMTP_PORT:int = 465
+    SMTP_PORT:int = 587
     SMTP_USER:str = ""
     SMTP_PASSWORD:str = ""
     # 兼容旧配置名
