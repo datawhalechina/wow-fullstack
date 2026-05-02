@@ -280,7 +280,7 @@ async def register(request: Request, name: str = Form(...), password: str = Form
         )
     return {"code": 200, "message":"OK"}
 
-@router.get("/fetch_registrations", dependencies=[Depends(check_jwt_token)])
+@router.get("/fetch_registrations")
 async def fetch_registrations(user: TokenModel = Depends(require_admin), db: Session = Depends(get_db)):
     result_proxy = db.query(Register).all()
     all_q_registrations = [{"id":row.id, "name":row.name, "phone":row.phone, "email":row.email, "notes":row.notes, "register_time":row.register_time} for row in result_proxy]
@@ -745,7 +745,7 @@ async def submit_profile(info: str = Form(...),
     return {"code": 200, "message":"OK"}
 
 
-@router.get("/fetch_all_users", dependencies=[Depends(check_jwt_token)])
+@router.get("/fetch_all_users")
 async def fetch_all_users(user: TokenModel = Depends(require_admin), db: Session = Depends(get_db)):
     """
     获取所有用户列表
