@@ -1,5 +1,4 @@
 from datetime import datetime
-from . import config
 from .database import SessionLocal
 from typing import Optional
 from fastapi import Header, HTTPException, status, Depends
