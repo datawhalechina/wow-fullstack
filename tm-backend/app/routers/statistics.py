@@ -332,7 +332,10 @@ async def get_users_learning_list(
     if bumen:
         query = query.filter(Users.bumen == bumen)
 
-    # 排序
+    # 排序（仅允许白名单字段）
+    allowed_sort_fields = {"learn_hour", "create_hour", "shuzhi", "id", "username"}
+    if sort_by not in allowed_sort_fields:
+        sort_by = "learn_hour"
     sort_column = getattr(Users, sort_by, Users.learn_hour)
     if sort_order == "desc":
         query = query.order_by(desc(sort_column))
