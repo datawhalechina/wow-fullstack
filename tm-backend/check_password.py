@@ -9,6 +9,9 @@ db = SessionLocal()
 phone = "15812345678"
 password = "zishu"
 user = db.query(Users).filter(Users.phone== phone).first()
+if not user:
+    print("用户不存在")
+    exit(1)
 rst = pwd_context.verify(password, user.password)
 print(user.username)
 print(rst)
