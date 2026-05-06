@@ -25,8 +25,8 @@ def read_user_file(filepath: str) -> List:
                             data.append(ast.literal_eval(line))
                         except (ValueError, SyntaxError):
                             continue
-        except Exception as e:
-            print(f"读取文件失败 {filepath}: {e}")
+        except Exception:
+            pass
     return data
 
 
