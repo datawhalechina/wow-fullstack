@@ -362,7 +362,7 @@ async def handle_changepass(newpass: str = Form(...), name: str = Form(...), use
     return {"code": 200, "message":"OK"}
 
 @router.post("/reset_pass")
-async def reset_pass(phone: str = Form(...), password: str = Form(...), db: Session = Depends(get_db)):
+async def reset_pass(phone: str = Form(...), password: str = Form(...), user: TokenModel = Depends(require_admin), db: Session = Depends(get_db)):
     # 验证密码强度
     is_valid, error_msg = validate_password_strength(password)
     if not is_valid:
@@ -492,7 +492,7 @@ async def reset_list():
     return parsed_list
 
 @router.post("/handle_reset_pass")
-async def handle_reset_pass(action: str = Form(...), id: int = Form(...), db: Session = Depends(get_db)):
+async def handle_reset_pass(action: str = Form(...), id: int = Form(...), user: TokenModel = Depends(require_admin), db: Session = Depends(get_db)):
     reset_file_path = "static/am/reset_pass.txt"
     reset_list = []
     
