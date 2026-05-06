@@ -174,29 +174,26 @@ e = math.e
                 'exitCode': -1
             }
         except Exception as e:
-            # Docker 不可用，回退到 subprocess 方式（注意：full_code 已在上面构造）
-            return self._execute_with_subprocess(code, timeout)
+            # Docker 不可用，回退到 subprocess 方式
+            return self._execute_with_subprocess(full_code, timeout)
 
     def _execute_with_subprocess(self, code: str, timeout: int) -> Dict[str, Any]:
         """
         使用 subprocess 执行 Python 代码（备用方案）
 
         Args:
-            code: Python 代码
+            code: Python 代码（已含预导入模块）
             timeout: 超时时间（秒）
 
         Returns:
             dict: { stdout, stderr, exitCode }
         """
-        # 在用户代码前添加预导入模块
-        full_code = self.PREIMPORTED_MODULES + '\n' + code
-
         python_cmd = self._get_python_command()
 
         try:
             # 使用 subprocess 运行 Python
             result = subprocess.run(
-                [python_cmd, '-c', full_code],
+                [python_cmd, '-c', code],
                 capture_output=True,
                 text=True,
                 timeout=timeout,
