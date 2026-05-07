@@ -602,7 +602,7 @@ async def get_study_calendar(
                 "value": round(hours, 1),
                 "level": min(4, int(hours / 2))  # 0-4级热力
             })
-        except (ValueError, SyntaxError):
+        except (ValueError, TypeError):
             continue
 
     return {
@@ -714,7 +714,7 @@ async def get_time_analysis(
                     if date_str not in daily_completion:
                         daily_completion[date_str] = 0
                     daily_completion[date_str] += duration / 60
-            except (ValueError, SyntaxError):
+            except (ValueError, TypeError):
                 continue
 
     # 按天统计
@@ -792,7 +792,7 @@ async def get_personal_trend_fixed(
                     if date_str not in daily_data:
                         daily_data[date_str] = 0
                     daily_data[date_str] += duration / 60
-            except (ValueError, SyntaxError):
+            except (ValueError, TypeError):
                 continue
 
     # 生成完整的日期序列
