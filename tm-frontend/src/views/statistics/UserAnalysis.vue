@@ -201,7 +201,7 @@ onMounted(() => {
         <!-- 用户信息卡片 -->
         <el-card v-if="userDetail?.user" class="user-info-card">
             <div class="user-header">
-                <el-avatar :size="80" :src="userDetail.user.avantar || ''">
+                <el-avatar :size="80" :src="userDetail.user.avatar || ''">
                     {{ userDetail.user.username?.charAt(0)?.toUpperCase() }}
                 </el-avatar>
                 <div class="user-details">
