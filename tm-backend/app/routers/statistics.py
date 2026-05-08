@@ -272,7 +272,7 @@ async def get_growth_trend(
     while current <= end_date:
         date_str = current.strftime("%Y-%m-%d")
         count = db.query(Users).filter(
-            cast(Users.register_time, Date) == current.date()
+            func.date(Users.register_time) == current.date()
         ).count()
         daily_stats.append({
             "date": date_str,
