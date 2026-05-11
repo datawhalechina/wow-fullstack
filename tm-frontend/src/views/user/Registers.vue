@@ -2,7 +2,7 @@
 import { fetchRigiAPI, handleRigiAPI } from '../../request/user/api'
 import { onMounted, ref, reactive } from 'vue'
 import { ElTable, ElMessage } from 'element-plus'
-import { Check, Delete } from '@element-plus/icons-vue'
+import { Check, Delete, Refresh } from '@element-plus/icons-vue'
 
 document.title = '注册审核'
 
