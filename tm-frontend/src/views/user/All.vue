@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { fetchAllUsersAPI } from '../../request/user/api'
-import { onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref, computed } from 'vue'
 import { useLoginStore } from '../../store'
 import { ElTable, ElMessage } from 'element-plus'
 
@@ -83,10 +83,6 @@ const maskPhone = (phone: string) => {
     </el-card>
   </div>
 </template>
-
-<script lang="ts">
-import { computed } from 'vue'
-</script>
 
 <style scoped>
 .all-container {
