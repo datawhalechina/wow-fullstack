@@ -316,7 +316,6 @@ async def get_users_learning_list(
     """获取所有用户学习情况列表（所有认证用户可见）"""
     from app.core.models.users import Users
     from app.core.models.config import SystemConfig
-    from sqlalchemy import or_
 
     # 获取不活跃阈值配置
     config = db.query(SystemConfig).filter(SystemConfig.key == "inactive_days_threshold").first()
