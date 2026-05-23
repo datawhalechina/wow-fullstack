@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ChangePassAPI } from '../../request/user/api'
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 import type { FormInstance, FormRules } from 'element-plus'
 import { useLoginStore } from '../../store'
 import { ElMessage } from 'element-plus'
@@ -20,6 +20,20 @@ interface RuleForm {
 const form = reactive<RuleForm>({
   password: '',
   checkpass: ''
+})
+
+const passwordStrength = computed(() => {
+  const pwd = form.password
+  if (!pwd) return { level: 0, text: '', color: '#dcdfe6' }
+  let score = 0
+  if (pwd.length >= 6) score++
+  if (pwd.length >= 10) score++
+  if (/[a-z]/.test(pwd) && /[A-Z]/.test(pwd)) score++
+  if (/\d/.test(pwd)) score++
+  if (/[^a-zA-Z0-9]/.test(pwd)) score++
+  if (score <= 1) return { level: 1, text: '弱', color: '#f56c6c' }
+  if (score <= 3) return { level: 2, text: '中', color: '#e6a23c' }
+  return { level: 3, text: '强', color: '#67c23a' }
 })
 
 const validateCheckPass = (rule: any, value: any, callback: any) => {
@@ -96,6 +110,17 @@ const handleSubmit = async (formEl: FormInstance | undefined) => {
             show-password
             clearable
           />
+          <div v-if="form.password" class="password-strength">
+            <el-progress
+              :percentage="passwordStrength.level * 33"
+              :color="passwordStrength.color"
+              :stroke-width="6"
+              :show-text="false"
+            />
+            <span class="strength-text" :style="{ color: passwordStrength.color }">
+              {{ passwordStrength.text }}
+            </span>
+          </div>
         </el-form-item>
 
         <el-form-item label="确认密码" prop="checkpass">
@@ -144,5 +169,22 @@ const handleSubmit = async (formEl: FormInstance | undefined) => {
 .submit-btn {
   width: 100%;
   margin-top: 20px;
+}
+
+.password-strength {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  width: 100%;
+}
+
+.password-strength .el-progress {
+  flex: 1;
+}
+
+.strength-text {
+  font-size: 12px;
+  white-space: nowrap;
 }
 </style>
