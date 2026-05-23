@@ -864,8 +864,8 @@ async def add_shuzhi(request: Request, db: Session = Depends(get_db)):
             db.commit()
 
         return {"code": 200, "message": "添加成功"}
-    except Exception as e:
-        return {"code": 500, "message": str(e)}
+    except Exception:
+        return {"code": 500, "message": "操作失败，请稍后重试"}
 
 
 @router.post("/update_user_role")
@@ -887,9 +887,9 @@ async def update_user_role(request: Request, user: TokenModel = Depends(require_
         db.commit()
 
         return {"code": 200, "message": "角色更新成功"}
-    except Exception as e:
+    except Exception:
         db.rollback()
-        return {"code": 500, "message": str(e)}
+        return {"code": 500, "message": "操作失败，请稍后重试"}
 
 
 @router.get("/fetch_permissions")
@@ -943,5 +943,5 @@ async def save_permissions(request: Request, user: TokenModel = Depends(require_
                 f.write(str(perm) + "\n")
 
         return {"code": 200, "message": "权限配置已保存"}
-    except Exception as e:
-        return {"code": 500, "message": str(e)}
+    except Exception:
+        return {"code": 500, "message": "操作失败，请稍后重试"}
