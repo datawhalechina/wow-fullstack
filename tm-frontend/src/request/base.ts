@@ -28,7 +28,7 @@ async function refreshToken() {
 // request拦截器
 instance.interceptors.request.use(
     config => {
-        if (loginstate.atoken == '') {
+        if (loginstate.atoken === '') {
             //添加请求头
             config.headers["token"] = loginstate.rtoken
         } else {
