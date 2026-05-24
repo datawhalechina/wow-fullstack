@@ -664,8 +664,6 @@ async def get_profile(*, user_id: int, user: TokenModel = Depends(check_jwt_toke
     rtn['location']=useritem.location or ''
     rtn['desc']=useritem.desc or ''
     save_base_dir = "static/uploads/profiles/"
-    if not os.path.exists(save_base_dir):
-        os.makedirs(save_base_dir)
     tmplist = []
     for i in range(0,5):
         pattern = str(user_id)+"_"+str(i)+"*.jpg"
