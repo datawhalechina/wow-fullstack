@@ -182,7 +182,7 @@ router.beforeEach(async (to, from, next) => {
 
   const isAuthenticated = userStore.logined && !!userStore.atoken
   const userRole = userStore.role || 'user'
-  const isAdmin = userStore.id === 1 || userRole === 'admin'
+  const isAdmin = userRole === 'admin'
 
   // 需要认证的路由
   if (to.meta.requiresAuth) {
