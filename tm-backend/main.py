@@ -12,6 +12,11 @@ from app.routers import code_execution
 from app.routers import config
 
 from app.config import settings
+from app.core.models.users import Base
+from app.database import engine
+
+# 初始化数据库表结构
+Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 app.mount("/api/static", StaticFiles(directory="static"), name="static")

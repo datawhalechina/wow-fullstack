@@ -8,8 +8,6 @@ from app.database import engine
 import json, os, ast
 
 
-Base.metadata.create_all(bind=engine)
-
 inno = APIRouter(
     prefix="/api/inno",
     tags=["inno"],
