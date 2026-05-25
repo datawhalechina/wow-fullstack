@@ -290,7 +290,6 @@ const submitReport = async () => {
 const beforeUnload = () => {
   if (studyTimer.value > 60) {
     // 实际项目中这里可以发送请求
-    console.log('学习时长:', studyTimer.value)
   }
 }
 
