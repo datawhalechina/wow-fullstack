@@ -250,9 +250,7 @@ async def register(request: Request, name: str = Form(...), password: str = Form
             detail=error_msg
         )
     
-    print(name, email)
     form_data = await request.form()
-    print(form_data.get("phone"))
     # 检查手机号是否已注册
     existing_user = db.query(Users).filter(Users.phone == phone).first()
     existing_register = db.query(Register).filter(Register.phone == phone).first()
