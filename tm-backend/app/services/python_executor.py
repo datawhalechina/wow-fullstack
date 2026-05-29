@@ -4,11 +4,9 @@ Python 代码执行器
 """
 import asyncio
 import re
-import sys
 import platform
 from typing import Dict, Any
 import subprocess
-import shlex
 
 
 class PythonExecutor:

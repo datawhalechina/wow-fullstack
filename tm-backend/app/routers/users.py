@@ -1,9 +1,8 @@
-from fastapi import APIRouter, Form, Depends, HTTPException, status, Request, UploadFile, File
+from fastapi import APIRouter, Form, Depends, HTTPException, status, Request
 from datetime import datetime, timedelta
 from app.dependencies import check_jwt_token, get_db, verify_password, get_password_hash, require_admin
 from app.config import settings
 from jose import jwt
-import requests
 import os
 import json
 import glob
@@ -12,7 +11,7 @@ import re  # 添加re模块用于正则表达式验证
 from typing import Optional
 from app.core.schemas.users import UserBase, TokenModel
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc 
+from sqlalchemy import desc 
 from app.core.models.users import Base, Users, Register
 from app.database import engine
 from email.mime.text import MIMEText

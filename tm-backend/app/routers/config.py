@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import Dict, Any, List
+from typing import Dict
 from datetime import datetime
 
 from app.dependencies import check_jwt_token, get_db, require_admin
