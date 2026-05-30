@@ -5,6 +5,9 @@ from datetime import datetime, timedelta
 from typing import Optional, List
 import os
 import ast
+import logging
+
+logger = logging.getLogger(__name__)
 
 from app.dependencies import check_jwt_token, get_db, require_admin
 from app.core.schemas.users import TokenModel
@@ -26,7 +29,7 @@ def read_user_file(filepath: str) -> List:
                         except (ValueError, SyntaxError):
                             continue
         except Exception as e:
-            print(f"读取文件失败 {filepath}: {e}")
+            logger.warning("读取文件失败 %s: %s", filepath, e)
     return data
 
 

@@ -6,6 +6,9 @@ from app.core.schemas.users import UserBase
 from app.core.models.users import Users, Base
 from app.database import engine
 import json, os, ast
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 Base.metadata.create_all(bind=engine)
@@ -101,7 +104,7 @@ async def add_study_time(request: Request, user_id:int):
                         tasklist_str = parsed['taskinfo'][0]
                         tasklist = json.loads(tasklist_str)
                 except Exception as parse_err:
-                    print(f"URL解析错误: {parse_err}")
+                    logger.warning("URL解析错误: %s", parse_err)
 
         # 读取现有数据
         existing_pr = []
