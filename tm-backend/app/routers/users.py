@@ -1,8 +1,11 @@
 from fastapi import APIRouter, Form, Depends, HTTPException, status, Request, UploadFile, File
 from datetime import datetime, timedelta
+import logging
 from app.dependencies import check_jwt_token, get_db, verify_password, get_password_hash, require_admin
 from app.config import settings
 from jose import jwt
+
+logger = logging.getLogger(__name__)
 import requests
 import os
 import json
@@ -250,9 +253,9 @@ async def register(request: Request, name: str = Form(...), password: str = Form
             detail=error_msg
         )
     
-    print(name, email)
+    logger.debug("用户注册: name=%s, email=%s", name, email)
     form_data = await request.form()
-    print(form_data.get("phone"))
+    logger.debug("注册手机号: %s", form_data.get("phone"))
     # 检查手机号是否已注册
     existing_user = db.query(Users).filter(Users.phone == phone).first()
     existing_register = db.query(Register).filter(Register.phone == phone).first()
