@@ -26,7 +26,7 @@ def read_user_file(filepath: str) -> List:
                         except (ValueError, SyntaxError):
                             continue
         except Exception as e:
-            print(f"读取文件失败 {filepath}: {e}")
+            logger.warning("读取文件失败 %s: %s", filepath, e)
     return data
 
 
