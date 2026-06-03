@@ -2,7 +2,7 @@ from fastapi import APIRouter, Form, Depends, HTTPException, status, Request
 from datetime import datetime, timedelta
 from app.dependencies import check_jwt_token, get_db
 from sqlalchemy.orm import Session
-from app.core.schemas.users import UserBase
+from app.core.schemas.users import TokenModel
 from app.core.models.users import Users, Base
 from app.database import engine
 import json, os, ast
@@ -18,7 +18,9 @@ inno = APIRouter(
 
 
 @inno.get('/get_tm/{user_id}')
-async def get_tm(user_id:int):
+async def get_tm(user_id: int, user: Users = Depends(check_jwt_token)):
+    if user_id != user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="无权访问其他用户数据")
     userid = str(user_id)
     pr = []
     fn = []
@@ -34,7 +36,9 @@ async def get_tm(user_id:int):
     return {"pr":pr, "fn":fn}
 
 @inno.get('/get_pr/{user_id}')
-async def get_pr(user_id:int):
+async def get_pr(user_id: int, user: Users = Depends(check_jwt_token)):
+    if user_id != user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="无权访问其他用户数据")
     userid = str(user_id)
     pr = []
     if os.path.exists(f"static/tm/t{userid}.txt"):
@@ -44,7 +48,9 @@ async def get_pr(user_id:int):
     return pr
 
 @inno.put('/save_pr/{user_id}')
-async def save_pr(request: Request, user_id:int):
+async def save_pr(request: Request, user_id: int, user: Users = Depends(check_jwt_token)):
+    if user_id != user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="无权访问其他用户数据")
     userid = str(user_id)
     form_data = await request.form()
     # 尝试多种参数格式
@@ -57,7 +63,9 @@ async def save_pr(request: Request, user_id:int):
     return {"code": "200"}
 
 @inno.put('/finish_tm/{user_id}')
-async def finish_tm(request: Request, user_id:int):
+async def finish_tm(request: Request, user_id: int, user: Users = Depends(check_jwt_token)):
+    if user_id != user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="无权访问其他用户数据")
     userid = str(user_id)
     form_data = await request.form()
     # 尝试多种参数格式
@@ -72,8 +80,10 @@ async def finish_tm(request: Request, user_id:int):
 
 
 @inno.post('/add_study_time/{user_id}')
-async def add_study_time(request: Request, user_id:int):
+async def add_study_time(request: Request, user_id: int, user: Users = Depends(check_jwt_token)):
     """添加学习时间到时间管理"""
+    if user_id != user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="无权访问其他用户数据")
     userid = str(user_id)
     try:
         content_type = request.headers.get("content-type", "")
@@ -101,6 +111,8 @@ async def add_study_time(request: Request, user_id:int):
                         tasklist_str = parsed['taskinfo'][0]
                         tasklist = json.loads(tasklist_str)
                 except Exception as parse_err:
+                    import logging
+                    logger = logging.getLogger(__name__)
                     logger.warning("URL解析错误: %s", parse_err)
 
         # 读取现有数据
