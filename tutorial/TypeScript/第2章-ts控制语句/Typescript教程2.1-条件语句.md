@@ -20,7 +20,7 @@ TypeScript if 语句由一个布尔表达式后跟一个或多个语句组成。
 语法格式如下所示：
 ```typescript
 if(boolean_expression){
-    # 在布尔表达式 boolean_expression 为 true 执行
+    // 在布尔表达式 boolean_expression 为 true 执行
 }
 
 ```
@@ -42,9 +42,9 @@ if (num > 0) {
 
 ```typescript
 if(boolean_expression){
-   # 在布尔表达式 boolean_expression 为 true 执行
+   // 在布尔表达式 boolean_expression 为 true 执行
 }else{
-   # 在布尔表达式 boolean_expression 为 false 执行
+   // 在布尔表达式 boolean_expression 为 false 执行
 }
 ```
 
@@ -66,13 +66,13 @@ if...else if....else 语句在执行多个判断条件的时候很有用。
 
 ```typescript
 if(boolean_expression 1) {
-    # 在布尔表达式 boolean_expression 1 为 true 执行
+    // 在布尔表达式 boolean_expression 1 为 true 执行
 } else if( boolean_expression 2) {
-    # 在布尔表达式 boolean_expression 2 为 true 执行
+    // 在布尔表达式 boolean_expression 2 为 true 执行
 } else if( boolean_expression 3) {
-    # 在布尔表达式 boolean_expression 3 为 true 执行
+    // 在布尔表达式 boolean_expression 3 为 true 执行
 } else {
-    # 布尔表达式的条件都为 false 时执行
+    // 布尔表达式的条件都为 false 时执行
 }
 ```
 
