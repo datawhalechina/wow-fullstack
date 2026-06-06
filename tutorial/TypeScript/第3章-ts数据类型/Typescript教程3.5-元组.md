@@ -16,13 +16,13 @@ console.log(tuple.length); // 输出 3
 ### 内置方法：
 
 1.  **concat(...items: ConcatArray[]): T[]:** 
-   - 描述：连接两个或多个数组或值，并返回一个新数组。
+   - 描述：连接两个或多个数组或值，并返回一个新数组（注意：concat 始终返回数组类型，而非元组类型）。
    - 示例：
 ```typescript
 let tuple1: [string, number] = ["Hello", 42];
 let tuple2: [boolean] = [true];
 let result = tuple1.concat(tuple2);
-console.log(result); // 输出 ["Hello", 42, true]
+console.log(result); // 输出 ["Hello", 42, true] - 类型为 (string | number | boolean)[]
 ```
  
 

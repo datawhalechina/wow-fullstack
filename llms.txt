@@ -1,0 +1,47 @@
+# wow-fullstack Project Documentation
+
+## Project Overview
+wow-fullstack is a fullstack learning project maintained by DataWhale.
+
+## Repository Structure
+
+- `tm-frontend/` - Frontend application (Vue 3 + Element Plus + TypeScript)
+- `tm-backend/` - Backend API (FastAPI + Python)
+- `tm-docs/` - Documentation
+- `tm-guide/` - Guides
+- `tutorial/` - Learning tutorials
+- `react-tutorial/` - React tutorials
+
+## Tech Stack
+
+### Frontend
+- Vue 3
+- TypeScript
+- Vite
+- Element Plus
+- Pinia
+- Monaco Editor
+- ECharts
+
+### Backend
+- FastAPI
+- Python
+
+## Getting Started
+
+### Frontend
+```bash
+cd tm-frontend
+npm install
+npm run dev
+```
+
+### Backend
+```bash
+cd tm-backend
+pip install -r requirements.txt
+uvicorn main:app --reload
+```
+
+## API Documentation
+See `tm-docs/` directory for API documentation.
