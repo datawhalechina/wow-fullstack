@@ -621,12 +621,12 @@ async def save_profile(request: Request, user: TokenModel = Depends(check_jwt_to
         user_id = form.get("id") or str(user.id)
         serial = 4
         for i in range(0, 5):
-            pattern = str(user_id) + "_" + str(i) + "*.jpg"
+            pattern = str(user_id) + "_" + str(i) + "*" + file_extension
             if not glob.glob(os.path.join(save_base_dir, pattern)):
                 serial = i
                 break
         
-        filename = str(user_id) + "_" + str(serial) + "_" + timestamp + ".jpg"
+        filename = str(user_id) + "_" + str(serial) + "_" + timestamp + file_extension
         file_path = os.path.join(save_base_dir, filename)
         
         # 使用上下文管理器确保文件正确关闭
