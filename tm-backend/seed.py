@@ -1,5 +1,6 @@
 from app.core.models.users import Users
 from app.dependencies import get_password_hash
+from app.config import settings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
@@ -12,7 +13,7 @@ def create_directory(directory):
 create_directory("static")
 create_directory("static/profiles")
 create_directory("static/tm")
-engine = create_engine("sqlite:///mydatabase.db")
+engine = create_engine(settings.SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 db = SessionLocal()
 new_user = Users(

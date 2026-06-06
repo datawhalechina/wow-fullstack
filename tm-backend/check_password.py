@@ -1,9 +1,10 @@
 from passlib.context import CryptContext
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 from app.core.models.users import Users
+from app.config import settings
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-engine = create_engine("sqlite:///mydatabase.db")
+engine = create_engine(settings.SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 db = SessionLocal()
 phone = "15812345678"
