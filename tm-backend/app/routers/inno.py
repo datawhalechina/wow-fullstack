@@ -6,6 +6,9 @@ from app.core.schemas.users import UserBase
 from app.core.models.users import Users, Base
 from app.database import engine
 import json, os, ast
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 Base.metadata.create_all(bind=engine)

@@ -1,4 +1,5 @@
 import uvicorn
+import logging
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -12,6 +13,12 @@ from app.routers import code_execution
 from app.routers import config
 
 from app.config import settings
+
+# 配置日志格式
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+)
 
 app = FastAPI()
 app.mount("/api/static", StaticFiles(directory="static"), name="static")
