@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useLoginStore } from '../../store'
+import { ElMessage } from 'element-plus'
 import {
     fetchPersonalOverviewAPI,
     fetchPersonalTrendAPI,
