@@ -81,49 +81,6 @@ async def get_personal_overview(
     }
 
 
-@router.get("/personal/trend")
-async def get_personal_trend(
-    days: int = 7,
-    user: TokenModel = Depends(check_jwt_token),
-    db: Session = Depends(get_db)
-):
-    """获取个人学习时长趋势"""
-    from app.core.models.users import Users
-    from datetime import datetime, timedelta
-
-    end_date = datetime.now()
-    start_date = end_date - timedelta(days=days)
-
-    # 按天统计学习时长
-    daily_stats = []
-    current = start_date
-    while current <= end_date:
-        date_str = current.strftime("%Y-%m-%d")
-        daily_stats.append({
-            "date": date_str,
-            "value": 0
-        })
-        current += timedelta(days=1)
-
-    # 从数据库获取学习记录
-    records = db.query(Users).filter(
-        Users.id == user.id
-    ).first()
-
-    # 返回模拟数据（实际项目中应该从study_time表获取）
-    # 这里返回最近7天的模拟数据
-    import random
-    trend_data = []
-    for i in range(days):
-        date = (end_date - timedelta(days=days - i - 1)).strftime("%Y-%m-%d")
-        trend_data.append({
-            "date": date,
-            "value": round(random.uniform(0.5, 4.0), 1)
-        })
-
-    return {"code": 200, "data": trend_data}
-
-
 @router.get("/personal/shuzhi-history")
 async def get_shuzhi_history(
     user: TokenModel = Depends(check_jwt_token)
@@ -768,12 +725,12 @@ async def get_time_analysis(
 
 
 @router.get("/personal/trend")
-async def get_personal_trend_fixed(
+async def get_personal_trend(
     days: int = 7,
     user: TokenModel = Depends(check_jwt_token),
     db: Session = Depends(get_db)
 ):
-    """获取个人学习时长趋势（修复版，从真实文件读取）"""
+    """获取个人学习时长趋势"""
     userid_str = str(user.id)
     fn_file = f"static/tm/f{userid_str}.txt"
 
