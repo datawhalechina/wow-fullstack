@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from typing import Optional, List
 import os
 import ast
+import asyncio
 import logging
 
 logger = logging.getLogger(__name__)
@@ -347,14 +348,14 @@ async def get_users_learning_list(
     users = query.offset((page - 1) * page_size).limit(page_size).all()
 
     # 获取每个用户的课程进度
+    userid_strs = [str(u.id) for u in users]
+    fn_files = [f"static/tm/f{userid_str}.txt" for userid_str in userid_strs]
+    finished_tasks_list = await asyncio.gather(
+        *(asyncio.to_thread(read_user_file, fn_file) for fn_file in fn_files)
+    )
+
     users_data = []
-    for u in users:
-        userid_str = str(u.id)
-
-        # 读取已完成任务获取课程学习记录
-        fn_file = f"static/tm/f{userid_str}.txt"
-        finished_tasks = read_user_file(fn_file)
-
+    for u, finished_tasks in zip(users, finished_tasks_list):
         # 统计学习相关课程
         courses_completed = 0
         courses_in_progress = set()
