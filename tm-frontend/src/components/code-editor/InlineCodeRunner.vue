@@ -4,6 +4,7 @@ import MonacoEditor from './MonacoEditor.vue'
 import ExecutionResult from './ExecutionResult.vue'
 import type { ExecutionOutput } from './ExecutionResult.vue'
 import { SUPPORTED_LANGUAGES, normalizeLanguage } from '@/utils/languageMapping'
+import { executeCode } from '@/composables/useCodeExecution'
 
 interface Props {
   code: string
@@ -57,7 +58,6 @@ const runCode = async () => {
   output.value = null
 
   try {
-    const { executeCode } = await import('@/composables/useCodeExecution')
     output.value = await executeCode(selectedLanguage.value, localCode.value)
   } catch (error: any) {
     output.value = {
