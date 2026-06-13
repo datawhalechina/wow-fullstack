@@ -1,0 +1,22 @@
+[
+  {"file": "tm-backend/app/routers/inno.py", "line": 104, "severity": "LOW", "type": "print_statement", "description": "print(f\"URL解析错误: {parse_err}\") - 调试用print语句残留", "suggested_fix": "使用日志模块替代print语句，如 logging.error()"},
+  {"file": "tm-backend/app/routers/users.py", "line": 222, "severity": "LOW", "type": "print_statement", "description": "#print(rtn) - 注释掉的调试print语句", "suggested_fix": "删除注释掉的print语句或使用日志模块"},
+  {"file": "tm-backend/app/routers/users.py", "line": 253, "severity": "LOW", "type": "print_statement", "description": "print(name, email) - 调试用print语句残留", "suggested_fix": "使用日志模块替代print语句"},
+  {"file": "tm-backend/app/routers/users.py", "line": 255, "severity": "LOW", "type": "print_statement", "description": "print(form_data.get(\"phone\")) - 调试用print语句残留", "suggested_fix": "使用日志模块替代print语句"},
+  {"file": "tm-backend/app/routers/statistics.py", "line": 29, "severity": "LOW", "type": "print_statement", "description": "print(f\"读取文件失败 {filepath}: {e}\") - 调试用print语句残留", "suggested_fix": "使用日志模块替代print语句，如 logging.error()"},
+  {"file": "tm-backend/app/dependencies.py", "line": 56, "severity": "LOW", "type": "print_statement", "description": "# print(expiration_time) - 注释掉的调试print语句", "suggested_fix": "删除注释掉的print语句"},
+  {"file": "tm-backend/check_password.py", "line": 13, "severity": "LOW", "type": "print_statement", "description": "print(user.username) - 调试用print语句残留", "suggested_fix": "删除或使用日志模块"},
+  {"file": "tm-backend/check_password.py", "line": 14, "severity": "LOW", "type": "print_statement", "description": "print(rst) - 调试用print语句残留", "suggested_fix": "删除或使用日志模块"},
+  {"file": "tutorial/FastAPI/第6章-FastAPI MCP/main.py", "line": 91, "severity": "LOW", "type": "print_statement", "description": "print(f\"关键错误：无法从配置加载EdDSA私钥。错误: {e}\") - 调试用print语句残留", "suggested_fix": "使用日志模块替代print语句"},
+  {"file": "tm-backend/app/routers/users.py", "line": 85, "severity": "MEDIUM", "type": "password_in_url", "description": "密码信息出现在URL中: reset_link包含reset_token", "suggested_fix": "通过安全通道传递重置令牌，避免在URL中暴露敏感信息"},
+  {"file": "tm-backend/app/routers/statistics.py", "line": 118, "severity": "LOW", "type": "B311_random", "description": "使用标准伪随机数生成器(random.uniform)，不适合安全/加密用途", "suggested_fix": "使用 secrets 模块或 os.urandom() 替代"},
+  {"file": "tm-backend/app/services/python_executor.py", "line": 10, "severity": "LOW", "type": "B404_subprocess", "description": "导入subprocess模块，存在潜在安全风险", "suggested_fix": "确保subprocess调用的输入经过严格验证和消毒"},
+  {"file": "tm-backend/app/services/python_executor.py", "line": 150, "severity": "MEDIUM", "type": "B108_hardcoded_tmp", "description": "硬编码临时目录/tmp，存在安全风险", "suggested_fix": "使用 tempfile.gettempdir() 或 tempfile.mkdtemp() 获取临时目录"},
+  {"file": "tm-backend/app/services/python_executor.py", "line": 198, "severity": "LOW", "type": "B603_subprocess", "description": "subprocess调用未检查执行输入", "suggested_fix": "确保所有输入经过验证，考虑使用shell=False并传入列表形式的命令"},
+  {"file": "tm-backend/check_password.py", "line": 10, "severity": "LOW", "type": "B105_hardcoded_password", "description": "硬编码密码: 'zishu'", "suggested_fix": "使用环境变量或配置文件存储密码"},
+  {"file": "tutorial/FastAPI/第6章-FastAPI MCP/main.py", "line": 98, "severity": "MEDIUM", "type": "B105_hardcoded_password", "description": "可能的硬编码密码: 'None'", "suggested_fix": "使用环境变量或安全的配置管理"},
+  {"file": "tutorial/FastAPI/第6章-FastAPI MCP/main.py", "line": 104, "severity": "MEDIUM", "type": "B105_hardcoded_password", "description": "可能的硬编码密码: 'zishu.co'", "suggested_fix": "使用环境变量或安全的配置管理"},
+  {"file": "tutorial/FastAPI/第6章-FastAPI MCP/main.py", "line": 215, "severity": "MEDIUM", "type": "B113_request_without_timeout", "description": "requests.get调用未设置timeout参数", "suggested_fix": "添加timeout参数，如 requests.get(url, headers=headers, params=params, timeout=30)"},
+  {"file": "tutorial/FastAPI/第6章-FastAPI MCP/main.py", "line": 226, "severity": "MEDIUM", "type": "B113_request_without_timeout", "description": "requests.get调用未设置timeout参数", "suggested_fix": "添加timeout参数，如 requests.get(url, headers=headers, params=params, timeout=30)"},
+  {"file": "tutorial/FastAPI/第6章-FastAPI MCP/main.py", "line": 345, "severity": "MEDIUM", "type": "B104_bind_all_interfaces", "description": "绑定到所有网络接口0.0.0.0", "suggested_fix": "仅在需要时绑定到特定接口，如 127.0.0.1 用于本地开发"}
+]

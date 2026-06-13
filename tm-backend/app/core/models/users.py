@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, Float, VARCHAR, Sequence, DateTime
+from sqlalchemy import Column, Integer, Float, VARCHAR, DateTime
 from app.database import Base
 
 class Users(Base):
