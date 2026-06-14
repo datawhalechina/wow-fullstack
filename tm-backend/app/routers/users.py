@@ -793,20 +793,6 @@ def validate_password_strength(password: str) -> tuple[bool, str]:
     return True, ""
 
 
-def validate_password_format(password: str) -> bool:
-    """
-    简单验证密码格式（用于已有函数兼容）
-    至少8位，包含数字和字母
-    """
-    if len(password) < 8:
-        return False
-    if not re.search(r"[0-9]", password):
-        return False
-    if not re.search(r"[A-Za-z]", password):
-        return False
-    return True
-
-
 @router.get("/fetch_shuzhi")
 async def fetch_shuzhi(userid: int):
     """获取用户塾值记录"""
